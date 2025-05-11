@@ -1,26 +1,63 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+	--text-primary : #0A2540;
+  --text-secondary : #425466;
+  --text-tetiary : #8E98A3;
+
+  --bg-primary : #FFFFFF;
+  --bg-secondary : #F4F4F4;
+  --bg-tetiary : #EBEBEB;
+  --bg-quantinary : #D0D0D0;
+  --bg-primary-lighter : #FBFBFB;
+
+  --border-primary : #E4E4E4;
+  --border-secondary : #F7F7F7;
+  --border-tetiary : #DDDDDD;
+
+  --main-primary : #6060D0;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@theme {
+	--color-text-primary : var(--text-primary);
+  --color-text-secondary : var(--text-secondary);
+  --color-text-tetiary : var(--text-tetiary);
+
+  --color-bg-primary : var(--bg-primary);
+  --color-bg-secondary : var(--bg-secondary);
+  --color-bg-tetiary : var(--bg-tetiary);
+  --color-bg-quantinary : var(--bg-quantinary);
+  --color-bg-primary-lighter : var(--bg-primary-lighter);
+
+  --color-border-primary : var(--border-primary);
+  --color-border-secondary : var(--border-secondary);
+  --color-border-tetiary : var(--border-tetiary);
+
+  --color-main-primary : var(--main-primary);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --bg-primary : #FFFFFF;
+    --bg-secondary : #F4F4F4;
+    --bg-tetiary : #EBEBEB;
+    --bg-quantinary : #D0D0D0;
+    --bg-primary-lighter : #FBFBFB;
+
+    --border-primary : #E4E4E4;
+    --border-secondary : #F7F7F7;
+    --border-tetiary : #DDDDDD;
+
+    --text-primary : #0A2540;
+    --text-secondary : #425466;
+    --text-tetiary : #8E98A3;
+
+    --main-primary : #6060D0;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
   font-family: Arial, Helvetica, sans-serif;
 }
