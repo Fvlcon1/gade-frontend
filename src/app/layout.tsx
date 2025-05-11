@@ -9,8 +9,8 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "PAIV Admin",
-  description: "PAIV Admin",
+  title: "GADE",
+  description: "GADE",
 };
 
 export default function RootLayout({
