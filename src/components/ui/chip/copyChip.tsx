@@ -1,6 +1,6 @@
 "use client";
 
-import Pressable from "@components/button/pressable";
+import Pressable from "@components/ui/button/pressable";
 import Text from "@styles/components/text";
 import theme from "@styles/theme";
 import { ReactNode, useState } from "react";

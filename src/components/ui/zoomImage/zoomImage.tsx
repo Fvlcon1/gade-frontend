@@ -1,4 +1,4 @@
-import Overlay from "@components/overlay/overlay"
+import Overlay from "@components/ui/overlay/overlay"
 import { AnimatePresence } from "framer-motion"
 import Image from "next/image"
 

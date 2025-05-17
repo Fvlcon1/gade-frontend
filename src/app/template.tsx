@@ -1,4 +1,4 @@
-import MouseTrail from "@components/mouse-trail/mouse-trail";
+import MouseTrail from "@components/ui/mouse-trail/mouse-trail";
 import Slidein from "@styles/components/slidein";
 
 const Template = ({children}: {children: React.ReactNode}) => {

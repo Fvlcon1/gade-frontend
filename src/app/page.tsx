@@ -1,42 +1,33 @@
+'use client';
+import { usePathname } from 'next/navigation';
 import Image from "next/image";
-import Button from "@components/button/button";
+import Button from "@components/ui/button/button";
 import { IoAddCircleOutline } from "react-icons/io5";
-import OutlineButton from "@components/button/outlineButton";
-import Text from "@styles/components/text";
+import OutlineButton from "@components/ui/button/outlineButton";
 import theme from "@styles/theme";
+import LeftPanel from "@components/layout/LeftPanel/LeftPanel";
+import Mid from "@components/layout/MiddlePanel/Mid";
+import { menuItems } from "@components/layout/LeftPanel/menuItems";
+import Right from '@components/layout/RightPanel/Right';
 
 export default function Home() {
-	return (
-		<>
-			<div className="p-4 flex items-center justify-center gap-6">
-				<Button
-					text="Button"
-					icon={<IoAddCircleOutline />}
-					loading
-					loadingColor="white"
-				/>
-				<Button
-					text="Button"
-					icon={<IoAddCircleOutline />}
-					loadingColor="white"
-				/>
-				<OutlineButton
-					text="Button"
-					icon={<IoAddCircleOutline />}
-				/>
-				<OutlineButton
-					text="Button"
-					icon={<IoAddCircleOutline />}
-					loading
-				/>
-				<Text>Sample Text</Text>
-				<Text
-					size={theme.text.size.HL}
-					bold={theme.text.bold.lg}
-				>
-					Sample Text
-				</Text>
-			</div>
-		</>
-	);
+  const pathname = usePathname();
+  const activeItem = menuItems.find((item) => item.href === pathname);
+  const activeTitle = activeItem?.title || "Dashboard";
+  
+
+  const ActiveIcon = activeItem?.icon;
+  const activeIcon = ActiveIcon ? <ActiveIcon size={20} /> : null;
+
+  return (
+    <div className="flex w-screen h-screen overflow-hidden pl-2.5">
+  <LeftPanel />
+  <Mid 
+    activeTitle={activeTitle} 
+    activeIcon={activeIcon}
+    isActive={true}
+  />
+  <Right />
+</div>
+  );
 }

@@ -16,6 +16,24 @@
   --border-tetiary : #DDDDDD;
 
   --main-primary : #6060D0;
+  --main-primary-20: rgba(96, 96, 208, 0.2);
+  --main-primary-70: rgba(96, 96, 208, 0.7);
+  --bg-under-review: rgba(255, 203, 48, 0.13);
+  --under-review-text: rgba(215, 127, 3, 1);
+  --bg-verified: rgba(48, 179, 255, 0.13);
+  --verified-text: rgba(15, 122, 172, 1);
+  --bg-notified: rgba(158, 48, 255, 0.13);
+  --notified-text: rgba(163, 57, 216, 1);
+  --bg-resolved: rgba(48, 255, 62, 0.13);
+  --resolved-text: rgba(39, 145, 66, 1);
+
+
+
+
+
+
+
+
 }
 
 @theme {
@@ -34,6 +52,7 @@
   --color-border-tetiary : var(--border-tetiary);
 
   --color-main-primary : var(--main-primary);
+  
 }
 
 @media (prefers-color-scheme: dark) {
@@ -53,6 +72,8 @@
     --text-tetiary : #8E98A3;
 
     --main-primary : #6060D0;
+    --main-primary-20: rgba(96, 96, 208, 0.2);
+    --main-primary-70: rgba(96, 96, 208, 0.7);
   }
 }
 
@@ -60,4 +81,14 @@ body {
   background: var(--color-bg-primary);
   color: var(--color-text-primary);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
 }
