@@ -6,7 +6,7 @@ const ResolvedCasesCard = () => {
   return (
     <div className="relative w-[214px] h-[99px] rounded-[15px] overflow-hidden">
       <Image
-        src="/assets/Mid/metric%20card%20(4).png" // URL-encoded space
+        src="/assets/Mid/metric-card-4.png"
         alt="Resolved Cases Card"
         fill
         className="object-cover rounded-[15px]"

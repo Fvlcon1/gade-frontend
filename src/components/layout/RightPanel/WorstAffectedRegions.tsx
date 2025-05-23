@@ -20,8 +20,8 @@ const WorstAffectedRegions = () => {
   const maxValue = Math.max(...affectedRegions.map((r) => r.value));
 
   return (
-    <div className="w-[352px] h-[265px] rounded-[10px] flex flex-col justify-between mt-10">
-      {/* Header */}
+    <div className="w-[354px] h-[265px] rounded-[10px] flex flex-col justify-between mt-10">
+      
       <div className="flex items-center w-[164px] h-[18px] justify-between">
         <div className="w-[18px] h-[18px] bg-[var(--main-primary-20)] rounded-md flex items-center justify-center">
           <MdBarChart className="text-[var(--color-main-primary)]" size={13} />
@@ -35,7 +35,7 @@ const WorstAffectedRegions = () => {
         </Text>
       </div>
 
-      {/* Bars */}
+      
       <div className="flex flex-col gap-[10px] mt-4">
         {affectedRegions.map((region) => (
           <div
@@ -76,7 +76,7 @@ const WorstAffectedRegions = () => {
       <div className="flex items-center gap-2 mt-3 bg-[var(--color-bg-tetiary)] text-[var(--color-main-primary)] rounded-full px-3 py-1 w-fit min-h-[32px]">
         <FaInfoCircle size={12} />
         <Text
-          size={theme.text.size.XS}
+          size={theme.text.size.SM}
           bold={theme.text.bold.sm}
           className="!text-[var(--color-main-primary)]"
         >
@@ -88,7 +88,7 @@ const WorstAffectedRegions = () => {
 
       <div className="mt-[50px] w-full h-[33px] flex justify-center items-center ">
           <Text
-          size={theme.text.size.XS}
+          size={theme.text.size.SM}
           bold={theme.text.bold.sm}
           className="!text-[var(--color-main-primary)]"
         >

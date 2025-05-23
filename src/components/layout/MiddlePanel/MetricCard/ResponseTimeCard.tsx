@@ -6,7 +6,7 @@ const ResponseTimeCard = () => {
   return (
     <div className="relative w-[214px] h-[99px] rounded-[15px] overflow-hidden">
       <Image
-        src="/assets/Mid/metric%20card%20(1).png"
+        src="/assets/Mid/metric-card-1.png"
         alt="Response Time Card"
         fill
         className="object-cover rounded-[15px]"

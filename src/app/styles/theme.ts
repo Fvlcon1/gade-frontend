@@ -26,6 +26,7 @@ export const theme = {
     colors,
     text: {
         size: { 
+            SM: TypographySize.SM,
             body: TypographySize.body,
             HL: TypographySize.HL,
             HM: TypographySize.HM,

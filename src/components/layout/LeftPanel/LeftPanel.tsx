@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation"; 
 import { menuItems } from "./menuItems";
 import Link from "next/link";
@@ -12,18 +12,27 @@ export const getActiveMenuItem = (pathname: string) => {
   return menuItems.find((item) => item.href === pathname);
 };
 
-const LeftPanel = () => {
+const LeftPanel = ({ onExpandChange }) => {
   const pathname = usePathname();
   const activeItem = getActiveMenuItem(pathname);
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // Notify parent component when expansion state changes
+  useEffect(() => {
+    onExpandChange?.(isExpanded);
+  }, [isExpanded, onExpandChange]);
+
+  const toggleExpansion = () => {
+    setIsExpanded(!isExpanded);
+  };
 
   return (
     <div
       className={`${
         isExpanded ? "w-[214px]" : "w-[54px]"
-      } h-full bg-[#F8F9FB] border-[0.5px] border-[var(--color-border-primary)] rounded-xl flex flex-col py-3 px-2 transition-all duration-500 ease-in-out relative`}
+      } h-full bg-white/50 backdrop-blur-md  border-[0.5px] border-[var(--color-border-primary)] rounded-xl flex flex-col py-3 px-2 transition-all duration-500 ease-in-out relative `}
     >
-      {/* Top Section */}
+      
       <div className={`flex flex-col ${isExpanded ? "items-start" : "items-center"} gap-4`}>
         <div className="flex items-center justify-between w-full relative group">
           <div className="flex items-center gap-2">
@@ -39,9 +48,9 @@ const LeftPanel = () => {
             {isExpanded && <span className="text-[16px] font-semibold text-[#B58A3D]">GADE</span>}
           </div>
 
-          {/* Expand/Collapse Icon - Dynamically positioned */}
+          
           <div
-            onClick={() => setIsExpanded(!isExpanded)}
+            onClick={toggleExpansion}
             className={`absolute top-1/2 transform -translate-y-1/2 w-[25px] h-[25px] bg-[var(--color-bg-tetiary)] rounded-full flex items-center justify-center cursor-pointer transition-all duration-500 ease-in-out active:scale-90
               ${
                 isExpanded 
@@ -63,7 +72,7 @@ const LeftPanel = () => {
         <div className="w-full h-px bg-[var(--color-border-primary)]" />
       </div>
 
-      {/* Menu Items */}
+      
       <div className={`flex flex-col ${isExpanded ? "items-start" : "items-center"} gap-1 mt-2`}>
         <span className={`text-xs text-gray-400 px-2 ${isExpanded ? "self-start" : "hidden"}`}>Main</span>
         {menuItems.map((item, index) => {
@@ -100,7 +109,7 @@ const LeftPanel = () => {
         })}
       </div>
 
-      {/* Bottom Section */}
+      
       <div className={`mt-auto flex flex-col ${isExpanded ? "items-start" : "items-center"} gap-2`}>
         <div className="w-full h-px bg-[var(--color-border-primary)] my-1" />
 

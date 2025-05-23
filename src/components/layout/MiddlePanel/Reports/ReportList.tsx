@@ -10,6 +10,7 @@ const statusStyles = {
   'verified': 'bg-[var(--bg-verified)] text-[var(--verified-text)]',
   'notified': 'bg-[var(--bg-notified)] text-[var(--notified-text)]',
   'resolved': 'bg-[var(--bg-resolved)] text-[var(--resolved-text)]',
+  'default': "bg-gray-200 text-gray-800",
   
 };
 

@@ -2,11 +2,11 @@
 import React from "react";
 import Image from "next/image";
 
-const ResponseTimeCard = () => {
+const ResolvedCasesCard = () => {
   return (
     <div className="relative w-[214px] h-[99px] rounded-[15px] overflow-hidden">
       <Image
-        src="/assets/Mid/metric%20card%20(3).png"
+        src="/assets/Mid/metric-card-3.png"
         alt="Response Time Card"
         fill
         className="object-cover rounded-[15px]"
@@ -16,4 +16,4 @@ const ResponseTimeCard = () => {
   );
 };
 
-export default ResponseTimeCard;
+export default ResolvedCasesCard;

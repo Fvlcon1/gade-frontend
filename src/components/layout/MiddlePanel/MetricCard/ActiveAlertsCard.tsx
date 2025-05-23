@@ -5,7 +5,7 @@ const ActiveAlertsCard = () => {
   return (
       <div className="relative w-[214px] h-[99px] rounded-[15px] overflow-hidden">
         <Image
-          src="/assets/Mid/metric%20card%20(2).png" // URL-encoded space
+          src="/assets/Mid/metric-card-3.png"
           alt="Resolved Cases Card"
           fill
           className="object-cover rounded-[15px]"

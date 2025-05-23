@@ -13,7 +13,7 @@ import Right from '@components/layout/RightPanel/Right';
 export default function Home() {
   const pathname = usePathname();
   const activeItem = menuItems.find((item) => item.href === pathname);
-  const activeTitle = activeItem?.title || "Dashboard";
+  const activeTitle = activeItem?.label || "Dashboard";
   
 
   const ActiveIcon = activeItem?.icon;
