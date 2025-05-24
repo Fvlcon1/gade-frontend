@@ -13,15 +13,15 @@ export default function Home() {
   const ActiveIcon = activeItem?.icon;
   const activeIcon = ActiveIcon ? <ActiveIcon size={20} /> : null;
 
-  // 👇 Sidebar expansion state
+  
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
 
   return (
     <div className="flex w-screen h-screen overflow-hidden bg-white pl-2.5">
-      {/* Sidebar */}
+     
       <LeftPanel onExpandChange={setSidebarExpanded} />
 
-      {/* Main content */}
+      
       
     </div>
   );
