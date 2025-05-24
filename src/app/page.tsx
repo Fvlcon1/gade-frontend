@@ -1,5 +1,6 @@
 'use client';
 import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 import Image from "next/image";
 import Button from "@components/ui/button/button";
 import { IoAddCircleOutline } from "react-icons/io5";
@@ -12,22 +13,23 @@ import Right from '@components/layout/RightPanel/Right';
 
 export default function Home() {
   const pathname = usePathname();
+  const [isExpanded, setIsExpanded] = useState(false); // ⬅️ Expansion state
+
   const activeItem = menuItems.find((item) => item.href === pathname);
   const activeTitle = activeItem?.label || "Dashboard";
-  
 
   const ActiveIcon = activeItem?.icon;
   const activeIcon = ActiveIcon ? <ActiveIcon size={20} /> : null;
 
   return (
     <div className="flex w-screen h-screen overflow-hidden pl-2.5">
-  <LeftPanel />
-  <Mid 
-    activeTitle={activeTitle} 
-    activeIcon={activeIcon}
-    isActive={true}
-  />
-  <Right />
-</div>
+      <LeftPanel onExpandChange={setIsExpanded} />
+      <Mid 
+        activeTitle={activeTitle} 
+        activeIcon={activeIcon}
+        isActive={true}
+      />
+      <Right />
+    </div>
   );
 }

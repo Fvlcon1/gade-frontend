@@ -1,0 +1,28 @@
+'use client';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
+import LeftPanel from "@components/layout/LeftPanel/LeftPanel";
+import { menuItems } from "@components/layout/LeftPanel/menuItems";
+import Title from '@components/layout/Reports/Title';
+
+
+export default function Home() {
+  const pathname = usePathname();
+  const activeItem = menuItems.find((item) => item.href === pathname);
+  const activeTitle = activeItem?.label || "Reports";
+  const ActiveIcon = activeItem?.icon;
+  const activeIcon = ActiveIcon ? <ActiveIcon size={20} /> : null;
+
+  // 👇 Sidebar expansion state
+  const [sidebarExpanded, setSidebarExpanded] = useState(false);
+
+  return (
+    <div className="flex w-screen h-screen overflow-hidden bg-white pl-2.5">
+      {/* Sidebar */}
+      <LeftPanel onExpandChange={setSidebarExpanded} />
+
+      {/* Main content */}
+      
+    </div>
+  );
+}
