@@ -30,7 +30,7 @@ const LeftPanel = ({ onExpandChange }) => {
     <div
       className={`${
         isExpanded ? "w-[214px]" : "w-[54px]"
-      } h-full bg-white/50 backdrop-blur-md  border-[0.5px] border-[var(--color-border-primary)] rounded-xl flex flex-col py-3 px-2 transition-all duration-500 ease-in-out relative `}
+      } h-full bg-white/90 backdrop-blur-md  border-[0.5px] border-[var(--color-border-primary)] rounded-xl flex flex-col py-3 px-2 transition-all duration-500 ease-in-out relative `}
     >
       
       <div className={`flex flex-col ${isExpanded ? "items-start" : "items-center"} gap-4`}>

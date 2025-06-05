@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { IoMdClose } from "react-icons/io";
 import { FaPlay, FaChevronDown, FaChevronRight, FaCalendar } from "react-icons/fa";
 
@@ -23,12 +23,16 @@ const TimelineController = ({ isOpen, onClose, sidebarExpanded = false }) => {
   const [range, setRange] = useState([0, months.length - 1]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
-const [isComparisonCollapsed, setIsComparisonCollapsed] = useState(false);
-const [startDate, setStartDate] = useState("");
-const [endDate, setEndDate] = useState("");
-
+  const [isComparisonCollapsed, setIsComparisonCollapsed] = useState(false);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleReset = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
     setRange([0, months.length - 1]);
     setIsPlaying(false);
   };
@@ -41,15 +45,46 @@ const [endDate, setEndDate] = useState("");
   };
 
   useEffect(() => {
-    if (!isPlaying) return;
+    // Cleanup function to clear any existing timeout
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isPlaying) {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      return;
+    }
+
     if (range[0] >= range[1]) {
       handleReset();
       return;
     }
-    const timeout = setTimeout(() => {
+
+    // Clear any existing timeout before setting a new one
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    // Set a new timeout with a reasonable duration
+    timeoutRef.current = setTimeout(() => {
       setRange(([from, to]) => [from + 1, to]);
     }, 800);
-    return () => clearTimeout(timeout);
+
+    // Cleanup function
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
   }, [range, isPlaying]);
 
   const handleRangeChange = (index, value) => {
