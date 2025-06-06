@@ -1,4 +1,3 @@
-// components/InteractiveMapClient.tsx
 "use client";
 import React, { useMemo, useState, useEffect } from "react";
 import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
@@ -35,83 +34,6 @@ const MouseCoordinateDisplay = () => {
     </div>
   );
 };
-
-// Removed: Component to add drawing and print controls
-// Removed: const MapControls = () => {
-// Removed:   const map = useMap();
-// Removed:   // Use state to hold the feature group, initializing as null
-// Removed:   const [editableFeatureGroup, setEditableFeatureGroup] = useState<L.FeatureGroup | null>(null);
-
-// Removed:   useEffect(() => {
-// Removed:     if (!map) return;
-
-// Removed:     // Create and add the feature group to the map
-// Removed:     const featureGroup = new (L as any).FeatureGroup();
-// Removed:     map.addLayer(featureGroup);
-// Removed:     setEditableFeatureGroup(featureGroup);
-
-// Removed:     // Clean up the feature group on component unmount
-// Removed:     return () => {
-// Removed:       if (map.hasLayer(featureGroup)) {
-// Removed:         map.removeLayer(featureGroup);
-// Removed:       }
-// Removed:     };
-
-// Removed:   }, [map]);
-
-// Removed:   // Placeholder handlers for drawing events
-// Removed:   const onCreated = (e: any) => {
-// Removed:     const layer = e.layer;
-// Removed:     console.log('Layer created:', layer);
-// Removed:     // Add the drawn layer to the editable feature group
-// Removed:     if (editableFeatureGroup) {
-// Removed:       editableFeatureGroup.addLayer(layer);
-// Removed:     }
-// Removed:     // Do something with the drawn layer, e.g., save to state or send to server
-// Removed:   };
-
-// Removed:   const onEdited = (e: any) => {
-// Removed:     const layers = e.layers;
-// Removed:     console.log('Layers edited:', layers);
-// Removed:     // Do something with the edited layers
-// Removed:   };
-
-// Removed:   const onDeleted = (e: any) => {
-// Removed:     const layers = e.layers;
-// Removed:     console.log('Layers deleted:', layers);
-// Removed:     // Do something with the deleted layers
-// Removed:   };
-
-// Removed:   return (
-// Removed:     <>
-// Removed:       {/* Render EditControl only when featureGroup is initialized */}
-// Removed:       {editableFeatureGroup && (
-// Removed:         <EditControl
-// Removed:           position="topright"
-// Removed:           onCreated={onCreated}
-// Removed:           onEdited={onEdited}
-// Removed:           onDeleted={onDeleted}
-// Removed:           draw={{
-// Removed:             rectangle: true,
-// Removed:             polygon: true,
-// Removed:             polyline: true,
-// Removed:             circle: true,
-// Removed:             marker: true,
-// Removed:             circlemarker: true,
-// Removed:           }}
-// Removed:           edit={{
-// Removed:             // Enable editing and provide the feature group
-// Removed:             remove: true,
-// Removed:             featureGroup: editableFeatureGroup,
-// Removed:           }}
-// Removed:         />
-// Removed:       )}
-// Removed:     </>
-// Removed:   );
-// Removed: };
-
-// Removed: Dynamically import MapControls to ensure it's client-side rendered
-// Removed: const DynamicMapControls = dynamic(() => Promise.resolve(MapControls), { ssr: false });
 
 interface Layer {
   id: string;
@@ -165,7 +87,7 @@ const LAYER_STYLES = {
   },
 };
 
-// Highlight styles for all layers on hover
+// Highlight styles (kept for reference but no longer used for hover)
 const HIGHLIGHT_STYLE = {
   mining_sites: {
     color: "#FF6B6B", // Brighter red
@@ -293,7 +215,7 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
       {/* Basemap */}
       <TileLayer
         url={BASEMAP_URLS[activeBasemap]}
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
 
       {/* Feature Layers */}
@@ -312,7 +234,7 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
                 const district = feature.properties.district;
                 const isSelected = selectedDistricts.includes(district);
                 
-                // Only add tooltip and hover effects if district is selected or no districts are selected
+                // Only add tooltip if district is selected or no districts are selected
                 if (selectedDistricts.length === 0 || isSelected) {
                   // Add tooltip with district and region info in a more compact format
                   const tooltipContent = feature.properties.region 
@@ -323,19 +245,6 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
                     direction: 'top',
                     offset: [0, -5],
                     className: 'district-tooltip'
-                  });
-
-                  // Add hover effects
-                  leafletLayer.on({
-                    mouseover: (e) => {
-                      const layer = e.target;
-                      layer.setStyle(HIGHLIGHT_STYLE.admin);
-                      layer.bringToFront();
-                    },
-                    mouseout: (e) => {
-                      const layer = e.target;
-                      layer.setStyle(getDistrictStyle(feature));
-                    }
                   });
                 }
               }}
@@ -355,19 +264,6 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
                 const date = new Date(feature.properties.detected_date).toLocaleDateString();
                 const tooltipContent = `Detected: ${date}${feature.properties.district ? `\nDistrict: ${feature.properties.district}` : ''}`;
                 leafletLayer.bindTooltip(tooltipContent);
-
-                // Add hover effects
-                leafletLayer.on({
-                  mouseover: (e) => {
-                    const layer = e.target;
-                    layer.setStyle(HIGHLIGHT_STYLE[layer.id]);
-                    layer.bringToFront();
-                  },
-                  mouseout: (e) => {
-                    const layer = e.target;
-                    layer.setStyle(LAYER_STYLES[layer.id]);
-                  }
-                });
               }}
             />
           );
@@ -381,17 +277,6 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
             style={LAYER_STYLES[layer.id]}
             onEachFeature={(feature, leafletLayer) => {
               leafletLayer.bindTooltip(feature.properties.name || 'Unnamed');
-              leafletLayer.on({
-                mouseover: (e) => {
-                  const layer = e.target;
-                  layer.setStyle(HIGHLIGHT_STYLE[layer.id]);
-                  layer.bringToFront();
-                },
-                mouseout: (e) => {
-                  const layer = e.target;
-                  layer.setStyle(LAYER_STYLES[layer.id]);
-                }
-              });
             }}
           />
         );
