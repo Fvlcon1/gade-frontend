@@ -83,43 +83,43 @@ export function UserTable({
   selectedStatus,
   onFilterChange,
 }: UserTableProps) {
-const columns: ColumnDef<User>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <div className="flex items-center justify-center">
-        <Checkbox
-          checked={table.getIsAllPageRowsSelected()}
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      </div>
-    ),
-    cell: ({ row }) => (
-      <div className="flex items-center justify-center">
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      </div>
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "name",
-    header: "Name",
-    cell: ({ row }) => <div className="font-medium">{row.getValue("name")}</div>,
-  },
-  {
-    accessorKey: "email",
-    header: "Email",
-    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
-  },
-  {
-    accessorKey: "role",
-    header: "Role",
+  const columns: ColumnDef<User>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <div className="flex items-center justify-center">
+          <Checkbox
+            checked={table.getIsAllPageRowsSelected()}
+            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            aria-label="Select all"
+          />
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+          />
+        </div>
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "name",
+      header: "Name",
+      cell: ({ row }) => <div className="font-medium">{row.getValue("name")}</div>,
+    },
+    {
+      accessorKey: "email",
+      header: "Email",
+      cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+    },
+    {
+      accessorKey: "role",
+      header: "Role",
       cell: ({ row }) => {
         const role = row.original.role;
         let variant: "default" | "secondary" | "destructive" | "outline" = "outline";
@@ -153,10 +153,10 @@ const columns: ColumnDef<User>[] = [
           </Badge>
         );
       },
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
       cell: ({ row }) => {
         const status = row.original.status;
         let variant: "default" | "secondary" | "destructive" | "outline" = "outline";
@@ -186,55 +186,55 @@ const columns: ColumnDef<User>[] = [
           </Badge>
         );
       },
-  },
-  {
-    accessorKey: "department",
-    header: "Department",
-    cell: ({ row }) => (
-      <Select defaultValue={row.original.department}>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Select Department" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="sales">Sales</SelectItem>
-          <SelectItem value="engineering">Engineering</SelectItem>
-          <SelectItem value="marketing">Marketing</SelectItem>
-          <SelectItem value="support">Support</SelectItem>
-        </SelectContent>
-      </Select>
-    ),
-  },
-  {
-    accessorKey: "lastLogin",
-    header: "Last Login",
-    cell: ({ row }) => (
-      <div className="text-muted-foreground">
-        {row.original.lastLogin ? new Date(row.original.lastLogin).toLocaleDateString() : "N/A"}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "createdAt",
-    header: "Created At",
-    cell: ({ row }) => (
-      <div className="text-muted-foreground">
-        {new Date(row.original.createdAt).toLocaleDateString()}
-      </div>
-    ),
-  },
-  {
-    id: "actions",
-    cell: ({ row }) => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
-            <IconDotsVertical className="h-4 w-4" />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem>Edit</DropdownMenuItem>
-          <DropdownMenuItem>View Details</DropdownMenuItem>
+    },
+    {
+      accessorKey: "department",
+      header: "Department",
+      cell: ({ row }) => (
+        <Select defaultValue={row.original.department}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select Department" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="sales">Sales</SelectItem>
+            <SelectItem value="engineering">Engineering</SelectItem>
+            <SelectItem value="marketing">Marketing</SelectItem>
+            <SelectItem value="support">Support</SelectItem>
+          </SelectContent>
+        </Select>
+      ),
+    },
+    {
+      accessorKey: "lastLogin",
+      header: "Last Login",
+      cell: ({ row }) => (
+        <div className="text-muted-foreground">
+          {row.original.lastLogin ? new Date(row.original.lastLogin).toLocaleDateString() : "N/A"}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "createdAt",
+      header: "Created At",
+      cell: ({ row }) => (
+        <div className="text-muted-foreground">
+          {new Date(row.original.createdAt).toLocaleDateString()}
+        </div>
+      ),
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <IconDotsVertical className="h-4 w-4" />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuItem>View Details</DropdownMenuItem>
             {row.original.status === 'active' ? (
               <DropdownMenuItem onClick={() => onStatusChange(row.original.id, 'inactive')}>Deactivate</DropdownMenuItem>
             ) : (
@@ -255,15 +255,15 @@ const columns: ColumnDef<User>[] = [
 
              {row.original.role !== 'super admin' && (
                 <>
-          <DropdownMenuSeparator />
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem className="text-destructive" onClick={() => onRemoveUser(row.original.id)}>Remove Account</DropdownMenuItem>
                 </>
              )}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
-  },
-]
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ]
 
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(

@@ -6,7 +6,6 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import { useSpatialStore } from '@/lib/store/spatialStore';
-import type { Layer as LeafletLayer } from 'leaflet';
 
 const MouseCoordinateDisplay = () => {
   const map = useMap();
@@ -166,12 +165,32 @@ const LAYER_STYLES = {
   },
 };
 
-// Highlight style for selected districts only
-const SELECTED_DISTRICT_STYLE = {
-  color: "#FFA500", // Orange
-  weight: 2,
-  opacity: 0.8,
-  fillOpacity: 0.4,
+// Highlight styles for all layers on hover
+const HIGHLIGHT_STYLE = {
+  mining_sites: {
+    color: "#FF6B6B", // Brighter red
+    weight: 3,
+    opacity: 1,
+    fillOpacity: 0.4,
+  },
+  forest: {
+    color: "#66BB6A", // Brighter green
+    weight: 3,
+    opacity: 1,
+    fillOpacity: 0.4,
+  },
+  admin: {
+    color: "#FFA500", // Orange
+    weight: 2,
+    opacity: 0.8,
+    fillOpacity: 0.4,
+  },
+  rivers: {
+    color: "#29B6F6", // Brighter blue
+    weight: 3,
+    opacity: 1,
+    fillOpacity: 0.5,
+  }
 };
 
 // Add custom styles for tooltips
@@ -196,40 +215,6 @@ const tooltipStyles = `
   }
 `;
 
-// Style for districts based on selection
-const getDistrictStyle = (feature: any) => {
-  const { selectedDistricts, pendingDistricts, isFilterApplied } = useSpatialStore.getState();
-  const district = feature.properties.district;
-
-  // If no districts are selected, show default style
-  if (pendingDistricts.length === 0 && selectedDistricts.length === 0) {
-    return LAYER_STYLES.admin;
-  }
-
-  // If district is selected but not yet applied (yellow highlight)
-  if (pendingDistricts.includes(district) && !isFilterApplied) {
-    return {
-      color: "#eab308", // yellow-500
-      weight: 2,
-      opacity: 0.8,
-      fillOpacity: 0.3,
-    };
-  }
-
-  // If district is in final selection (primary color)
-  if (selectedDistricts.includes(district) && isFilterApplied) {
-    return {
-      color: "var(--color-main-primary)",
-      weight: 2,
-      opacity: 0.8,
-      fillOpacity: 0.3,
-    };
-  }
-
-  // Hide unselected districts
-  return { ...LAYER_STYLES.admin, opacity: 0, fillOpacity: 0 };
-};
-
 const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers }) => {
   const { 
     miningSites,
@@ -239,8 +224,17 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
     forestReserves, 
     rivers, 
     isLoading, 
-    error
+    error, 
+    selectedDistricts,
+    highlightedDistricts,
+    dateRange,
+    applyFilters 
   } = useSpatialStore();
+
+  // Apply filters when they change
+  useEffect(() => {
+    applyFilters();
+  }, [selectedDistricts, dateRange, applyFilters]);
 
   // Memoize filtered data to prevent unnecessary recalculations
   const filteredLayerData = useMemo(() => {
@@ -249,28 +243,33 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
     return {
       mining_sites: filteredMiningSites,
       forest: forestReserves,
-      admin: filteredDistricts,
+      admin: filteredDistricts, // Use filtered districts
       rivers: rivers,
     };
   }, [filteredDistricts, filteredMiningSites, forestReserves, rivers]);
 
-  // Update the onEachFeature to show tooltips only for selected districts
-  const onEachFeature = (feature: any, layer: LeafletLayer) => {
-    const { selectedDistricts, pendingDistricts } = useSpatialStore.getState();
+  // Style for districts based on selection and highlighting
+  const getDistrictStyle = (feature: any) => {
     const district = feature.properties.district;
-    
-    // Only show tooltip if district is selected or no districts are selected
-    if (district && (selectedDistricts.length === 0 || selectedDistricts.includes(district) || pendingDistricts.includes(district))) {
-      const tooltipContent = feature.properties.region 
-        ? `${district} • ${feature.properties.region}`
-        : district;
-      layer.bindTooltip(tooltipContent, {
-        permanent: false,
-        direction: 'top',
-        offset: [0, -5],
-        className: 'district-tooltip'
-      });
+    const isHighlighted = highlightedDistricts.includes(district);
+    const isSelected = selectedDistricts.includes(district);
+
+    // If no districts are selected, show all with default style
+    if (selectedDistricts.length === 0) {
+      return isHighlighted ? HIGHLIGHT_STYLE.admin : LAYER_STYLES.admin;
     }
+
+    // If districts are selected, only show selected ones
+    if (!isSelected) {
+      return { ...LAYER_STYLES.admin, opacity: 0, fillOpacity: 0 };
+    }
+
+    return isHighlighted ? HIGHLIGHT_STYLE.admin : {
+      color: "#4CAF50", // Green for selected
+      weight: 2,
+      opacity: 0.8,
+      fillOpacity: 0.3,
+    };
   };
 
   if (isLoading) {
@@ -308,8 +307,38 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
             <GeoJSON
               key={layer.id}
               data={data}
-              style={getDistrictStyle}
-              onEachFeature={onEachFeature}
+              style={(feature) => getDistrictStyle(feature)}
+              onEachFeature={(feature, leafletLayer) => {
+                const district = feature.properties.district;
+                const isSelected = selectedDistricts.includes(district);
+                
+                // Only add tooltip and hover effects if district is selected or no districts are selected
+                if (selectedDistricts.length === 0 || isSelected) {
+                  // Add tooltip with district and region info in a more compact format
+                  const tooltipContent = feature.properties.region 
+                    ? `${district} • ${feature.properties.region}`
+                    : district;
+                  leafletLayer.bindTooltip(tooltipContent, {
+                    permanent: false,
+                    direction: 'top',
+                    offset: [0, -5],
+                    className: 'district-tooltip'
+                  });
+
+                  // Add hover effects
+                  leafletLayer.on({
+                    mouseover: (e) => {
+                      const layer = e.target;
+                      layer.setStyle(HIGHLIGHT_STYLE.admin);
+                      layer.bringToFront();
+                    },
+                    mouseout: (e) => {
+                      const layer = e.target;
+                      layer.setStyle(getDistrictStyle(feature));
+                    }
+                  });
+                }
+              }}
             />
           );
         }
@@ -322,9 +351,23 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
               data={data}
               style={LAYER_STYLES[layer.id]}
               onEachFeature={(feature, leafletLayer) => {
+                // Add tooltip with detection date and district
                 const date = new Date(feature.properties.detected_date).toLocaleDateString();
                 const tooltipContent = `Detected: ${date}${feature.properties.district ? `\nDistrict: ${feature.properties.district}` : ''}`;
                 leafletLayer.bindTooltip(tooltipContent);
+
+                // Add hover effects
+                leafletLayer.on({
+                  mouseover: (e) => {
+                    const layer = e.target;
+                    layer.setStyle(HIGHLIGHT_STYLE[layer.id]);
+                    layer.bringToFront();
+                  },
+                  mouseout: (e) => {
+                    const layer = e.target;
+                    layer.setStyle(LAYER_STYLES[layer.id]);
+                  }
+                });
               }}
             />
           );
@@ -338,6 +381,17 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
             style={LAYER_STYLES[layer.id]}
             onEachFeature={(feature, leafletLayer) => {
               leafletLayer.bindTooltip(feature.properties.name || 'Unnamed');
+              leafletLayer.on({
+                mouseover: (e) => {
+                  const layer = e.target;
+                  layer.setStyle(HIGHLIGHT_STYLE[layer.id]);
+                  layer.bringToFront();
+                },
+                mouseout: (e) => {
+                  const layer = e.target;
+                  layer.setStyle(LAYER_STYLES[layer.id]);
+                }
+              });
             }}
           />
         );

@@ -40,10 +40,10 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
   const [activeRange, setActiveRange] = useState("Yesterday");
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
-  const [localPendingDistricts, setLocalPendingDistricts] = useState<string[]>([]);
+  const [pendingDistricts, setPendingDistricts] = useState<string[]>([]);
   const { 
     setSelectedDistricts, 
-    setPendingDistricts,
+    setHighlightedDistricts,
     setDateRange, 
     dateRange: storeDateRange,
     selectedDistricts: storeSelectedDistricts,
@@ -51,7 +51,6 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
   } = useSpatialStore();
   const months = getLastSixMonths();
   const [monthRange, setMonthRange] = useState([0, months.length - 1]);
-  const [isFilterApplied, setIsFilterApplied] = useState(false);
 
   // All refs
   const searchResultsRef = useRef<HTMLDivElement>(null);
@@ -64,17 +63,17 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
   // Process districts data
   const { districtsToShow, searchResultDistricts } = useMemo(() => {
     const searchResultDistricts = searchResults?.result || [];
-    // Only show districts that are not in selected array
+    // Only show districts that are not in pendingDistricts
     const districtsToShow = searchResultDistricts.filter(district => 
-      !selected.includes(district)
+      !pendingDistricts.includes(district)
     );
     
     return { districtsToShow, searchResultDistricts };
-  }, [searchResults?.result, selected]);
+  }, [searchResults?.result, pendingDistricts]);
 
-  // Toggle district selection
+  // All callbacks
   const toggleDistrict = useCallback((district: string) => {
-    setSelected(prev => {
+    setPendingDistricts(prev => {
       const isSelected = prev.includes(district);
       if (isSelected) {
         return prev.filter(d => d !== district);
@@ -82,7 +81,6 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
         return [...prev, district];
       }
     });
-    setIsFilterApplied(false); // Reset filter applied state when changing selection
   }, []);
 
   const handleRefresh = useCallback(() => {
@@ -101,29 +99,66 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
     [searchTerm]
   );
 
+  // Update store when selections change
+  useEffect(() => {
+    setSelectedDistricts(selected);
+  }, [selected, setSelectedDistricts]);
+
+  // Update store when date range changes
+  useEffect(() => {
+    if (fromDate || toDate) {
+      setDateRange({
+        from: fromDate || null,
+        to: toDate || null
+      });
+      applyFilters(); // Apply filters after updating date range
+    }
+  }, [fromDate, toDate, setDateRange, applyFilters]);
+
+  // Update date inputs when month range changes
+  useEffect(() => {
+    if (monthRange[0] !== undefined && monthRange[1] !== undefined) {
+      setFromDate(months[monthRange[0]].value);
+      setToDate(months[monthRange[1]].value);
+      setActiveRange(""); // Clear preset when using slider
+    }
+  }, [monthRange]);
+
+  // Update pending districts when selection changes
+  useEffect(() => {
+    setPendingDistricts(selected);
+  }, [selected]);
+
+  // Update highlighted districts when selection changes
+  useEffect(() => {
+    setHighlightedDistricts(pendingDistricts);
+  }, [pendingDistricts, setHighlightedDistricts]);
+
+  // Update pending districts when store selection changes
+  useEffect(() => {
+    setPendingDistricts(storeSelectedDistricts);
+  }, [storeSelectedDistricts]);
+
   // Reset all filters
   const handleReset = useCallback(() => {
-    setSelected([]); // Clear local selection
-    setSelectedDistricts([]); // Clear store selection
-    setPendingDistricts([]); // Clear pending districts
+    setPendingDistricts([]);
+    setSelectedDistricts([]);
+    setHighlightedDistricts([]);
     setFromDate("");
     setToDate("");
     setMonthRange([0, months.length - 1]);
     setActiveRange("");
-    setIsFilterApplied(false);
     applyFilters();
-  }, [setSelectedDistricts, setPendingDistricts, applyFilters]);
+  }, [setSelectedDistricts, setHighlightedDistricts, applyFilters]);
 
   // Apply district filter changes
   const handleApplyDistricts = () => {
-    if (selected.length === 0) {
+    if (pendingDistricts.length === 0) {
       handleReset();
     } else {
-      // Update store states in a single batch
-      setSelectedDistricts(selected);
-      setPendingDistricts(selected);
+      setSelectedDistricts(pendingDistricts);
+      setHighlightedDistricts([]);
       applyFilters();
-      setIsFilterApplied(true);
     }
   };
 
@@ -166,11 +201,6 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
       setMonthRange(newRange);
     }
   };
-
-  // Update local selection when store selection changes (only on mount)
-  useEffect(() => {
-    setSelected(storeSelectedDistricts);
-  }, []); // Empty dependency array - only run on mount
 
   if (!isOpen) return null;
   const leftPosition = sidebarExpanded ? "296px" : "136px";
@@ -233,8 +263,8 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
             <div className="flex-shrink-0 mt-4">
               <div className="w-full h-[40px] bg-white border border-[var(--color-border-primary)] rounded-[8px] px-3 flex items-center gap-2 relative">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5 text-gray-400">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z" />
-              </svg>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z" />
+                </svg>
                 <input 
                   type="text" 
                   placeholder="Search district..." 
@@ -247,7 +277,7 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
                     <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
                   </div>
                 )}
-            </div>
+              </div>
 
               <div 
                 ref={searchResultsRef} 
@@ -287,33 +317,37 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
                     </div>
                   ) : (
                     districtsToShow.map((district) => (
-                  <button
-                    key={district}
-                    onClick={() => toggleDistrict(district)}
-                    className="flex items-center gap-1 h-[26px] px-2.5 rounded-full border border-gray-300 text-gray-500 text-xs font-medium transition cursor-pointer hover:border-[var(--color-main-primary)] hover:text-[var(--color-main-primary)]"
-                  >
-                    {district.toUpperCase()}
-                  </button>
-                ))
+                      <button
+                        key={district}
+                        onClick={() => toggleDistrict(district)}
+                        className="flex items-center gap-1 h-[26px] px-2.5 rounded-full border border-gray-300 text-gray-500 text-xs font-medium transition cursor-pointer hover:border-[var(--color-main-primary)] hover:text-[var(--color-main-primary)]"
+                      >
+                        {district.toUpperCase()}
+                      </button>
+                    ))
                   )}
                 </div>
               </div>
             </div>
 
-            {selected.length > 0 && (
+            {pendingDistricts.length > 0 && (
               <div 
                 ref={selectedDistrictsRef}
                 className="mt-3 mb-0 pt-2 border-t border-gray-200 bg-gray-50/50 rounded-lg px-2 pb-2"
               >
                 <Text size={theme.text.size.SM} bold={theme.text.bold.sm} className="text-gray-500 mb-1">
-                  Selected Districts ({selected.length})
+                  Selected Districts ({pendingDistricts.length})
                 </Text>
                 <div className="h-[80px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 pr-1">
-                    {selected.map((district) => (
+                    {pendingDistricts.map((district) => (
                       <button
                         key={district}
-                        onClick={() => toggleDistrict(district)}
+                        onClick={() => {
+                          setPendingDistricts(prev => 
+                            prev.filter(d => d !== district)
+                          );
+                        }}
                         className="flex items-center gap-1 h-[24px] px-2 rounded-full border border-[var(--color-main-primary)] text-[var(--color-main-primary)] text-xs font-medium transition cursor-pointer hover:bg-[var(--color-main-primary)]/10 whitespace-nowrap overflow-hidden text-ellipsis"
                       >
                         <span className="w-[14px] h-[14px] rounded-full bg-[var(--color-main-primary)] flex items-center justify-center flex-shrink-0">
@@ -336,8 +370,8 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
                 onClick={handleApplyDistricts}
                 className="px-4 py-1.5 text-white text-sm font-medium rounded-lg transition-colors bg-[var(--color-main-primary)] hover:bg-[var(--color-main-primary)]/90"
               >
-                {selected.length === 0 ? 'Reset' : 'Apply Filter'}
-                  </button>
+                {pendingDistricts.length === 0 ? 'Reset' : 'Apply Filter'}
+              </button>
             </div>
           </div>
         )}
