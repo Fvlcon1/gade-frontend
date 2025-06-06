@@ -13,7 +13,7 @@ import TimelineController from "../../components/Controllers/TimelineController"
 import ComparisonSlider from "../../components/Controllers/ComparisonSlider";
 import { initialLayers } from "../../components/Controllers/LayersControl";
 
-const InteractiveMapClient = dynamic(() => import("./InteractiveMapClient"), {
+const InteractiveMapClient = dynamic(() => import("../../components/layout/MiddlePanel/Map/InteractiveMapClient"), {
   ssr: false,
 });
 

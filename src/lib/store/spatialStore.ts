@@ -1,5 +1,25 @@
 import { create } from 'zustand';
-import { fetchSpatialData, SpatialData } from '@/hooks/spatial-data';
+import { fetchSpatialData } from '@/hooks/spatial-data';
+
+// Define SpatialData type here since it's not exported from spatial-data
+interface SpatialData {
+  type: 'FeatureCollection';
+  features: Array<{
+    type: 'Feature';
+    properties: {
+      assets?: string;
+      category?: string;
+      district?: string;
+      name: string;
+      owner?: string;
+      region?: string;
+      status?: string;
+      type?: string;
+      detected_date?: string;
+    };
+    geometry: any;
+  }>;
+}
 
 // Add type for mining site properties
 interface MiningSiteProperties {

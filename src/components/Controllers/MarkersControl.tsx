@@ -38,10 +38,9 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [activeRange, setActiveRange] = useState("Yesterday");
-  const [containerHeight, setContainerHeight] = useState(200);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
-  const [selectedDistrictsHeight, setSelectedDistrictsHeight] = useState(0);
+  const [pendingDistricts, setPendingDistricts] = useState<string[]>([]);
   const { 
     setSelectedDistricts, 
     setHighlightedDistricts,
@@ -52,15 +51,11 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
   } = useSpatialStore();
   const months = getLastSixMonths();
   const [monthRange, setMonthRange] = useState([0, months.length - 1]);
-  const [pendingDistricts, setPendingDistricts] = useState<string[]>([]);
 
   // All refs
-  const containerRef = useRef<HTMLDivElement>(null);
   const searchResultsRef = useRef<HTMLDivElement>(null);
   const selectedDistrictsRef = useRef<HTMLDivElement>(null);
   const dragControls = useDragControls();
-  const y = useMotionValue(0);
-  const height = useTransform(y, [0, -300], [200, 500]);
 
   // Fetch district search results
   const { data: searchResults, isLoading: isSearching } = useDistrictSearch(debouncedSearchTerm);
@@ -68,13 +63,13 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
   // Process districts data
   const { districtsToShow, searchResultDistricts } = useMemo(() => {
     const searchResultDistricts = searchResults?.result || [];
-    const selectedButNotInSearch = selected.filter(district => 
-      !searchResultDistricts.includes(district)
+    // Only show districts that are not in pendingDistricts
+    const districtsToShow = searchResultDistricts.filter(district => 
+      !pendingDistricts.includes(district)
     );
-    const districtsToShow = [...new Set([...searchResultDistricts, ...selectedButNotInSearch])];
     
     return { districtsToShow, searchResultDistricts };
-  }, [searchResults?.result, selected]);
+  }, [searchResults?.result, pendingDistricts]);
 
   // All callbacks
   const toggleDistrict = useCallback((district: string) => {
@@ -95,12 +90,6 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
 
   const toggleCollapse = useCallback(() => setIsCollapsed(!isCollapsed), [isCollapsed]);
 
-  const handleDragEnd = useCallback(() => {
-    const newHeight = Math.max(200, Math.min(500, containerHeight - y.get()));
-    setContainerHeight(newHeight);
-    y.set(0);
-  }, [containerHeight, y]);
-
   // Debounce effect
   useDebounce(
     () => {
@@ -109,40 +98,6 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
     500,
     [searchTerm]
   );
-
-  // Update selected districts height when it changes
-  useEffect(() => {
-    if (selectedDistrictsRef.current) {
-      const height = selectedDistrictsRef.current.offsetHeight;
-      setSelectedDistrictsHeight(height);
-    }
-  }, [selected.length, searchResults?.result]); // Update when selections or search results change
-
-  // Height calculation effect
-  useEffect(() => {
-    if (!isCollapsed && containerRef.current) {
-      const minHeight = 200; // Minimum height
-      const baseHeight = 120; // Height for search input and padding
-      const searchResultsHeight = 120; // Fixed height for search results
-      
-      // Only grow if we have selected districts that need more space
-      const shouldGrow = selected.length > 0;
-      
-      if (shouldGrow) {
-        // Calculate height needed for selected districts
-        const selectedDistrictsRequiredHeight = selectedDistrictsHeight + 20; // Add padding
-        const requiredHeight = baseHeight + searchResultsHeight + selectedDistrictsRequiredHeight;
-        setContainerHeight(Math.max(minHeight, requiredHeight));
-      } else {
-        // Reset to minimum height if no selections
-        setContainerHeight(minHeight);
-      }
-    }
-  }, [
-    isCollapsed,
-    selected.length,
-    selectedDistrictsHeight // Use the state instead of ref
-  ]);
 
   // Update store when selections change
   useEffect(() => {
@@ -266,10 +221,9 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
 
       {/* Filter by Districts */}
       <motion.div
-        ref={containerRef}
-        animate={{ height: isCollapsed ? 35 : containerHeight + 40 }}
+        animate={{ height: isCollapsed ? 35 : 'auto' }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="w-full overflow-hidden bg-white/80 backdrop-blur-sm shadow-md px-4 py-[8px] rounded-[10px]"
+        className="w-full overflow-hidden bg-white/80 backdrop-blur-sm shadow-md px-4 py-[8px] rounded-[10px] relative"
       >
         <div 
           className="w-full h-[24px] flex items-center justify-between cursor-pointer"
@@ -305,84 +259,113 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
         </div>
 
         {!isCollapsed && (
-          <div className="mt-2 flex flex-col h-[calc(100%-40px)]">
-            {/* Search input */}
-            <div className="w-full h-[36px] bg-white border border-[var(--color-border-primary)] rounded-[8px] px-3 flex items-center gap-2 relative">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4 text-gray-400">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z" />
-              </svg>
-              <input 
-                type="text" 
-                placeholder="Search district..." 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full text-sm text-gray-700 placeholder-gray-400 outline-none" 
-              />
-              {isSearching && (
-                <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                  <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
-                </div>
-              )}
-            </div>
-
-            {/* Search results at the top - fixed height */}
-            <div 
-              ref={searchResultsRef} 
-              className="mt-2 h-[120px] overflow-y-auto hide-scrollbar"
-            >
-              <div className="flex flex-wrap gap-2">
-                {districtsToShow.length === 0 && searchTerm && !isSearching ? (
-                  <div className="w-full text-center text-sm text-gray-500 py-2">
-                    No districts found
+          <div className="flex flex-col pb-9">
+            <div className="flex-shrink-0 mt-4">
+              <div className="w-full h-[40px] bg-white border border-[var(--color-border-primary)] rounded-[8px] px-3 flex items-center gap-2 relative">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5 text-gray-400">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z" />
+                </svg>
+                <input 
+                  type="text" 
+                  placeholder="Search district..." 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full text-sm text-gray-700 placeholder-gray-400 outline-none h-full" 
+                />
+                {isSearching && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
                   </div>
-                ) : (
-                  districtsToShow
-                    .filter(district => !selected.includes(district))
-                    .map((district) => (
-                  <button
-                    key={district}
-                    onClick={() => toggleDistrict(district)}
-                        className="flex items-center gap-1.5 h-[24px] px-3 rounded-full border border-gray-300 text-gray-500 text-xs font-medium transition cursor-pointer hover:border-[var(--color-main-primary)] hover:text-[var(--color-main-primary)]"
-                  >
-                        {district.toUpperCase()}
-                  </button>
-                    ))
                 )}
+              </div>
+
+              <div 
+                ref={searchResultsRef} 
+                className="mt-3 h-[80px] overflow-y-auto px-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400"
+              >
+                <style jsx global>{`
+                  /* Custom scrollbar styles */
+                  .scrollbar-thin::-webkit-scrollbar {
+                    width: 6px;
+                  }
+                  
+                  .scrollbar-thin::-webkit-scrollbar-track {
+                    background: transparent;
+                    border-radius: 3px;
+                  }
+                  
+                  .scrollbar-thin::-webkit-scrollbar-thumb {
+                    background: #d1d5db;
+                    border-radius: 3px;
+                    transition: background 0.2s ease;
+                  }
+                  
+                  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+                    background: #9ca3af;
+                  }
+
+                  /* Hide scrollbar for Firefox */
+                  .scrollbar-thin {
+                    scrollbar-width: thin;
+                    scrollbar-color: #d1d5db transparent;
+                  }
+                `}</style>
+                <div className="flex flex-wrap gap-1.5 pr-1">
+                  {districtsToShow.length === 0 && searchTerm && !isSearching ? (
+                    <div className="w-full text-center text-sm text-gray-500 py-2">
+                      No districts found
+                    </div>
+                  ) : (
+                    districtsToShow.map((district) => (
+                      <button
+                        key={district}
+                        onClick={() => toggleDistrict(district)}
+                        className="flex items-center gap-1 h-[26px] px-2.5 rounded-full border border-gray-300 text-gray-500 text-xs font-medium transition cursor-pointer hover:border-[var(--color-main-primary)] hover:text-[var(--color-main-primary)]"
+                      >
+                        {district.toUpperCase()}
+                      </button>
+                    ))
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* Selected districts section */}
             {pendingDistricts.length > 0 && (
               <div 
                 ref={selectedDistrictsRef}
-                className="mt-2 pt-2 border-t border-gray-200 bg-gray-50/50 rounded-lg px-2 pb-2"
+                className="mt-3 mb-0 pt-2 border-t border-gray-200 bg-gray-50/50 rounded-lg px-2 pb-2"
               >
-                <Text size={theme.text.size.SM} bold={theme.text.bold.sm} className="text-gray-500 mb-2">
+                <Text size={theme.text.size.SM} bold={theme.text.bold.sm} className="text-gray-500 mb-1">
                   Selected Districts ({pendingDistricts.length})
                 </Text>
-                <div className="grid grid-cols-2 gap-2">
-                  {pendingDistricts.map((district) => (
-                    <button
-                      key={district}
-                      onClick={() => {
-                        setPendingDistricts(prev => 
-                          prev.filter(d => d !== district)
-                        );
-                      }}
-                      className="flex items-center gap-1.5 h-[24px] px-3 rounded-full border border-[var(--color-main-primary)] text-[var(--color-main-primary)] text-xs font-medium transition cursor-pointer hover:bg-[var(--color-main-primary)]/10 whitespace-nowrap overflow-hidden text-ellipsis"
-                    >
-                      <span className="w-[16px] h-[16px] rounded-full bg-[var(--color-main-primary)] flex items-center justify-center flex-shrink-0">
-                        <IoMdCheckmark size={12} className="text-white" />
-                      </span>
-                      <span className="truncate">{district.toUpperCase()}</span>
-                    </button>
-                  ))}
+                <div className="h-[80px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 pr-1">
+                    {pendingDistricts.map((district) => (
+                      <button
+                        key={district}
+                        onClick={() => {
+                          setPendingDistricts(prev => 
+                            prev.filter(d => d !== district)
+                          );
+                        }}
+                        className="flex items-center gap-1 h-[24px] px-2 rounded-full border border-[var(--color-main-primary)] text-[var(--color-main-primary)] text-xs font-medium transition cursor-pointer hover:bg-[var(--color-main-primary)]/10 whitespace-nowrap overflow-hidden text-ellipsis"
+                      >
+                        <span className="w-[14px] h-[14px] rounded-full bg-[var(--color-main-primary)] flex items-center justify-center flex-shrink-0">
+                          <IoMdCheckmark size={10} className="text-white" />
+                        </span>
+                        <span className="truncate">{district.toUpperCase()}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
+          </div>
+        )}
 
-            {/* Apply/Reset button - always show */}
-            <div className="flex justify-end mt-3 px-2">
+        {!isCollapsed && (
+          <div className="absolute bottom-0 right-0 left-0 px-4 py-1.5 border-t border-gray-100 rounded-b-[10px]">
+            <div className="flex justify-end">
               <button
                 onClick={handleApplyDistricts}
                 className="px-4 py-1.5 text-white text-sm font-medium rounded-lg transition-colors bg-[var(--color-main-primary)] hover:bg-[var(--color-main-primary)]/90"
@@ -396,7 +379,7 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
     
       {/* Filter by Date Range */}
       <motion.div
-        animate={{ height: isDateCollapsed ? 35 : 380 }}
+        animate={{ height: isDateCollapsed ? 35 : 'auto' }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className="w-full overflow-hidden bg-white/80 backdrop-blur-sm shadow-md px-4 py-[8px] rounded-[10px] mt-2"
       >
@@ -438,13 +421,11 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
 
         {!isDateCollapsed && (
           <div className="mt-4 flex flex-col gap-4">
-            {/* Months Slider */}
             <div className="rounded-[10px] w-full bg-[#EBEBEB]/140 px-3">
               <Text size={theme.text.size.SM} bold={theme.text.bold.sm} className="text-gray-500 mb-2">
                 Select date range using slider
               </Text>
               
-              {/* Slider */}
               <div className="relative w-full h-[40px]">
                 <div className="absolute top-[50%] left-0 right-0 h-[4px] bg-gray-300 rounded-full -translate-y-1/2" />
                 <div
@@ -473,8 +454,7 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
                   onChange={(e) => handleMonthRangeChange(1, parseInt(e.target.value))}
                   className="absolute w-full h-full top-0 left-0 appearance-none bg-transparent z-30 pointer-events-auto"
                 />
-                <style jsx>{`
-                  input[type="range"]::-webkit-slider-thumb {
+                <style jsx>{`                  input[type="range"]::-webkit-slider-thumb {
                     -webkit-appearance: none;
                     height: 18px;
                     width: 18px;
@@ -490,7 +470,6 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
                 `}</style>
               </div>
 
-              {/* Month Labels */}
               <div className="flex justify-between w-full -mt-3.5 text-xs font-[200] text-gray-500">
                 {months.map((month, index) => (
                   <span
@@ -507,12 +486,9 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
               </div>
             </div>
 
-            {/* Or use calendar */}
             <div className="text-center text-sm text-gray-500">- or -</div>
 
-            {/* Existing calendar inputs */}
             <div className="flex justify-between px-2">
-              {/* FROM */}
               <div className="flex flex-col w-[120px]">
                 <Text size={theme.text.size.SM} bold={theme.text.bold.sm} className="!text-[var(--color-text-tetiary)] mb-1">From</Text>
                 <div
@@ -533,12 +509,10 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
                 </div>
               </div>
 
-              {/* Dots */}
               <div className="flex items-end pb-2">
                 <Text size={theme.text.size.SM} bold={theme.text.bold.md} className="!text-[var(--color-text-tetiary)]">...</Text>
               </div>
 
-              {/* TO */}
               <div className="flex flex-col w-[120px]">
                 <Text size={theme.text.size.SM} bold={theme.text.bold.sm} className="!text-[var(--color-text-tetiary)] mb-1">To</Text>
                 <div
@@ -560,7 +534,6 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
               </div>
             </div>
 
-            {/* Preset ranges */}
             <div className="flex flex-col gap-2">
               {DateRanges.map((label) => (
                 <button
@@ -584,3 +557,4 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
 };
 
 export default MarkersControl;
+
