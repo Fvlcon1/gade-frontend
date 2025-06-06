@@ -140,10 +140,10 @@ const LayersControl: React.FC<LayersControlProps> = ({
               <div className="flex flex-col gap-1">
                 {featureLayers.map((layer) => (
                   <div key={layer.id}>
-                    <label className="flex items-center gap-3 py-[6px] cursor-pointer">
+                    <div className="flex items-center gap-3 py-[6px] cursor-pointer" onClick={() => toggleFeatureLayer(layer.id)}>
                       <ToggleSwitch 
                         checked={layer.checked} 
-                        onChange={() => toggleFeatureLayer(layer.id)} 
+                        onChange={() => {}}
                       />
                       <span
                         className={`text-left text-sm font-medium ${
@@ -152,7 +152,7 @@ const LayersControl: React.FC<LayersControlProps> = ({
                       >
                         {layer.label}
                       </span>
-                    </label>
+                    </div>
                     <div className="h-px bg-gray-200 w-[calc(100%+1rem)] -mr-4" />
                   </div>
                 ))}

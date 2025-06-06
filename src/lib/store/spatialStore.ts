@@ -88,6 +88,12 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
     const { miningSites, districts, selectedDistricts, dateRange } = get();
     if (!miningSites || !districts) return;
 
+    console.log('Applying filters with:', {
+      selectedDistricts,
+      dateRange,
+      totalMiningSites: miningSites.features.length
+    });
+
     // Efficient date range check
     const isDateInRange = (dateStr: string) => {
       if (!dateRange.from && !dateRange.to) return true;
@@ -99,17 +105,33 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
       return (!from || date >= from) && (!to || date <= to);
     };
 
-    // Filter mining sites first - this is the most important filter
-    const filteredSites = {
+    // First apply date range filter to all mining sites
+    const dateFilteredSites = {
       ...miningSites,
-      features: miningSites.features.filter(feature => {
-        const matchesDistrict = selectedDistricts.length === 0 || 
-          selectedDistricts.includes(feature.properties.district);
-        const matchesDate = !feature.properties.detected_date || 
-          isDateInRange(feature.properties.detected_date);
-        return matchesDistrict && matchesDate;
-      })
+      features: miningSites.features.filter(feature => 
+        !feature.properties.detected_date || isDateInRange(feature.properties.detected_date)
+      )
     };
+
+    console.log('After date filter:', {
+      dateFilteredCount: dateFilteredSites.features.length
+    });
+
+    // Then apply district filter if districts are selected
+    const filteredSites = selectedDistricts.length === 0 
+      ? dateFilteredSites // If no districts selected, show all date-filtered sites
+      : {
+          ...dateFilteredSites,
+          features: dateFilteredSites.features.filter(feature => 
+            selectedDistricts.includes(feature.properties.district)
+          )
+        };
+
+    console.log('Final filtered results:', {
+      filteredSitesCount: filteredSites.features.length,
+      selectedDistrictsCount: selectedDistricts.length,
+      dateRangeActive: !!(dateRange.from || dateRange.to)
+    });
 
     // Only filter districts if we have selected districts
     const filteredDistricts = selectedDistricts.length === 0 ? districts : {

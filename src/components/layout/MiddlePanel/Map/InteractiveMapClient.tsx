@@ -163,9 +163,9 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
     if (!filteredDistricts || !filteredMiningSites) return {};
 
     return {
-      mining_sites: filteredMiningSites,
+      mining_sites: filteredMiningSites, // Use store's filtered data directly
       forest: forestReserves,
-      admin: filteredDistricts, // Use filtered districts
+      admin: filteredDistricts,
       rivers: rivers,
     };
   }, [filteredDistricts, filteredMiningSites, forestReserves, rivers]);
