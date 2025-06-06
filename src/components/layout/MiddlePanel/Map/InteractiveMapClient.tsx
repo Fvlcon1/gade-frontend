@@ -187,7 +187,7 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
     }
 
     return isHighlighted ? HIGHLIGHT_STYLE.admin : {
-      color: "#4CAF50", // Green for selected
+      color: "var(--color-main-primary)", // Using project's primary color
       weight: 2,
       opacity: 0.8,
       fillOpacity: 0.3,
