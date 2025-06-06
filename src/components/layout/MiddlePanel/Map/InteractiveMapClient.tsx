@@ -256,11 +256,10 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
         if (layer.id === 'mining_sites') {
           return (
             <GeoJSON
-              key={layer.id}
+              key={`${layer.id}-${selectedDistricts.join(',')}-${dateRange?.from || ''}-${dateRange?.to || ''}`}
               data={data}
               style={LAYER_STYLES[layer.id]}
               onEachFeature={(feature, leafletLayer) => {
-                // Add tooltip with detection date and district
                 const date = new Date(feature.properties.detected_date).toLocaleDateString();
                 const tooltipContent = `Detected: ${date}${feature.properties.district ? `\nDistrict: ${feature.properties.district}` : ''}`;
                 leafletLayer.bindTooltip(tooltipContent);

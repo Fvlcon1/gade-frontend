@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { fetchSpatialData } from '@/hooks/spatial-data';
 
-// Define SpatialData type here since it's not exported from spatial-data
+// Define SpatialData type
 interface SpatialData {
   type: 'FeatureCollection';
   features: Array<{
@@ -31,7 +31,7 @@ interface MiningSiteProperties {
   region?: string;
   status?: string;
   type?: string;
-  detected_date?: string; // Make it optional
+  detected_date?: string;
 }
 
 interface SpatialState {
@@ -56,16 +56,6 @@ interface SpatialState {
   fetchAllData: () => Promise<void>;
 }
 
-// Update the mining sites type
-interface MiningSite {
-  type: string;
-  features: Array<{
-    type: string;
-    properties: MiningSiteProperties;
-    geometry: any;
-  }>;
-}
-
 export const useSpatialStore = create<SpatialState>((set, get) => ({
   districts: null,
   forestReserves: null,
@@ -79,71 +69,56 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
   highlightedDistricts: [],
   dateRange: {
     from: null,
-    to: null
+    to: null,
   },
   setSelectedDistricts: (districts) => set({ selectedDistricts: districts }),
   setHighlightedDistricts: (districts) => set({ highlightedDistricts: districts }),
   setDateRange: (range) => set({ dateRange: range }),
   applyFilters: () => {
-    const { miningSites, districts, selectedDistricts, dateRange } = get();
-    if (!miningSites || !districts) return;
-
-    console.log('Applying filters with:', {
-      selectedDistricts,
-      dateRange,
-      totalMiningSites: miningSites.features.length
-    });
-
-    // Efficient date range check
-    const isDateInRange = (dateStr: string) => {
-      if (!dateRange.from && !dateRange.to) return true;
+    set((state) => {
+      const { selectedDistricts, dateRange, miningSites } = state;
       
-      const date = new Date(dateStr).getTime();
-      const from = dateRange.from ? new Date(dateRange.from).setHours(0, 0, 0, 0) : null;
-      const to = dateRange.to ? new Date(dateRange.to).setHours(23, 59, 59, 999) : null;
-      
-      return (!from || date >= from) && (!to || date <= to);
-    };
-
-    // First apply date range filter to all mining sites
-    const dateFilteredSites = {
-      ...miningSites,
-      features: miningSites.features.filter(feature => 
-        !feature.properties.detected_date || isDateInRange(feature.properties.detected_date)
-      )
-    };
-
-    console.log('After date filter:', {
-      dateFilteredCount: dateFilteredSites.features.length
-    });
-
-    // Then apply district filter if districts are selected
-    const filteredSites = selectedDistricts.length === 0 
-      ? dateFilteredSites // If no districts selected, show all date-filtered sites
-      : {
-          ...dateFilteredSites,
-          features: dateFilteredSites.features.filter(feature => 
-            selectedDistricts.includes(feature.properties.district)
-          )
+      // Return early if miningSites is not loaded yet
+      if (!miningSites) {
+        return {
+          ...state,
+          filteredMiningSites: null
         };
+      }
+      
+      // Apply date filter first
+      const dateFilteredSites = miningSites.features.filter(site => {
+        if (!dateRange?.from && !dateRange?.to) return true;
+        if (!site.properties.detected_date) return false;
+        
+        const siteDate = new Date(site.properties.detected_date);
+        const fromDate = dateRange.from ? new Date(dateRange.from) : null;
+        const toDate = dateRange.to ? new Date(dateRange.to) : null;
+        
+        if (fromDate && toDate) {
+          return siteDate >= fromDate && siteDate <= toDate;
+        } else if (fromDate) {
+          return siteDate >= fromDate;
+        } else if (toDate) {
+          return siteDate <= toDate;
+        }
+        return true;
+      });
 
-    console.log('Final filtered results:', {
-      filteredSitesCount: filteredSites.features.length,
-      selectedDistrictsCount: selectedDistricts.length,
-      dateRangeActive: !!(dateRange.from || dateRange.to)
-    });
+      // Then apply district filter
+      const filteredSites = selectedDistricts.length === 0 
+        ? dateFilteredSites
+        : dateFilteredSites.filter(site => 
+            selectedDistricts.includes(site.properties.district)
+          );
 
-    // Only filter districts if we have selected districts
-    const filteredDistricts = selectedDistricts.length === 0 ? districts : {
-      ...districts,
-      features: districts.features.filter(feature => 
-        selectedDistricts.includes(feature.properties.district)
-      )
-    };
-
-    set({ 
-      filteredMiningSites: filteredSites,
-      filteredDistricts: filteredDistricts
+      return {
+        ...state,
+        filteredMiningSites: {
+          ...miningSites,
+          features: filteredSites
+        }
+      };
     });
   },
   fetchAllData: async () => {
@@ -172,4 +147,4 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
       });
     }
   },
-})); 
+}));
