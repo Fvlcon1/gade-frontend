@@ -23,9 +23,9 @@ const TimelineController = ({ isOpen, onClose, sidebarExpanded = false }) => {
   const [range, setRange] = useState([0, months.length - 1]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isComparisonCollapsed, setIsComparisonCollapsed] = useState(false);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+const [isComparisonCollapsed, setIsComparisonCollapsed] = useState(false);
+const [startDate, setStartDate] = useState("");
+const [endDate, setEndDate] = useState("");
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleReset = () => {

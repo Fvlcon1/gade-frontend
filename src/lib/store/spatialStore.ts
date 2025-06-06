@@ -44,16 +44,19 @@ interface SpatialState {
   isLoading: boolean;
   error: string | null;
   selectedDistricts: string[];
-  highlightedDistricts: string[];
+  pendingDistricts: string[];
   dateRange: {
     from: string | null;
     to: string | null;
   };
+  isFilterApplied: boolean;
   setSelectedDistricts: (districts: string[]) => void;
-  setHighlightedDistricts: (districts: string[]) => void;
+  setPendingDistricts: (districts: string[]) => void;
   setDateRange: (range: { from: string | null; to: string | null }) => void;
+  setFilterApplied: (applied: boolean) => void;
   applyFilters: () => void;
   fetchAllData: () => Promise<void>;
+  getDistrictStyle: (feature: any) => any;
 }
 
 // Update the mining sites type
@@ -76,16 +79,18 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
   isLoading: false,
   error: null,
   selectedDistricts: [],
-  highlightedDistricts: [],
+  pendingDistricts: [],
+  isFilterApplied: false,
   dateRange: {
     from: null,
     to: null
   },
   setSelectedDistricts: (districts) => set({ selectedDistricts: districts }),
-  setHighlightedDistricts: (districts) => set({ highlightedDistricts: districts }),
+  setPendingDistricts: (districts) => set({ pendingDistricts: districts }),
   setDateRange: (range) => set({ dateRange: range }),
+  setFilterApplied: (applied) => set({ isFilterApplied: applied }),
   applyFilters: () => {
-    const { miningSites, districts, selectedDistricts, dateRange } = get();
+    const { miningSites, districts, pendingDistricts, dateRange } = get();
     if (!miningSites || !districts) return;
 
     // Efficient date range check
@@ -103,8 +108,8 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
     const filteredSites = {
       ...miningSites,
       features: miningSites.features.filter(feature => {
-        const matchesDistrict = selectedDistricts.length === 0 || 
-          selectedDistricts.includes(feature.properties.district);
+        const matchesDistrict = pendingDistricts.length === 0 || 
+          pendingDistricts.includes(feature.properties.district);
         const matchesDate = !feature.properties.detected_date || 
           isDateInRange(feature.properties.detected_date);
         return matchesDistrict && matchesDate;
@@ -112,17 +117,59 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
     };
 
     // Only filter districts if we have selected districts
-    const filteredDistricts = selectedDistricts.length === 0 ? districts : {
+    const filteredDistricts = pendingDistricts.length === 0 ? districts : {
       ...districts,
       features: districts.features.filter(feature => 
-        selectedDistricts.includes(feature.properties.district)
+        pendingDistricts.includes(feature.properties.district)
       )
     };
 
     set({ 
       filteredMiningSites: filteredSites,
-      filteredDistricts: filteredDistricts
+      filteredDistricts: filteredDistricts,
+      selectedDistricts: pendingDistricts,
+      isFilterApplied: true
     });
+  },
+  getDistrictStyle: (feature: any) => {
+    const { selectedDistricts, pendingDistricts, isFilterApplied } = get();
+    const district = feature.properties.district;
+    const isSelected = selectedDistricts.includes(district);
+    const isPending = pendingDistricts.includes(district);
+
+    if (pendingDistricts.length === 0 && selectedDistricts.length === 0) {
+      return {
+        color: "#666",
+        weight: 1,
+        opacity: 0.8,
+        fillOpacity: 0.1,
+      };
+    }
+
+    if (isPending && !isSelected) {
+      return {
+        color: "#eab308",
+        weight: 2,
+        opacity: 0.8,
+        fillOpacity: 0.3,
+      };
+    }
+
+    if (isSelected && isFilterApplied) {
+      return {
+        color: "var(--color-main-primary)",
+        weight: 2,
+        opacity: 0.8,
+        fillOpacity: 0.3,
+      };
+    }
+
+    return {
+      color: "#666",
+      weight: 1,
+      opacity: 0,
+      fillOpacity: 0,
+    };
   },
   fetchAllData: async () => {
     set({ isLoading: true, error: null });
