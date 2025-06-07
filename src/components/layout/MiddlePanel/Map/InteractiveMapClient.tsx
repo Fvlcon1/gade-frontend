@@ -5,6 +5,9 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import { useSpatialStore } from '@/lib/store/spatialStore';
+import { useReports } from '@/hooks/useReports';
+import L from 'leaflet';
+import { useSearchParams } from "next/navigation";
 
 const MouseCoordinateDisplay = () => {
   const map = useMap();
@@ -137,6 +140,77 @@ const tooltipStyles = `
   }
 `;
 
+// Add ReportsLayer component
+const ReportsLayer: React.FC<{ reports: any[], activeFeatureLayers: Layer[] }> = ({ reports, activeFeatureLayers }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    const reportsLayer = (map as any).reportsLayer;
+
+    // Check if reports layer should be visible
+    const shouldShowReports = activeFeatureLayers.some(layer => layer.id === 'reports' && layer.checked);
+
+    if (reportsLayer) {
+      if (shouldShowReports) {
+        map.addLayer(reportsLayer);
+      } else {
+        map.removeLayer(reportsLayer);
+      }
+    } else if (shouldShowReports && reports.length > 0) {
+      // Create reports layer if it doesn't exist and should be visible
+      const markersLayer = L.layerGroup().addTo(map);
+      (map as any).reportsLayer = markersLayer;
+
+      // Create custom icon for reports
+      const reportIcon = L.divIcon({
+        className: 'report-marker',
+        html: `
+          <div class="relative">
+            <svg viewBox="0 0 24 24" width="24" height="24" class="text-orange-500">
+              <path fill="currentColor" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+            <div class="absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-medium bg-white px-1 rounded shadow-sm">
+              <span class="text-gray-800"></span>
+            </div>
+          </div>
+        `,
+        iconSize: [24, 24],
+        iconAnchor: [12, 24],
+        popupAnchor: [0, -24],
+      });
+
+      // Add markers for each report
+      reports.forEach(report => {
+        const marker = L.marker([report.location.lat, report.location.lon], { icon: reportIcon })
+          .bindPopup(`
+            <div class="p-2">
+              <h3 class="font-medium text-sm">${report.locality}</h3>
+              <p class="text-xs text-gray-600">Severity: ${report.severity}</p>
+              <p class="text-xs text-gray-600">Status: ${report.status || 'Open'}</p>
+              <p class="text-xs text-gray-600">Reported: ${new Date(report.created_at).toLocaleDateString()}</p>
+            </div>
+          `);
+
+        // Update the locality text
+        const localitySpan = marker.getElement()?.querySelector('.text-gray-800');
+        if (localitySpan) {
+          localitySpan.textContent = report.locality;
+        }
+
+        markersLayer.addLayer(marker);
+      });
+    }
+
+    return () => {
+      if (reportsLayer) {
+        map.removeLayer(reportsLayer);
+      }
+    };
+  }, [map, activeFeatureLayers, reports]);
+
+  return null;
+};
+
 const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers }) => {
   const { 
     miningSites,
@@ -144,7 +218,8 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
     filteredDistricts,
     districts, 
     forestReserves, 
-    rivers, 
+    rivers,
+    reports,
     isLoading, 
     error, 
     selectedDistricts,
@@ -163,7 +238,7 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
     if (!filteredDistricts || !filteredMiningSites) return {};
 
     return {
-      mining_sites: filteredMiningSites, // Use store's filtered data directly
+      mining_sites: filteredMiningSites,
       forest: forestReserves,
       admin: filteredDistricts,
       rivers: rivers,
@@ -217,6 +292,9 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
         url={BASEMAP_URLS[activeBasemap]}
         attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
+
+      {/* Reports Layer */}
+      <ReportsLayer reports={reports} activeFeatureLayers={activeFeatureLayers} />
 
       {/* Feature Layers */}
       {activeFeatureLayers.map((layer) => {
@@ -342,25 +420,77 @@ const zoomControlStyles = `
 `;
 
 const InteractiveMapClient: React.FC<MapContainerProps> = ({ mapRef, activeBasemap, activeFeatureLayers }) => {
+  const { reports } = useSpatialStore();
+  const searchParams = useSearchParams();
+
+  // Get initial view from URL parameters or use default
+  const initialView = useMemo(() => {
+    const lat = searchParams.get('lat');
+    const lon = searchParams.get('lon');
+    const zoom = searchParams.get('zoom');
+
+    if (lat && lon) {
+      return {
+        center: [parseFloat(lat), parseFloat(lon)] as [number, number],
+        zoom: parseInt(zoom || '14')
+      };
+    }
+
+    // Default view (Ghana)
+    return {
+      center: [7.9465, -1.0232] as [number, number],
+      zoom: 7
+    };
+  }, [searchParams]);
+
   return (
-    <div className="relative w-full h-full">
-      <style>{zoomControlStyles}</style>
+    <>
       <style>{tooltipStyles}</style>
       <MapContainer
-        center={[4.9016, -1.7831]}
-        zoom={11}
-        scrollWheelZoom={true}
-        zoomControl={true}
-        className="w-full h-full rounded-b-xl z-0"
         ref={mapRef}
+        center={initialView.center}
+        zoom={initialView.zoom}
+        zoomControl={false}
+        className="w-full h-full"
+        whenReady={() => {
+          const map = mapRef.current;
+          if (!map) return;
+
+          // Handle URL parameters after map is created
+          const reportId = searchParams.get('report');
+          if (reportId && reports) {
+            const report = reports.find(r => r.id === reportId);
+            if (report) {
+              // Use flyTo for smooth animation
+              map.flyTo(
+                [report.location.lat, report.location.lon],
+                14,
+                {
+                  duration: 1.5,
+                  easeLinearity: 0.25
+                }
+              );
+
+              // Find and open the report's popup after a short delay
+              setTimeout(() => {
+                const reportsLayer = (map as any).reportsLayer;
+                if (reportsLayer) {
+                  reportsLayer.eachLayer((layer) => {
+                    if (layer.getLatLng().equals([report.location.lat, report.location.lon])) {
+                      layer.openPopup();
+                    }
+                  });
+                }
+              }, 1500);
+            }
+          }
+        }}
       >
-        <MapLayers 
-          activeBasemap={activeBasemap}
-          activeFeatureLayers={activeFeatureLayers}
-        />
+        <MapLayers activeBasemap={activeBasemap} activeFeatureLayers={activeFeatureLayers} />
+        {reports && <ReportsLayer reports={reports} activeFeatureLayers={activeFeatureLayers} />}
         <MouseCoordinateDisplay />
       </MapContainer>
-    </div>
+    </>
   );
 };
 

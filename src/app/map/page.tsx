@@ -5,6 +5,10 @@ import { motion } from "framer-motion";
 import { FaLayerGroup, FaMapMarkerAlt, FaChartBar, FaLocationArrow } from "react-icons/fa";
 import { FaSliders } from "react-icons/fa6";
 import { BsFillClockFill } from "react-icons/bs";
+import { useReports } from '@/hooks/useReports';
+import { useSpatialStore } from '@/lib/store/spatialStore';
+import { FaExclamationTriangle } from 'react-icons/fa';
+import { useSearchParams } from 'next/navigation';
 
 import LeftPanel from "@components/layout/LeftPanel/LeftPanel";
 import LayersControl from "../../components/Controllers/LayersControl";
@@ -25,6 +29,7 @@ interface Layer {
 
 const Page = () => {
   const mapRef = useRef(null);
+  const searchParams = useSearchParams();
 
   const [mapReady, setMapReady] = useState(false);
   const [showLayers, setShowLayers] = useState(false);
@@ -32,20 +37,30 @@ const Page = () => {
   const [showTimeline, setShowTimeline] = useState(false);
   const [activeTab, setActiveTab] = useState(null);
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
-  const [activeBasemap, setActiveBasemap] = useState('osm');
+  const [activeBasemap, setActiveBasemap] = useState('satellite');
   const [activeFeatureLayers, setActiveFeatureLayers] = useState<Layer[]>(initialLayers.filter(layer => layer.checked));
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+  const { data: reports, isLoading: isLoadingReports } = useReports(currentPage, pageSize);
+  const { setReports } = useSpatialStore();
 
   useEffect(() => {
     const timer = setTimeout(() => setMapReady(true), 300);
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    console.log('Reports data from API:', reports);
+    if (reports) {
+      setReports(reports);
+    }
+  }, [reports, setReports]);
+
   const handleBasemapChange = useCallback((basemapId: string) => {
     setActiveBasemap(basemapId);
   }, []);
 
   const handleLayerChange = useCallback((layers: Layer[]) => {
-    // Use a timeout to avoid state updates during render
     setTimeout(() => {
       setActiveFeatureLayers(layers.filter(layer => layer.checked));
     }, 0);
@@ -176,6 +191,14 @@ const Page = () => {
 
       {/* Comparison Slider Overlay */}
       <ComparisonSlider isVisible={showTimeline} sidebarExpanded={sidebarExpanded} />
+
+      {/* Add loading indicator for reports */}
+      {isLoadingReports && (
+        <div className="absolute top-4 right-4 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-sm text-sm text-gray-600 flex items-center gap-2">
+          <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-600 border-t-transparent" />
+          Loading reports...
+        </div>
+      )}
     </div>
   );
 };

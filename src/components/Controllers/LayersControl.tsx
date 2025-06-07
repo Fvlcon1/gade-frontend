@@ -18,6 +18,7 @@ export const initialLayers = [
   { id: 'forest', label: 'Forest reserves', checked: true },
   { id: 'admin', label: 'Admin districts', checked: true },
   { id: 'rivers', label: 'Rivers', checked: true },
+  { id: 'reports', label: 'Reports', checked: true },
 ];
 
 interface Layer {

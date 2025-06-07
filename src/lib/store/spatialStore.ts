@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { fetchSpatialData } from '@/hooks/spatial-data';
+import { Report } from '@/hooks/useReports';
 
 // Define SpatialData type
 interface SpatialData {
@@ -35,6 +36,8 @@ interface MiningSiteProperties {
 }
 
 interface SpatialState {
+  baseUrl: string;
+  reports: Report[];
   districts: SpatialData | null;
   forestReserves: SpatialData | null;
   rivers: SpatialData | null;
@@ -54,9 +57,12 @@ interface SpatialState {
   setDateRange: (range: { from: string | null; to: string | null }) => void;
   applyFilters: () => void;
   fetchAllData: () => Promise<void>;
+  setReports: (reports: Report[]) => void;
 }
 
 export const useSpatialStore = create<SpatialState>((set, get) => ({
+  baseUrl: process.env.NEXT_PUBLIC_API_URL || '',
+  reports: [],
   districts: null,
   forestReserves: null,
   rivers: null,
@@ -147,4 +153,5 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
       });
     }
   },
+  setReports: (reports) => set({ reports }),
 }));

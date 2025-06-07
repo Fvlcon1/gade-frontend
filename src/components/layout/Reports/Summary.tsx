@@ -1,6 +1,10 @@
 'use client';
 import React from 'react';
 import { AiFillAlert } from "react-icons/ai";
+import { useSpatialStore } from '@/lib/store/spatialStore';
+
+// Define valid status types
+type ReportStatus = 'OPEN' | 'IN REVIEW' | 'RESOLVED' | 'CLOSED';
 
 const PriorityCard = ({ 
   priority, 
@@ -58,24 +62,70 @@ const PriorityCard = ({
   );
 };
 
+const Summary = () => {
+  const { reports } = useSpatialStore();
 
-const PriorityDashboard = () => {
+  // Calculate counts for each priority level
+  const counts = React.useMemo(() => {
+    if (!reports || reports.length === 0) {
+      return { high: 0, medium: 0, low: 0 };
+    }
+
+    // Count reports by severity, only counting OPEN reports by default
+    const counts = reports.reduce((acc, report) => {
+      // Normalize status to handle variations
+      const status = (report.status || 'OPEN').toUpperCase() as ReportStatus;
+      
+      // Debug log for status
+      console.log('Report status:', { id: report.id, status, originalStatus: report.status });
+      
+      // Only count reports that are OPEN
+      if (status !== 'OPEN') {
+        return acc;
+      }
+
+      // Normalize severity to uppercase
+      const severity = (report.severity || 'LOW').toUpperCase();
+      
+      switch (severity) {
+        case 'HIGH':
+          acc.high++;
+          break;
+        case 'MEDIUM':
+          acc.medium++;
+          break;
+        case 'LOW':
+          acc.low++;
+          break;
+        default:
+          // If severity is not set or unknown, treat as LOW priority
+          console.warn(`Unknown severity for report ${report.id}:`, severity);
+          acc.low++;
+          break;
+      }
+      return acc;
+    }, { high: 0, medium: 0, low: 0 });
+
+    console.log('Reports count by priority (OPEN status only):', counts);
+    return counts;
+  }, [reports]);
+
   return (
-    <div className="  flex mt-2 items-start ">
+    <div className="flex mt-2 items-start">
       <div className="flex gap-6 flex-wrap">
         <PriorityCard 
-          priority="High Priority" 
-          count={6} 
+          priority="High Priority"
+          count={counts.high} 
           type="high" 
         />
         <PriorityCard 
-          priority="Medium Priority" 
-          count={18} 
+          priority="Medium Priority"
+          count={counts.medium} 
           type="medium" 
         />
         <PriorityCard 
-          priority="Low Priority" 
-          count={3} 
+          priority="Low Priority"
+          count={counts.low} 
           type="low" 
         />
       </div>
@@ -83,4 +133,4 @@ const PriorityDashboard = () => {
   );
 };
 
-export default PriorityDashboard;
+export default Summary;
