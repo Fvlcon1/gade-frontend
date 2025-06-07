@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { MapPin } from "lucide-react";
-import { FaMapMarkerAlt } from "react-icons/fa";
 
 interface ReportItemProps {
   id: string;
@@ -70,9 +69,9 @@ const ReportItem: React.FC<ReportItemProps> = ({
     });
   };
 
-  // Get a consistent mock report based on the ID
-  const mockIndex = parseInt(id.split('-').pop() || '0') % mockReports.length;
-  const mockReport = mockReports[mockIndex];
+  // Get a consistent mock report based on the ID, with a default fallback
+  const mockIndex = Math.abs(parseInt(id.replace(/\D/g, '') || '0')) % mockReports.length;
+  const mockReport = mockReports[mockIndex] || mockReports[0]; // Fallback to first mock report if index is invalid
 
   // Format priority to capitalize only first letter
   const formattedPriority = priority.charAt(0) + priority.slice(1).toLowerCase();

@@ -100,12 +100,22 @@ export default function ReportsPage() {
 
   // Filter and sort reports
   const filteredReports = reports?.filter(report => {
-    const matchesSearch = 
-      report.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      report.locality.toLowerCase().includes(searchTerm.toLowerCase());
+    // Search term filter (case-insensitive)
+    const searchTermLower = searchTerm.toLowerCase();
+    const matchesSearch = searchTerm === '' || 
+      report.id.toLowerCase().includes(searchTermLower) ||
+      report.locality.toLowerCase().includes(searchTermLower) ||
+      (report.title?.toLowerCase().includes(searchTermLower)) ||
+      (report.description?.toLowerCase().includes(searchTermLower));
 
-    const matchesStatus = statusFilter === 'All Statuses' || report.status === statusFilter;
-    const matchesPriority = priorityFilter === 'All Priorities' || report.severity === priorityFilter.split(' ')[0];
+    // Status filter (case-insensitive)
+    const matchesStatus = statusFilter === 'All Statuses' || 
+      report.status.toLowerCase() === statusFilter.toLowerCase();
+
+    // Priority filter (case-insensitive)
+    const priorityLevel = priorityFilter.split(' ')[0].toLowerCase();
+    const matchesPriority = priorityFilter === 'All Priorities' || 
+      report.severity.toLowerCase() === priorityLevel;
 
     return matchesSearch && matchesStatus && matchesPriority;
   }).sort((a, b) => {
@@ -169,7 +179,7 @@ export default function ReportsPage() {
                     status={report.status}
                     priority={report.severity}
                     createdAt={report.created_at}
-                    updatedAt={report.created_at}
+                    updatedAt={report.updated_at || report.created_at}
                     location={report.locality}
                     onViewOnMap={() => handleViewOnMap(report)}
                   />

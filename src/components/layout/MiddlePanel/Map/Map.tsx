@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { MdMap } from "react-icons/md";
 import Text from '@styles/components/text';
 import theme from '@styles/theme';
@@ -13,6 +13,7 @@ const InteractiveMapClient = dynamic(() => import('./InteractiveMapClient'), {
 
 const Map = () => {
   const [mapReady, setMapReady] = useState(false);
+  const mapRef = useRef(null);
 
   useEffect(() => {
     // Delay rendering pill to avoid interfering with map init
@@ -46,9 +47,17 @@ const Map = () => {
 
       {/* Map Container */}
       <div className="w-full h-[380px] rounded-[9px] relative">
-        <InteractiveMapClient />
-
-        
+        <InteractiveMapClient 
+          mapRef={mapRef}
+          activeBasemap="satellite"
+          activeFeatureLayers={[
+            { id: 'reports', label: 'Reports', checked: true },
+            { id: 'admin', label: 'Districts', checked: true },
+            { id: 'mining_sites', label: 'Mining Sites', checked: true },
+            { id: 'forest', label: 'Forest Reserves', checked: true },
+            { id: 'rivers', label: 'Rivers', checked: true }
+          ]}
+        />
       </div>
     </div>
   );
