@@ -6,7 +6,7 @@ import theme from "@styles/theme";
 import Metric from "./MetricCard/Metric";
 import Map from "./Map/Map";
 import Title from "./Reports/Title";
-import ReportList from "./Reports/ReportList";
+import ReportList from "../Reports/ReportList";
 import Overlay from "@components/ui/overlay/overlay";
 
 interface MidProps {

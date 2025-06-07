@@ -1,5 +1,5 @@
 "use client";
-import { motion, useMotionValue, useTransform, useDragControls } from "framer-motion";
+import { motion } from "framer-motion";
 import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { AiOutlineReload } from "react-icons/ai";
 import { FaChevronDown, FaChevronRight, FaCalendar } from "react-icons/fa";
@@ -11,7 +11,7 @@ import { useDebounce } from 'react-use';
 import { Loader2 } from 'lucide-react';
 import { useSpatialStore } from '@/lib/store/spatialStore';
 
-// Initial districts list - will be populated from search
+// Initial districts list
 const initialDistricts: string[] = [];
 const DateRanges = ["Last month", "Last 2 months"];
 
@@ -23,24 +23,27 @@ const getLastSixMonths = () => {
     const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
     months.push({
       label: date.toLocaleString("default", { month: "short" }),
-      value: date.toISOString().split('T')[0]
+      value: date.toISOString().split('T')[0],
     });
   }
   return months;
 };
 
 const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
-  // All state hooks
+  // State hooks
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isDateCollapsed, setIsDateCollapsed] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const [activeRange, setActiveRange] = useState("Yesterday");
+  const [activeRange, setActiveRange] = useState("");
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [pendingDistricts, setPendingDistricts] = useState<string[]>([]);
+  const [monthRange, setMonthRange] = useState([0, getLastSixMonths().length - 1]);
+
+  // Zustand store
   const { 
     setSelectedDistricts, 
     setHighlightedDistricts,
@@ -49,13 +52,12 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
     selectedDistricts: storeSelectedDistricts,
     applyFilters 
   } = useSpatialStore();
-  const months = getLastSixMonths();
-  const [monthRange, setMonthRange] = useState([0, months.length - 1]);
 
-  // All refs
+  const months = useMemo(() => getLastSixMonths(), []);
+
+  // Refs
   const searchResultsRef = useRef<HTMLDivElement>(null);
   const selectedDistrictsRef = useRef<HTMLDivElement>(null);
-  const dragControls = useDragControls();
 
   // Fetch district search results
   const { data: searchResults, isLoading: isSearching } = useDistrictSearch(debouncedSearchTerm);
@@ -63,23 +65,17 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
   // Process districts data
   const { districtsToShow, searchResultDistricts } = useMemo(() => {
     const searchResultDistricts = searchResults?.result || [];
-    // Only show districts that are not in pendingDistricts
     const districtsToShow = searchResultDistricts.filter(district => 
       !pendingDistricts.includes(district)
     );
-    
     return { districtsToShow, searchResultDistricts };
   }, [searchResults?.result, pendingDistricts]);
 
-  // All callbacks
+  // Callbacks
   const toggleDistrict = useCallback((district: string) => {
     setPendingDistricts(prev => {
       const isSelected = prev.includes(district);
-      if (isSelected) {
-        return prev.filter(d => d !== district);
-      } else {
-        return [...prev, district];
-      }
+      return isSelected ? prev.filter(d => d !== district) : [...prev, district];
     });
   }, []);
 
@@ -90,7 +86,7 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
 
   const toggleCollapse = useCallback(() => setIsCollapsed(!isCollapsed), [isCollapsed]);
 
-  // Debounce effect
+  // Debounce search term
   useDebounce(
     () => {
       setDebouncedSearchTerm(searchTerm);
@@ -109,35 +105,50 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
     if (fromDate || toDate) {
       setDateRange({
         from: fromDate || null,
-        to: toDate || null
+        to: toDate || null,
       });
-      applyFilters(); // Apply filters after updating date range
+      applyFilters();
     }
   }, [fromDate, toDate, setDateRange, applyFilters]);
 
-  // Update date inputs when month range changes
+  // Synchronize monthRange with fromDate and toDate
   useEffect(() => {
-    if (monthRange[0] !== undefined && monthRange[1] !== undefined) {
-      setFromDate(months[monthRange[0]].value);
-      setToDate(months[monthRange[1]].value);
-      setActiveRange(""); // Clear preset when using slider
+    if (fromDate && toDate) {
+      const from = new Date(fromDate);
+      const to = new Date(toDate);
+      const monthValues = months.map(m => m.value);
+      const fromIndex = monthValues.indexOf(from.toISOString().split('T')[0]);
+      const toIndex = monthValues.indexOf(to.toISOString().split('T')[0]);
+      if (fromIndex !== -1 && toIndex !== -1) {
+        setMonthRange([fromIndex, toIndex]);
+      } else {
+        // Fallback to closest months if exact match not found
+        const fromDateObj = new Date(fromDate);
+        const toDateObj = new Date(toDate);
+        const fromDiffs = months.map((m, i) => ({
+          index: i,
+          diff: Math.abs(new Date(m.value).getTime() - fromDateObj.getTime()),
+        }));
+        const toDiffs = months.map((m, i) => ({
+          index: i,
+          diff: Math.abs(new Date(m.value).getTime() - toDateObj.getTime()),
+        }));
+        const fromClosest = fromDiffs.reduce((min, curr) => curr.diff < min.diff ? curr : min, fromDiffs[0]);
+        const toClosest = toDiffs.reduce((min, curr) => curr.diff < min.diff ? curr : min, toDiffs[0]);
+        setMonthRange([Math.min(fromClosest.index, toClosest.index), Math.max(fromClosest.index, toClosest.index)]);
+      }
     }
-  }, [monthRange]);
-
-  // Update pending districts when selection changes
-  useEffect(() => {
-    setPendingDistricts(selected);
-  }, [selected]);
-
-  // Update highlighted districts when selection changes
-  useEffect(() => {
-    setHighlightedDistricts(pendingDistricts);
-  }, [pendingDistricts, setHighlightedDistricts]);
+  }, [fromDate, toDate, months]);
 
   // Update pending districts when store selection changes
   useEffect(() => {
     setPendingDistricts(storeSelectedDistricts);
   }, [storeSelectedDistricts]);
+
+  // Update highlighted districts when pending districts change
+  useEffect(() => {
+    setHighlightedDistricts(pendingDistricts);
+  }, [pendingDistricts, setHighlightedDistricts]);
 
   // Reset all filters
   const handleReset = useCallback(() => {
@@ -149,7 +160,7 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
     setMonthRange([0, months.length - 1]);
     setActiveRange("");
     applyFilters();
-  }, [setSelectedDistricts, setHighlightedDistricts, applyFilters]);
+  }, [setSelectedDistricts, setHighlightedDistricts, applyFilters, months.length]);
 
   // Apply district filter changes
   const handleApplyDistricts = () => {
@@ -158,11 +169,12 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
     } else {
       setSelectedDistricts(pendingDistricts);
       setHighlightedDistricts([]);
+      setSelected(pendingDistricts);
       applyFilters();
     }
   };
 
-  // Update preset date range handler
+  // Handle preset date range
   const handlePresetRange = (range: string) => {
     setActiveRange(range);
     const now = new Date();
@@ -172,34 +184,48 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
     switch (range) {
       case "Last month":
         from.setMonth(from.getMonth() - 1);
-        from.setDate(1); // Start of last month
+        from.setDate(1);
         from.setHours(0, 0, 0, 0);
-        to.setDate(0); // Last day of last month
+        to.setDate(0);
         to.setHours(23, 59, 59, 999);
         break;
       case "Last 2 months":
         from.setMonth(from.getMonth() - 2);
-        from.setDate(1); // Start of two months ago
+        from.setDate(1);
         from.setHours(0, 0, 0, 0);
+        to.setDate(0);
         to.setHours(23, 59, 59, 999);
         break;
       default:
-        from = new Date(0);
-        to = new Date();
+        return;
     }
 
-    setFromDate(from.toISOString().split('T')[0]);
-    setToDate(to.toISOString().split('T')[0]);
-    // Reset month range when using presets
-    setMonthRange([0, months.length - 1]);
+    const fromStr = from.toISOString().split('T')[0];
+    const toStr = to.toISOString().split('T')[0];
+    setFromDate(fromStr);
+    setToDate(toStr);
+
+    // Map dates to monthRange indices
+    const monthValues = months.map(m => m.value);
+    const fromIndex = monthValues.indexOf(fromStr) !== -1 ? monthValues.indexOf(fromStr) : 0;
+    const toIndex = monthValues.indexOf(toStr) !== -1 ? monthValues.indexOf(toStr) : months.length - 1;
+    setMonthRange([fromIndex, toIndex]);
   };
 
+  // Handle month range slider change
   const handleMonthRangeChange = (index: number, value: number) => {
     const newRange = [...monthRange];
-    newRange[index] = value;
-    if (newRange[0] <= newRange[1]) {
-      setMonthRange(newRange);
+    if (index === 0) {
+      // Start handle: can't move past end handle
+      newRange[0] = Math.min(value, monthRange[1]);
+    } else {
+      // End handle: can't move before start handle
+      newRange[1] = Math.max(value, monthRange[0]);
     }
+    setMonthRange(newRange);
+    setFromDate(months[newRange[0]].value);
+    setToDate(months[newRange[1]].value);
+    setActiveRange(""); // Clear preset when using slider
   };
 
   if (!isOpen) return null;
@@ -284,27 +310,21 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
                 className="mt-3 h-[80px] overflow-y-auto px-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400"
               >
                 <style jsx global>{`
-                  /* Custom scrollbar styles */
                   .scrollbar-thin::-webkit-scrollbar {
                     width: 6px;
                   }
-                  
                   .scrollbar-thin::-webkit-scrollbar-track {
                     background: transparent;
                     border-radius: 3px;
                   }
-                  
                   .scrollbar-thin::-webkit-scrollbar-thumb {
                     background: #d1d5db;
                     border-radius: 3px;
                     transition: background 0.2s ease;
                   }
-                  
                   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
                     background: #9ca3af;
                   }
-
-                  /* Hide scrollbar for Firefox */
                   .scrollbar-thin {
                     scrollbar-width: thin;
                     scrollbar-color: #d1d5db transparent;
@@ -390,7 +410,6 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
           <Text size={theme.text.size.SM} bold={theme.text.bold.md} className="!text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">
             Filter by date range
           </Text>
-
           <div className="flex items-center gap-2 text-gray-500">
             {!isDateCollapsed && (
               <motion.div
@@ -421,11 +440,10 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
 
         {!isDateCollapsed && (
           <div className="mt-4 flex flex-col gap-4">
-            <div className="rounded-[10px] w-full bg-[#EBEBEB]/140 px-3">
+            <div className="rounded-[10px] w-full bg-[#EBEBEB]/40 px-3">
               <Text size={theme.text.size.SM} bold={theme.text.bold.sm} className="text-gray-500 mb-2">
                 Select date range using slider
               </Text>
-              
               <div className="relative w-full h-[40px]">
                 <div className="absolute top-[50%] left-0 right-0 h-[4px] bg-gray-300 rounded-full -translate-y-1/2" />
                 <div
@@ -437,7 +455,6 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
                     transform: "translateY(-50%)",
                   }}
                 />
-
                 <input
                   type="range"
                   min={0}
@@ -454,7 +471,8 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
                   onChange={(e) => handleMonthRangeChange(1, parseInt(e.target.value))}
                   className="absolute w-full h-full top-0 left-0 appearance-none bg-transparent z-30 pointer-events-auto"
                 />
-                <style jsx>{`                  input[type="range"]::-webkit-slider-thumb {
+                <style jsx>{`
+                  input[type="range"]::-webkit-slider-thumb {
                     -webkit-appearance: none;
                     height: 18px;
                     width: 18px;
@@ -469,7 +487,6 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
                   }
                 `}</style>
               </div>
-
               <div className="flex justify-between w-full -mt-3.5 text-xs font-[200] text-gray-500">
                 {months.map((month, index) => (
                   <span
@@ -499,7 +516,7 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
                   <input
                     id="from-date-input"
                     type="date"
-                    placeholder="00/00/0"
+                    placeholder="Select date"
                     value={fromDate}
                     max={toDate || undefined}
                     onChange={(e) => setFromDate(e.target.value)}
@@ -523,7 +540,7 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
                   <input
                     id="to-date-input"
                     type="date"
-                    placeholder="00/00/0"
+                    placeholder="Select date"
                     value={toDate}
                     min={fromDate || undefined}
                     onChange={(e) => setToDate(e.target.value)}
@@ -557,4 +574,3 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
 };
 
 export default MarkersControl;
-
