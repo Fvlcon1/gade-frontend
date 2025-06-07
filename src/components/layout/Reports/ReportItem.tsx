@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { MapPin } from "lucide-react";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 interface ReportItemProps {
   id: string;
@@ -58,8 +59,17 @@ const ReportItem: React.FC<ReportItemProps> = ({
   location,
   onViewOnMap
 }) => {
-  const timeAgo = new Date(createdAt).toLocaleDateString();
-  
+  // Format date to human readable format
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
   // Get a consistent mock report based on the ID
   const mockIndex = parseInt(id.split('-').pop() || '0') % mockReports.length;
   const mockReport = mockReports[mockIndex];
@@ -83,7 +93,7 @@ const ReportItem: React.FC<ReportItemProps> = ({
               {formattedPriority} Priority
             </span>
           </div>
-          <span className="text-gray-400 text-sm font-medium">{timeAgo}</span>
+          <span className="text-gray-400 text-sm font-medium">{formatDate(createdAt)}</span>
         </div>
         <span className="text-gray-400 text-sm font-semibold whitespace-nowrap">{id}</span>
       </div>

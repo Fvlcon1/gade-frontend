@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { AiFillAlert } from "react-icons/ai";
-import { useSpatialStore } from '@/lib/store/spatialStore';
+import { useReports } from '@/hooks/useReports';
 
 // Define valid status types
 type ReportStatus = 'OPEN' | 'IN REVIEW' | 'RESOLVED' | 'CLOSED';
@@ -63,7 +63,8 @@ const PriorityCard = ({
 };
 
 const Summary = () => {
-  const { reports } = useSpatialStore();
+  // Fetch all reports (use a large page size to get all reports)
+  const { data: reports } = useReports(1, 1000);
 
   // Calculate counts for each priority level
   const counts = React.useMemo(() => {
@@ -71,23 +72,9 @@ const Summary = () => {
       return { high: 0, medium: 0, low: 0 };
     }
 
-    // Count reports by severity, only counting OPEN reports by default
-    const counts = reports.reduce((acc, report) => {
-      // Normalize status to handle variations
-      const status = (report.status || 'OPEN').toUpperCase() as ReportStatus;
-      
-      // Debug log for status
-      console.log('Report status:', { id: report.id, status, originalStatus: report.status });
-      
-      // Only count reports that are OPEN
-      if (status !== 'OPEN') {
-        return acc;
-      }
-
-      // Normalize severity to uppercase
-      const severity = (report.severity || 'LOW').toUpperCase();
-      
-      switch (severity) {
+    // Count reports by severity
+    return reports.reduce((acc, report) => {
+      switch (report.severity) {
         case 'HIGH':
           acc.high++;
           break;
@@ -98,16 +85,11 @@ const Summary = () => {
           acc.low++;
           break;
         default:
-          // If severity is not set or unknown, treat as LOW priority
-          console.warn(`Unknown severity for report ${report.id}:`, severity);
           acc.low++;
           break;
       }
       return acc;
     }, { high: 0, medium: 0, low: 0 });
-
-    console.log('Reports count by priority (OPEN status only):', counts);
-    return counts;
   }, [reports]);
 
   return (
