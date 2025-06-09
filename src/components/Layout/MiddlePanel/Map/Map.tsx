@@ -4,7 +4,7 @@ import { MdMap } from "react-icons/md";
 import Text from '@styles/components/text';
 import theme from '@styles/theme';
 import dynamic from 'next/dynamic';
-import Overlay from './Overlay';
+
 
 // Dynamically import map
 const InteractiveMapClient = dynamic(() => import('./InteractiveMapClient'), {
@@ -49,13 +49,13 @@ const Map = () => {
       <div className="w-full h-[380px] rounded-[9px] relative">
         <InteractiveMapClient 
           mapRef={mapRef}
-          activeBasemap="satellite"
+          activeBasemap="osm"
           activeFeatureLayers={[
             { id: 'reports', label: 'Reports', checked: true },
-            { id: 'admin', label: 'Districts', checked: true },
+            { id: 'rivers', label: 'Rivers', checked: true },
             { id: 'mining_sites', label: 'Mining Sites', checked: true },
             { id: 'forest', label: 'Forest Reserves', checked: true },
-            { id: 'rivers', label: 'Rivers', checked: true }
+            { id: 'admin', label: 'Districts', checked: true },        
           ]}
         />
       </div>

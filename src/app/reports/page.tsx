@@ -186,6 +186,8 @@ export default function ReportsPage() {
                     createdAt={report.created_at}
                     updatedAt={report.updated_at || report.created_at}
                     location={report.locality}
+                    title={report.title}
+                    description={report.description}
                     onViewOnMap={() => handleViewOnMap(report)}
                   />
                 ))}

@@ -11,20 +11,21 @@ const basemaps = [
   { id: 'planet', label: 'Planet', checked: false },
 ];
 
-// Feature layer definitions
+// Feature layer definitions with colors matching LAYER_STYLES
 export const initialLayers = [
   // { id: 'mining', label: 'Mining concessions', checked: true }, // Commented out concessions
-  { id: 'mining_sites', label: 'Detected mining activity', checked: true },
-  { id: 'forest', label: 'Forest reserves', checked: true },
-  { id: 'admin', label: 'Admin districts', checked: true },
-  { id: 'rivers', label: 'Rivers', checked: true },
-  { id: 'reports', label: 'Reports', checked: true },
+  { id: 'mining_sites', label: 'Detected mining activity', checked: true, color: '#FF4B4B' }, // Matches mining_sites color
+  { id: 'forest', label: 'Forest reserves', checked: true, color: '#4CAF50' }, // Matches forest color
+  { id: 'admin', label: 'Admin districts', checked: true, color: '#D2B48C' }, // Matches admin color
+  { id: 'rivers', label: 'Rivers', checked: true, color: '#03A9F4' }, // Matches rivers color
+  { id: 'reports', label: 'Reports', checked: true, color: '#FFD06C' }, // Using mining_sites color for reports since they use icons
 ];
 
 interface Layer {
   id: string;
   label: string;
   checked: boolean;
+  color: string;
 }
 
 interface LayersControlProps {
@@ -145,12 +146,9 @@ const LayersControl: React.FC<LayersControlProps> = ({
                       <ToggleSwitch 
                         checked={layer.checked} 
                         onChange={() => {}}
+                        color={layer.color}
                       />
-                      <span
-                        className={`text-left text-sm font-medium ${
-                          layer.checked ? 'text-[#4F46E5]' : 'text-gray-500'
-                        }`}
-                      >
+                      <span className="text-left text-sm font-medium text-gray-700">
                         {layer.label}
                       </span>
                     </div>
@@ -180,17 +178,30 @@ const LayersControl: React.FC<LayersControlProps> = ({
 };
 
 // Toggle Switch Component
-const ToggleSwitch = ({ checked, onChange }: { checked: boolean; onChange: () => void }) => (
+const ToggleSwitch = ({ checked, onChange, color }: { checked: boolean; onChange: () => void; color: string }) => (
   <div
-    className={`w-[28px] h-[16px] flex items-center rounded-full p-[2px] transition duration-300 ${
-      checked ? 'bg-[#4F46E5]' : 'bg-gray-300'
-    }`}
+    style={{
+      width: '28px',
+      height: '16px',
+      display: 'flex',
+      alignItems: 'center',
+      borderRadius: '9999px',
+      padding: '2px',
+      transition: 'duration-300',
+      backgroundColor: checked ? color : '#D1D5DB'
+    }}
     onClick={onChange}
   >
     <div
-      className={`bg-white w-[12px] h-[12px] rounded-full shadow-md transform transition duration-300 ${
-        checked ? 'translate-x-[12px]' : ''
-      }`}
+      style={{
+        backgroundColor: 'white',
+        width: '12px',
+        height: '12px',
+        borderRadius: '9999px',
+        boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+        transform: checked ? 'translateX(12px)' : 'translateX(0)',
+        transition: 'transform 300ms'
+      }}
     />
   </div>
 );

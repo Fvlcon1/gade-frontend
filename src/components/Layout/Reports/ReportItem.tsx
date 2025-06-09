@@ -9,32 +9,13 @@ interface ReportItemProps {
   createdAt: string;
   updatedAt: string;
   location: string;
+  title?: string;
+  description?: string;
   onViewOnMap: () => void;
 }
 
-// Mock data for titles and descriptions
-const mockReports = [
-  {
-    title: "Large-scale Mining Operation",
-    description: "Suspected galamsey operation behind the abandoned cocoa farm.",
-  },
-  {
-    title: "Water Pollution from Mining Activity",
-    description: "Discoloration in river water observed near suspected mining site",
-  },
-  {
-    title: "Unauthorized Land Clearing",
-    description: "Authorities have seized equipment and arrested 3 individuals",
-  },
-  {
-    title: "Suspected Mining Equipment Transport",
-    description: "Convoy of trucks carrying mining equipment spotted heading to...",
-  },
-  {
-    title: "Noise Complaint - Mining Activity",
-    description: "Investigation confirmed legal sand quarry operating outside...",
-  }
-];
+// Remove mock data
+// const mockReports = [...];
 
 const statusStyles = {
   'open': { label: 'Open', bg: '#FFEACC', text: '#D77E00' },
@@ -56,6 +37,8 @@ const ReportItem: React.FC<ReportItemProps> = ({
   createdAt,
   updatedAt,
   location,
+  title,
+  description,
   onViewOnMap
 }) => {
   // Format date to human readable format
@@ -69,9 +52,9 @@ const ReportItem: React.FC<ReportItemProps> = ({
     });
   };
 
-  // Get a consistent mock report based on the ID, with a default fallback
-  const mockIndex = Math.abs(parseInt(id.replace(/\D/g, '') || '0')) % mockReports.length;
-  const mockReport = mockReports[mockIndex] || mockReports[0]; // Fallback to first mock report if index is invalid
+  // Remove mock report logic
+  // const mockIndex = Math.abs(parseInt(id.replace(/\D/g, '') || '0')) % mockReports.length;
+  // const mockReport = mockReports[mockIndex] || mockReports[0];
 
   // Format priority to capitalize only first letter
   const formattedPriority = priority.charAt(0) + priority.slice(1).toLowerCase();
@@ -101,8 +84,8 @@ const ReportItem: React.FC<ReportItemProps> = ({
       <div className="px-6 py-4 grid grid-cols-[1fr_300px_1fr] gap-x-6 items-center min-h-[100px]">
         {/* Title + Description */}
         <div className="space-y-2">
-          <h3 className="text-[#1F2937] text-base font-semibold leading-6 line-clamp-1">{mockReport.title}</h3>
-          <p className="text-gray-500 text-sm leading-5 line-clamp-2">{mockReport.description}</p>
+          <h3 className="text-[#1F2937] text-base font-semibold leading-6 line-clamp-1">{title || 'No Title'}</h3>
+          <p className="text-gray-500 text-sm leading-5 line-clamp-2">{description || 'No Description'}</p>
         </div>
 
         {/* Location */}

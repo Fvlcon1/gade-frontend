@@ -117,31 +117,88 @@ const HIGHLIGHT_STYLE = {
   }
 };
 
-// Add custom styles for tooltips
+// Add custom styles for tooltips and map elements
 const tooltipStyles = `
   .leaflet-tooltip {
-    padding: 4px 8px !important;
-    font-size: 12px !important;
-    line-height: 1.2 !important;
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+    line-height: 1.4 !important;
     margin: 0 !important;
-    background: rgba(255, 255, 255, 0.95) !important;
+    background: rgba(255, 255, 255, 0.98) !important;
     border: 1px solid #e5e7eb !important;
-    border-radius: 4px !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    backdrop-filter: blur(8px) !important;
+    color: #374151 !important;
+    font-weight: 500 !important;
+    width: fit-content !important;
+    min-width: 120px !important;
+    max-width: 400px !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    text-align: left !important;
+  }
+
+  /* Remove focus outline from map elements */
+  path.leaflet-interactive:focus {
+    outline: none !important;
+  }
+
+  /* Remove focus outline from all map elements */
+  .leaflet-container *:focus {
+    outline: none !important;
+  }
+
+  /* Ensure no outline on click */
+  .leaflet-container *:active {
+    outline: none !important;
   }
 
   .leaflet-tooltip-top:before {
     border-top-color: #e5e7eb !important;
+    margin-top: -6px !important;
   }
 
   .leaflet-tooltip-bottom:before {
     border-bottom-color: #e5e7eb !important;
+    margin-bottom: -6px !important;
+  }
+
+  .leaflet-popup-content-wrapper {
+    border-radius: 8px !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    backdrop-filter: blur(8px) !important;
+    min-width: 200px !important;
+    max-width: 400px !important;
+  }
+
+  .leaflet-popup-content {
+    margin: 12px !important;
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+  }
+
+  .leaflet-popup-tip {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
   }
 `;
 
 // Add ReportsLayer component
 const ReportsLayer: React.FC<{ reports: any[], activeFeatureLayers: Layer[] }> = ({ reports, activeFeatureLayers }) => {
   const map = useMap();
+
+  // Function to get the excavator icon
+  const getExcavatorIcon = () => {
+    return L.icon({
+      iconUrl: '/assets/Mid/excavator/exca4.png',
+      iconSize: [36, 36], // Adjust size as needed
+      iconAnchor: [16, 32], // Center bottom of the icon
+      popupAnchor: [0, -32], // Popup appears above the icon
+      className: 'excavator-marker'
+    });
+  };
 
   useEffect(() => {
     const reportsLayer = (map as any).reportsLayer;
@@ -160,41 +217,18 @@ const ReportsLayer: React.FC<{ reports: any[], activeFeatureLayers: Layer[] }> =
       const markersLayer = L.layerGroup().addTo(map);
       (map as any).reportsLayer = markersLayer;
 
-      // Create custom icon for reports
-      const reportIcon = L.divIcon({
-        className: 'report-marker',
-        html: `
-          <div class="relative">
-            <svg viewBox="0 0 24 24" width="24" height="24" class="text-[var(--color-main-primary)]">
-              <path fill="currentColor" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-            </svg>
-            <div class="absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-medium bg-white px-1 rounded shadow-sm">
-              <span class="text-gray-800"></span>
-            </div>
-          </div>
-        `,
-        iconSize: [24, 24],
-        iconAnchor: [12, 24],
-        popupAnchor: [0, -24],
-      });
-
       // Add markers for each report
       reports.forEach(report => {
-        const marker = L.marker([report.location.lat, report.location.lon], { icon: reportIcon })
-          .bindPopup(`
-            <div class="p-2">
-              <h3 class="font-medium text-sm">${report.locality}</h3>
-              <p class="text-xs text-gray-600">Severity: ${report.severity}</p>
-              <p class="text-xs text-gray-600">Status: ${report.status || 'Open'}</p>
-              <p class="text-xs text-gray-600">Reported: ${new Date(report.created_at).toLocaleDateString()}</p>
-            </div>
-          `);
-
-        // Update the locality text
-        const localitySpan = marker.getElement()?.querySelector('.text-gray-800');
-        if (localitySpan) {
-          localitySpan.textContent = report.locality;
-        }
+        const marker = L.marker([report.location.lat, report.location.lon], { 
+          icon: getExcavatorIcon()
+        }).bindPopup(`
+          <div class="p-2">
+            <h3 class="font-medium text-sm">${report.locality}</h3>
+            <p class="text-xs text-gray-600">Severity: ${report.severity}</p>
+            <p class="text-xs text-gray-600">Status: ${report.status || 'Open'}</p>
+            <p class="text-xs text-gray-600">Reported: ${new Date(report.created_at).toLocaleDateString()}</p>
+          </div>
+        `);
 
         markersLayer.addLayer(marker);
       });
@@ -212,20 +246,24 @@ const ReportsLayer: React.FC<{ reports: any[], activeFeatureLayers: Layer[] }> =
 
 const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers }) => {
   const { 
-    miningSites,
     filteredMiningSites,
     filteredDistricts,
-    districts, 
     forestReserves, 
     rivers,
     reports,
     isLoading, 
     error, 
     selectedDistricts,
-    highlightedDistricts,
     dateRange,
     applyFilters 
   } = useSpatialStore();
+
+  const map = useMap(); // Get map instance from useMap hook
+
+  // Only render layers if map instance is available
+  if (!map) {
+    return null;
+  }
 
   // Apply filters when they change
   useEffect(() => {
@@ -247,180 +285,162 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
   // Style for districts based on selection and highlighting
   const getDistrictStyle = (feature: any) => {
     const district = feature.properties.district;
-    const isHighlighted = highlightedDistricts.includes(district);
     const isSelected = selectedDistricts.includes(district);
 
     // If no districts are selected, show all with default style
     if (selectedDistricts.length === 0) {
-      return isHighlighted ? HIGHLIGHT_STYLE.admin : LAYER_STYLES.admin;
+      return {
+        weight: 1,
+        opacity: 0.4,
+        fillOpacity: 0.05,
+        color: '#D2B48C',
+        dashArray: '3, 3'
+      };
     }
 
     // If districts are selected, only show selected ones
     if (!isSelected) {
-      return { ...LAYER_STYLES.admin, opacity: 0, fillOpacity: 0 };
+      return { opacity: 0, fillOpacity: 0 };
     }
 
-    return isHighlighted ? HIGHLIGHT_STYLE.admin : {
-      color: "var(--color-main-primary)", // Using project's primary color
-      weight: 2,
-      opacity: 0.8,
-      fillOpacity: 0.3,
+    return {
+      color: "var(--color-main-primary)",
+      weight: 1.5,
+      opacity: 0.6,
+      fillOpacity: 0.1,
+      dashArray: 'none'
     };
   };
 
-  if (isLoading) {
-    return (
-      <div className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-sm z-[1000]">
-        <div className="loader" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-sm z-[1000]">
-        <div className="text-red-500">Error loading map data</div>
-      </div>
-    );
-  }
-
   return (
     <>
-      {/* Basemap */}
-      <TileLayer
-        url={BASEMAP_URLS[activeBasemap]}
-        attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      />
+      {/* Loading indicator */}
+      {isLoading && (
+        <div className="absolute top-4 right-[120px] bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-sm z-[1002] flex items-center gap-2">
+          <div className="animate-spin rounded-full h-4 w-4 border-2 border-[var(--color-main-primary)] border-t-transparent" />
+          <span className="text-sm text-gray-700 font-medium">Loading layers...</span>
+        </div>
+      )}
 
-      {/* Reports Layer */}
-      <ReportsLayer reports={reports} activeFeatureLayers={activeFeatureLayers} />
+      {/* Error state */}
+      {error && (
+        <div className="absolute top-4 right-[120px] bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-sm z-[1002] flex items-center gap-2">
+          <span className="text-sm text-red-500 font-medium">Error loading layers</span>
+        </div>
+      )}
 
-      {/* Feature Layers */}
-      {activeFeatureLayers.map((layer) => {
-        const data = filteredLayerData[layer.id];
-        if (!layer.checked || !data) return null;
+      {/* Only show layers when data is ready */}
+      {!isLoading && !error && (
+        <>
+          {/* Reports Layer */}
+          <ReportsLayer reports={reports} activeFeatureLayers={activeFeatureLayers} />
 
-        // For districts layer
-        if (layer.id === 'admin') {
-          return (
-            <GeoJSON
-              key={layer.id}
-              data={data}
-              style={(feature) => getDistrictStyle(feature)}
-              onEachFeature={(feature, leafletLayer) => {
-                const district = feature.properties.district;
-                const isSelected = selectedDistricts.includes(district);
-                
-                // Only add tooltip if district is selected or no districts are selected
-                if (selectedDistricts.length === 0 || isSelected) {
-                  // Add tooltip with district and region info in a more compact format
-                  const tooltipContent = feature.properties.region 
-                    ? `${district} • ${feature.properties.region}`
-                    : district;
+          {/* Feature Layers */}
+          {activeFeatureLayers.map((layer) => {
+            const data = filteredLayerData[layer.id];
+            if (!layer.checked || !data) return null;
+
+            // For districts layer
+            if (layer.id === 'admin') {
+              return (
+                <GeoJSON
+                  key={layer.id}
+                  data={data}
+                  style={(feature) => getDistrictStyle(feature)}
+                  onEachFeature={(feature, leafletLayer) => {
+                    const district = feature.properties.district;
+                    const isSelected = selectedDistricts.includes(district);
+                    
+                    // Remove click event handlers that might cause highlighting
+                    leafletLayer.off('click');
+                    leafletLayer.off('mouseover');
+                    leafletLayer.off('mouseout');
+                    
+                    // Only add tooltip if district is selected or no districts are selected
+                    if (selectedDistricts.length === 0 || isSelected) {
+                      const tooltipContent = `<div class="font-medium">${district}</div>`;
+                        
+                      leafletLayer.bindTooltip(tooltipContent, {
+                        permanent: false,
+                        direction: 'top',
+                        offset: [0, -8],
+                        className: 'district-tooltip'
+                      });
+                    }
+                  }}
+                />
+              );
+            }
+
+            // For mining sites layer
+            if (layer.id === 'mining_sites') {
+              return (
+                <GeoJSON
+                  key={`${layer.id}-${selectedDistricts.join(',')}-${dateRange?.from || ''}-${dateRange?.to || ''}`}
+                  data={data}
+                  style={LAYER_STYLES[layer.id]}
+                  onEachFeature={(feature, leafletLayer) => {
+                    const date = new Date(feature.properties.detected_date).toLocaleDateString();
+                    const district = feature.properties.district;
+                    const tooltipContent = `
+                      <div class="space-y-1">
+                        <div class="font-medium">Detected: ${date}</div>
+                        ${district ? `<div class="text-gray-600">District: ${district}</div>` : ''}
+                      </div>
+                    `;
+                    leafletLayer.bindTooltip(tooltipContent, {
+                      permanent: false,
+                      direction: 'top',
+                      offset: [0, -8],
+                      className: 'mining-site-tooltip'
+                    });
+                  }}
+                />
+              );
+            }
+
+            // For other layers (forest, rivers)
+            return (
+              <GeoJSON
+                key={layer.id}
+                data={data}
+                style={LAYER_STYLES[layer.id]}
+                onEachFeature={(feature, leafletLayer) => {
+                  const name = feature.properties.name || 'Unnamed';
+                  const tooltipContent = `<div class="font-medium">${name}</div>`;
                   leafletLayer.bindTooltip(tooltipContent, {
                     permanent: false,
                     direction: 'top',
-                    offset: [0, -5],
-                    className: 'district-tooltip'
+                    offset: [0, -8],
+                    className: `${layer.id}-tooltip`
                   });
-                }
-              }}
-            />
-          );
-        }
-
-        // For mining sites layer
-        if (layer.id === 'mining_sites') {
-          return (
-            <GeoJSON
-              key={`${layer.id}-${selectedDistricts.join(',')}-${dateRange?.from || ''}-${dateRange?.to || ''}`}
-              data={data}
-              style={LAYER_STYLES[layer.id]}
-              onEachFeature={(feature, leafletLayer) => {
-                const date = new Date(feature.properties.detected_date).toLocaleDateString();
-                const tooltipContent = `Detected: ${date}${feature.properties.district ? `\nDistrict: ${feature.properties.district}` : ''}`;
-                leafletLayer.bindTooltip(tooltipContent);
-              }}
-            />
-          );
-        }
-
-        // For other layers (forest, rivers)
-        return (
-          <GeoJSON
-            key={layer.id}
-            data={data}
-            style={LAYER_STYLES[layer.id]}
-            onEachFeature={(feature, leafletLayer) => {
-              leafletLayer.bindTooltip(feature.properties.name || 'Unnamed');
-            }}
-          />
-        );
-      })}
+                }}
+              />
+            );
+          })}
+        </>
+      )}
     </>
   );
 };
 
-// Add custom styles for responsive zoom controls
-const zoomControlStyles = `
-  .leaflet-control-zoom {
-    border: none !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-  }
-  
-  .leaflet-control-zoom a {
-    width: 36px !important;
-    height: 36px !important;
-    line-height: 36px !important;
-    font-size: 20px !important;
-    background-color: white !important;
-    color: #374151 !important;
-    border: 1px solid #e5e7eb !important;
-  }
-
-  .leaflet-control-zoom a:hover {
-    background-color: #f9fafb !important;
-    color: #1f2937 !important;
-  }
-
-  .leaflet-control-zoom-in {
-    border-radius: 4px 4px 0 0 !important;
-  }
-
-  .leaflet-control-zoom-out {
-    border-radius: 0 0 4px 4px !important;
-  }
-
-  @media (max-width: 640px) {
-    .leaflet-control-zoom {
-      margin: 12px !important;
-    }
-    
-    .leaflet-control-zoom a {
-      width: 32px !important;
-      height: 32px !important;
-      line-height: 32px !important;
-      font-size: 18px !important;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .leaflet-control-zoom {
-      margin: 8px !important;
-    }
-    
-    .leaflet-control-zoom a {
-      width: 28px !important;
-      height: 28px !important;
-      line-height: 28px !important;
-      font-size: 16px !important;
-    }
-  }
-`;
-
-const InteractiveMapClient: React.FC<MapContainerProps> = ({ mapRef, activeBasemap, activeFeatureLayers }) => {
+const InteractiveMapClient: React.FC<MapContainerProps> = ({ 
+  mapRef, 
+  activeBasemap = 'osm', 
+  activeFeatureLayers 
+}) => {
   const { reports } = useSpatialStore();
   const searchParams = useSearchParams();
+
+  // Initialize with OSM but allow switching
+  const [currentBasemap, setCurrentBasemap] = useState(activeBasemap);
+
+  // Update basemap when prop changes, but only if it's different
+  useEffect(() => {
+    if (activeBasemap !== currentBasemap) {
+      setCurrentBasemap(activeBasemap);
+    }
+  }, [activeBasemap]);
 
   // Get initial view from URL parameters or use default
   const initialView = useMemo(() => {
@@ -437,8 +457,8 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({ mapRef, activeBasem
 
     // Default view (Ghana)
     return {
-      center: [7.9465, -1.0232] as [number, number],
-      zoom: 7
+      center: [5.6570, -2.1478] as [number, number],
+      zoom: 9.2
     };
   }, [searchParams]);
 
@@ -460,7 +480,6 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({ mapRef, activeBasem
           if (reportId && reports) {
             const report = reports.find(r => r.id === reportId);
             if (report) {
-              // Use flyTo for smooth animation
               map.flyTo(
                 [report.location.lat, report.location.lon],
                 14,
@@ -470,7 +489,6 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({ mapRef, activeBasem
                 }
               );
 
-              // Find and open the report's popup after a short delay
               setTimeout(() => {
                 const reportsLayer = (map as any).reportsLayer;
                 if (reportsLayer) {
@@ -485,7 +503,13 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({ mapRef, activeBasem
           }
         }}
       >
-        <MapLayers activeBasemap={activeBasemap} activeFeatureLayers={activeFeatureLayers} />
+        {/* Show selected basemap */}
+        <TileLayer
+          url={BASEMAP_URLS[currentBasemap]}
+          attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+        
+        <MapLayers activeBasemap={currentBasemap} activeFeatureLayers={activeFeatureLayers} />
         {reports && <ReportsLayer reports={reports} activeFeatureLayers={activeFeatureLayers} />}
         <MouseCoordinateDisplay />
       </MapContainer>
