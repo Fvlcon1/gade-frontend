@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface SpatialFeature {
   geometry: any; // We'll type this properly when we know the exact geometry structure

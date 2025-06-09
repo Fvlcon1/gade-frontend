@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FiSearch } from 'react-icons/fi';
 import { RiDownload2Line } from 'react-icons/ri';
 import { IoMdArrowDropdown } from 'react-icons/io';
@@ -29,9 +29,23 @@ const sortOptions = [
 
 const Dropdown = ({ icon, options, selected, onChange }) => {
   const [open, setOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
-    <div className="relative">
+    <div className="relative" ref={dropdownRef}>
       <div
         className="flex items-center justify-between px-3 w-[160px] h-[40px] bg-[#FBFBFB] border border-gray-200 rounded-[10px] cursor-pointer hover:bg-gray-50 transition-colors"
         onClick={() => setOpen(!open)}
@@ -76,6 +90,21 @@ const FilterBar = ({ onSearch, onStatusChange, onPriorityChange, onSortChange, o
   const [sort, setSort] = useState('Newest First');
   const [searchTerm, setSearchTerm] = useState('');
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
+  const exportMenuRef = useRef(null);
+
+  // Handle click outside for export menu
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(event.target)) {
+        setExportMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Handle search with debounce
   useEffect(() => {
@@ -147,7 +176,7 @@ const FilterBar = ({ onSearch, onStatusChange, onPriorityChange, onSortChange, o
       </div>
 
       {/* Export Button with Dropdown */}
-      <div className="relative ml-auto">
+      <div className="relative ml-auto" ref={exportMenuRef}>
         <button 
           onClick={() => setExportMenuOpen(!exportMenuOpen)}
           className="w-[120px] h-[40px] bg-[var(--color-main-primary)] hover:bg-[var(--color-main-primary)]/90 transition-colors rounded-[10px] text-white flex items-center justify-center gap-2.5 text-sm font-medium px-4 shadow-sm hover:shadow-md active:shadow-sm"

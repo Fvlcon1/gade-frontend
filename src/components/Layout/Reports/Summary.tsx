@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { AiFillAlert } from "react-icons/ai";
-import { useReports } from '@/hooks/useReports';
+import { useSpatialStore } from '@/lib/store/spatialStore';
 
 // Define valid status types
 type ReportStatus = 'OPEN' | 'IN REVIEW' | 'RESOLVED' | 'CLOSED';
@@ -63,8 +63,8 @@ const PriorityCard = ({
 };
 
 const Summary = () => {
-  // Fetch all reports (use a large page size to get all reports)
-  const { data: reports } = useReports(1, 1000);
+  // Get reports from spatial store
+  const { reports } = useSpatialStore();
 
   // Calculate counts for each priority level
   const counts = React.useMemo(() => {

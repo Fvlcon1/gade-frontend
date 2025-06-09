@@ -5,7 +5,6 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import { useSpatialStore } from '@/lib/store/spatialStore';
-import { useReports } from '@/hooks/useReports';
 import L from 'leaflet';
 import { useSearchParams } from "next/navigation";
 

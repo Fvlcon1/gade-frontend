@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import LeftPanel from '@/components/layout/LeftPanel/LeftPanel';
+import LeftPanel from '@components/Layout/LeftPanel/LeftPanel';
 
 export default function AccountLayout({
   children,

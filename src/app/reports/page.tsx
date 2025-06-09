@@ -1,20 +1,19 @@
 'use client';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useCallback, useEffect } from 'react';
-import { FaMapMarkerAlt, FaSync } from 'react-icons/fa';
-import LeftPanel from "@components/layout/LeftPanel/LeftPanel";
-import { menuItems } from "@components/layout/LeftPanel/menuItems";
-import Title from '@components/layout/Reports/Title';
-import Summary from '../../components/layout/Reports/Summary';
-import FilterBar from '@/components/layout/Reports/FilterBar';
-import ReportList from '@/components/layout/Reports/ReportList';
-import ReportItem from '../../components/layout/Reports/ReportItem';
-import { useReports } from '@/hooks/useReports';
-import { exportToCSV } from '@/lib/utils/export';
-import { exportToPDF } from '@/lib/utils/export';
+import { FaSync } from 'react-icons/fa';
+import LeftPanel from "@components/Layout/LeftPanel/LeftPanel";
+import { menuItems } from "@components/Layout/LeftPanel/menuItems";
+import Title from '@components/Layout/Reports/Title';
+import Summary from '../../components/Layout/Reports/Summary';
+import FilterBar from '@components/Layout/Reports/FilterBar';
+import ReportList from '@components/Layout/Reports/ReportList';
+import ReportItem from '../../components/Layout/Reports/ReportItem';
+import { useSpatialStore, setupReportsRefresh, cleanupReportsRefresh } from '@/lib/store/spatialStore';
+import { exportToCSV } from '@/utils/export';
+import { exportToPDF } from '@/utils/export';
+import { formatReportId } from '@/utils/format';
 
-// Auto-refresh interval in milliseconds (30 seconds)
-const AUTO_REFRESH_INTERVAL = 30000;
 
 export default function ReportsPage() {
   const pathname = usePathname();
@@ -24,10 +23,8 @@ export default function ReportsPage() {
   const ActiveIcon = activeItem?.icon;
   const activeIcon = ActiveIcon ? <ActiveIcon size={20} /> : null;
 
-  // 👇 Sidebar expansion state
+  // Sidebar expansion state
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -35,24 +32,21 @@ export default function ReportsPage() {
   const [priorityFilter, setPriorityFilter] = useState('All Priorities');
   const [sortOrder, setSortOrder] = useState('Newest First');
 
-  // Fetch reports data with refetch function
-  const { data: reports, isLoading, refetch } = useReports(currentPage, pageSize);
+  // Get reports from spatial store
+  const { reports, isLoading, error, fetchReports } = useSpatialStore();
+
+  // Set up and clean up reports refresh
+  useEffect(() => {
+    setupReportsRefresh();
+    return () => cleanupReportsRefresh();
+  }, []);
 
   // Handle manual refresh
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
-    await refetch();
+    await fetchReports();
     setTimeout(() => setIsRefreshing(false), 1000); // Show refresh animation for 1 second
-  }, [refetch]);
-
-  // Set up auto-refresh
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      refetch();
-    }, AUTO_REFRESH_INTERVAL);
-
-    return () => clearInterval(intervalId);
-  }, [refetch]);
+  }, [fetchReports]);
 
   const handleViewOnMap = useCallback((report) => {
     router.push(`/map?lat=${report.location.lat}&lon=${report.location.lon}&zoom=14&report=${report.id}`);
@@ -63,8 +57,9 @@ export default function ReportsPage() {
 
     // Filter reports based on current filters
     const filteredReports = reports.filter(report => {
+      const formattedId = formatReportId(report.id);
       const matchesSearch = 
-        report.id.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+        formattedId.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
         report.locality.toLowerCase().includes(filters.searchTerm.toLowerCase());
 
       const matchesStatus = filters.status === 'All Statuses' || report.status === filters.status;
@@ -82,7 +77,7 @@ export default function ReportsPage() {
 
     // Prepare data for export
     const exportData = sortedReports.map(report => ({
-      'Report ID': report.id,
+      'Report ID': formatReportId(report.id),
       'Location': report.locality,
       'Status': report.status,
       'Severity': report.severity,
@@ -100,10 +95,11 @@ export default function ReportsPage() {
 
   // Filter and sort reports
   const filteredReports = reports?.filter(report => {
+    const formattedId = formatReportId(report.id);
     // Search term filter (case-insensitive)
     const searchTermLower = searchTerm.toLowerCase();
     const matchesSearch = searchTerm === '' || 
-      report.id.toLowerCase().includes(searchTermLower) ||
+      formattedId.toLowerCase().includes(searchTermLower) ||
       report.locality.toLowerCase().includes(searchTermLower) ||
       (report.title?.toLowerCase().includes(searchTermLower)) ||
       (report.description?.toLowerCase().includes(searchTermLower));
@@ -123,6 +119,15 @@ export default function ReportsPage() {
     const dateB = new Date(b.created_at).getTime();
     return sortOrder === 'Newest First' ? dateB - dateA : dateA - dateB;
   }) || [];
+
+  // Show error state if there's an error
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-red-500">Error: {error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex w-screen h-screen overflow-hidden bg-white pl-2.5">
@@ -175,7 +180,7 @@ export default function ReportsPage() {
                 {filteredReports.map((report) => (
                   <ReportItem
                     key={report.id}
-                    id={report.id}
+                    id={formatReportId(report.id)}
                     status={report.status}
                     priority={report.severity}
                     createdAt={report.created_at}

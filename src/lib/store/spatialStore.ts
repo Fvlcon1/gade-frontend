@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { fetchSpatialData } from '@/hooks/spatial-data';
-import { Report } from '@/hooks/useReports';
 
 // Define SpatialData type
 interface SpatialData {
@@ -22,119 +21,155 @@ interface SpatialData {
   }>;
 }
 
-// Add type for mining site properties
-interface MiningSiteProperties {
-  assets?: string;
-  category?: string;
-  district?: string;
-  name: string;
-  owner?: string;
-  region?: string;
-  status?: string;
-  type?: string;
-  detected_date?: string;
+interface ReportLocation {
+  lat: number;
+  lon: number;
 }
 
+ interface Report {
+  id: string;
+  title: string;
+  description: string;
+  locality: string;
+  severity: 'HIGH' | 'MEDIUM' | 'LOW';
+  status: string;
+  location: ReportLocation;
+  created_at: string;
+  updated_at: string;
+}
+
+
 interface SpatialState {
-  baseUrl: string;
-  reports: Report[];
+  // Spatial data
   districts: SpatialData | null;
   forestReserves: SpatialData | null;
   rivers: SpatialData | null;
   miningSites: SpatialData | null;
   filteredMiningSites: SpatialData | null;
   filteredDistricts: SpatialData | null;
+  
+  // Reports data
+  reports: Report[] | null;
+  reportsLastUpdated: number | null;
+  
+  // UI state
   isLoading: boolean;
   error: string | null;
   selectedDistricts: string[];
   highlightedDistricts: string[];
-  dateRange: {
-    from: string | null;
-    to: string | null;
-  };
+  dateRange: { from: string | null; to: string | null } | null;
+
+  // Actions
   setSelectedDistricts: (districts: string[]) => void;
   setHighlightedDistricts: (districts: string[]) => void;
   setDateRange: (range: { from: string | null; to: string | null }) => void;
   applyFilters: () => void;
   fetchAllData: () => Promise<void>;
-  setReports: (reports: Report[]) => void;
+  fetchReports: () => Promise<void>;
 }
 
+// Helper function to fetch reports
+const fetchReportsData = async (baseUrl: string): Promise<Report[]> => {
+  if (!baseUrl) {
+    throw new Error('API base URL is not configured');
+  }
+  const response = await fetch(`${baseUrl}/admin/report?page_id=1&page_size=1000`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch reports');
+  }
+  const data = await response.json();
+  return data;
+};
+
 export const useSpatialStore = create<SpatialState>((set, get) => ({
-  baseUrl: process.env.NEXT_PUBLIC_API_URL || '',
-  reports: [],
+  // Initial state
   districts: null,
   forestReserves: null,
   rivers: null,
   miningSites: null,
   filteredMiningSites: null,
   filteredDistricts: null,
+  reports: null,
+  reportsLastUpdated: null,
   isLoading: false,
   error: null,
   selectedDistricts: [],
   highlightedDistricts: [],
-  dateRange: {
-    from: null,
-    to: null,
-  },
+  dateRange: null,
+
+  // Actions
   setSelectedDistricts: (districts) => set({ selectedDistricts: districts }),
   setHighlightedDistricts: (districts) => set({ highlightedDistricts: districts }),
   setDateRange: (range) => set({ dateRange: range }),
+  
   applyFilters: () => {
-    set((state) => {
-      const { selectedDistricts, dateRange, miningSites } = state;
-      
-      // Return early if miningSites is not loaded yet
-      if (!miningSites) {
-        return {
-          ...state,
-          filteredMiningSites: null
-        };
-      }
-      
-      // Apply date filter first
-      const dateFilteredSites = miningSites.features.filter(site => {
-        if (!dateRange?.from && !dateRange?.to) return true;
-        if (!site.properties.detected_date) return false;
-        
-        const siteDate = new Date(site.properties.detected_date);
-        const fromDate = dateRange.from ? new Date(dateRange.from) : null;
-        const toDate = dateRange.to ? new Date(dateRange.to) : null;
-        
-        if (fromDate && toDate) {
-          return siteDate >= fromDate && siteDate <= toDate;
-        } else if (fromDate) {
-          return siteDate >= fromDate;
-        } else if (toDate) {
-          return siteDate <= toDate;
-        }
-        return true;
-      });
+    const { miningSites, districts, selectedDistricts, dateRange } = get();
+    if (!miningSites || !districts) return;
 
-      // Then apply district filter
-      const filteredSites = selectedDistricts.length === 0 
-        ? dateFilteredSites
-        : dateFilteredSites.filter(site => 
-            selectedDistricts.includes(site.properties.district)
-          );
+    // Filter mining sites based on selected districts and date range
+    const filteredMiningSites = {
+      ...miningSites,
+      features: miningSites.features.filter(feature => {
+        const matchesDistrict = selectedDistricts.length === 0 || 
+          selectedDistricts.includes(feature.properties.district);
+        
+        const matchesDate = !dateRange?.from || !dateRange?.to || 
+          (feature.properties.detected_date >= dateRange.from && 
+           feature.properties.detected_date <= dateRange.to);
+        
+        return matchesDistrict && matchesDate;
+      })
+    };
 
-      return {
-        ...state,
-        filteredMiningSites: {
-          ...miningSites,
-          features: filteredSites
-        }
-      };
-    });
+    // Filter districts based on selection
+    const filteredDistricts = {
+      ...districts,
+      features: districts.features.filter(feature => 
+        selectedDistricts.length === 0 || 
+        selectedDistricts.includes(feature.properties.district)
+      )
+    };
+
+    set({ filteredMiningSites, filteredDistricts });
   },
+
+  fetchReports: async () => {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (!baseUrl) {
+      set({ error: 'API base URL is not configured' });
+      return;
+    }
+
+    try {
+      const reports = await fetchReportsData(baseUrl);
+      set({ 
+        reports,
+        reportsLastUpdated: Date.now(),
+        error: null 
+      });
+    } catch (error) {
+      set({ 
+        error: error instanceof Error ? error.message : 'Failed to fetch reports',
+        reportsLastUpdated: Date.now() // Still update timestamp even on error
+      });
+    }
+  },
+
   fetchAllData: async () => {
     set({ isLoading: true, error: null });
     try {
-      const [districts, forestReserves, rivers, miningSites] = await Promise.all([
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+      if (!baseUrl) {
+        throw new Error('API base URL is not configured');
+      }
+
+      // Fetch all data in parallel
+      const [districts, forestReserves, rivers, miningSites, reports] = await Promise.all([
         fetchSpatialData('/data/districts'),
         fetchSpatialData('/data/forest-reserves'),
         fetchSpatialData('/data/rivers'),
         fetchSpatialData('/data/mining-sites'),
+        fetchReportsData(baseUrl)
       ]);
 
       set({
@@ -142,16 +177,38 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
         forestReserves,
         rivers,
         miningSites,
+        reports,
+        reportsLastUpdated: Date.now(),
         filteredMiningSites: miningSites,
         filteredDistricts: districts,
         isLoading: false,
+        error: null
       });
     } catch (error) {
       set({
-        error: error instanceof Error ? error.message : 'Failed to fetch spatial data',
-        isLoading: false,
+        error: error instanceof Error ? error.message : 'Failed to fetch data',
+        isLoading: false
       });
     }
-  },
-  setReports: (reports) => set({ reports }),
+  }
 }));
+
+// Set up automatic reports refresh
+let refreshInterval: NodeJS.Timeout | null = null;
+
+export const setupReportsRefresh = () => {
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+  }
+  
+  refreshInterval = setInterval(() => {
+    useSpatialStore.getState().fetchReports();
+  }, 10000); // Refresh every 10 seconds
+};
+
+export const cleanupReportsRefresh = () => {
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+    refreshInterval = null;
+  }
+};
