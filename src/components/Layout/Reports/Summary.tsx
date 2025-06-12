@@ -4,6 +4,7 @@ import { AiFillAlert } from "react-icons/ai";
 import { useSpatialStore } from '@/lib/store/spatialStore';
 import Text, { Head1 } from '@/app/styles/components/text';
 import { TypographySize, TypographyBold } from '@/app/styles/style.types';
+import { IconReport, IconAlertCircle, IconClock, IconCheck } from "@tabler/icons-react";
 
 // Define valid status types
 type ReportStatus = 'OPEN' | 'IN REVIEW' | 'RESOLVED' | 'CLOSED';
@@ -45,12 +46,12 @@ const PriorityCard = ({
   const styles = getStyles();
 
   return (
-    <div className={`rounded-2xl ${styles.container} w-[229px] h-[78px] border px-4 py-3 flex justify-between items-start`}>
+    <div className={`rounded-2xl ${styles.container} w-full h-[120px] border px-6 py-4 flex justify-between items-start`}>
       {/* Text section: priority + count */}
       <div className="flex flex-col items-start">
         <Text
           textColor={type === 'high' ? 'rgb(220 38 38)' : type === 'medium' ? 'rgb(215 126 0)' : 'rgb(13 148 136)'}
-          size={TypographySize.xs}
+          size={TypographySize.body2}
           bold={TypographyBold.sm}
           className={styles.title}
         >
@@ -67,8 +68,8 @@ const PriorityCard = ({
       </div>
 
       {/* Icon section */}
-      <div className={`w-[36px] h-[36px] rounded-xl ${styles.iconBg} flex items-center justify-center`}>
-        <AiFillAlert className={`w-[18px] h-[18px] ${styles.iconColor}`} />
+      <div className={`w-[40px] h-[40px] rounded-xl ${styles.iconBg} flex items-center justify-center`}>
+        <AiFillAlert className={`w-[20px] h-[20px] ${styles.iconColor}`} />
       </div>
     </div>
   );
@@ -104,25 +105,28 @@ const Summary = () => {
     }, { high: 0, medium: 0, low: 0 });
   }, [reports]);
 
+  // const totalReports = reports?.length;
+  // const openReports = reports.filter(report => report.status === 'OPEN').length;
+  // const inReviewReports = reports.filter(report => report.status === 'IN REVIEW').length;
+  // const resolvedReports = reports.filter(report => report.status === 'RESOLVED').length;
+
   return (
-    <div className="flex mt-2 items-start">
-      <div className="flex gap-6 flex-wrap">
-        <PriorityCard 
-          priority="High Priority"
-          count={counts.high} 
-          type="high" 
-        />
-        <PriorityCard 
-          priority="Medium Priority"
-          count={counts.medium} 
-          type="medium" 
-        />
-        <PriorityCard 
-          priority="Low Priority"
-          count={counts.low} 
-          type="low" 
-        />
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <PriorityCard 
+        priority="High Priority"
+        count={counts.high} 
+        type="high" 
+      />
+      <PriorityCard 
+        priority="Medium Priority"
+        count={counts.medium} 
+        type="medium" 
+      />
+      <PriorityCard 
+        priority="Low Priority"
+        count={counts.low} 
+        type="low" 
+      />
     </div>
   );
 };

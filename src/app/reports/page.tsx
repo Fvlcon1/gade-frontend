@@ -150,21 +150,6 @@ export default function ReportsPage() {
           sidebarExpanded ? "px-3" : "px-5"
         } pt-4`}
       >
-        <div className="flex items-center justify-between mb-4">
-          <Title activeTitle={activeTitle} activeIcon={activeIcon} isActive={true} />
-          <button
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors
-              ${isRefreshing 
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
-              }`}
-          >
-            <FaSync className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            {isRefreshing ? 'Refreshing...' : 'Refresh'}
-          </button>
-        </div>
 
         {/* Scrollable content area */}
         <div className="flex-1 flex flex-col overflow-y-auto pr-2 space-y-4 hide-scrollbar">
@@ -175,6 +160,11 @@ export default function ReportsPage() {
             onPriorityChange={setPriorityFilter}
             onSortChange={setSortOrder}
             onExport={handleExport}
+            onRefresh={handleRefresh}
+            isRefreshing={isRefreshing}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
           />
           <ReportList>
             {isLoading ? (
@@ -186,46 +176,22 @@ export default function ReportsPage() {
                 No reports found
               </div>
             ) : (
-              <>
-                <div className="space-y-4">
-                  {paginatedReports.map((report) => (
-                    <ReportItem
-                      key={report.id}
-                      id={formatReportId(report.id)}
-                      status={report.status}
-                      priority={report.severity}
-                      createdAt={report.created_at}
-                      updatedAt={report.updated_at || report.created_at}
-                      location={report.locality}
-                      title={report.title}
-                      description={report.description}
-                      onViewOnMap={() => handleViewOnMap(report)}
-                    />
-                  ))}
-                </div>
-                {/* Pagination Controls */}
-                {totalPages > 1 && (
-                  <div className="flex justify-center items-center gap-2 mt-6">
-                    <Button
-                      variant="outline"
-                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                      disabled={currentPage === 1}
-                    >
-                      Previous
-                    </Button>
-                    <span className="text-sm text-gray-600">
-                      Page {currentPage} of {totalPages}
-                    </span>
-                    <Button
-                      variant="outline"
-                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                      disabled={currentPage === totalPages}
-                    >
-                      Next
-                    </Button>
-                  </div>
-                )}
-              </>
+              <div className="space-y-4">
+                {paginatedReports.map((report) => (
+                  <ReportItem
+                    key={report.id}
+                    id={formatReportId(report.id)}
+                    status={report.status}
+                    priority={report.severity}
+                    createdAt={report.created_at}
+                    updatedAt={report.updated_at || report.created_at}
+                    location={report.locality}
+                    title={report.title}
+                    description={report.description}
+                    onViewOnMap={() => handleViewOnMap(report)}
+                  />
+                ))}
+              </div>
             )}
           </ReportList>
         </div>

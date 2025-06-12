@@ -7,6 +7,10 @@ import Image from "next/image";
 import { HelpCircle, Settings } from "lucide-react";
 import { LuArrowRightToLine } from "react-icons/lu";
 import ClickableTab from "@components/ui/clickable/clickabletab";
+import { useAuthStore } from "@/lib/store/auth-store";
+import Text from "@/app/styles/components/text";
+import { TypographySize, TypographyBold } from "@styles/style.types";
+
 
 export const getActiveMenuItem = (pathname: string) => {
   return menuItems.find((item) => item.href === pathname);
@@ -16,6 +20,7 @@ const LeftPanel = ({ onExpandChange }) => {
   const pathname = usePathname();
   const activeItem = getActiveMenuItem(pathname);
   const [isExpanded, setIsExpanded] = useState(false);
+  const { user } = useAuthStore();
 
   // Notify parent component when expansion state changes
   useEffect(() => {
@@ -25,6 +30,12 @@ const LeftPanel = ({ onExpandChange }) => {
   const toggleExpansion = () => {
     setIsExpanded(!isExpanded);
   };
+
+  // Filter menu items based on user role
+  const filteredMenuItems = menuItems.filter(item => {
+    if (!item.requiredRole) return true; // No role requirement
+    return user?.role === item.requiredRole; // Check if user has required role
+  });
 
   return (
     <div
@@ -75,12 +86,17 @@ const LeftPanel = ({ onExpandChange }) => {
       
       <div className={`flex flex-col ${isExpanded ? "items-start" : "items-center"} gap-1 mt-2`}>
         <span className={`text-xs text-gray-400 px-2 ${isExpanded ? "self-start" : "hidden"}`}>Main</span>
-        {menuItems.map((item, index) => {
+        {filteredMenuItems.map((item, index) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
 
           return (
-            <Link key={index} href={item.href} className="w-full">
+            <Link 
+              key={index} 
+              href={item.href} 
+              className="w-full"
+              prefetch={false}
+            >
               <div
                 className={`flex items-center gap-2 px-2 py-[8px] rounded-lg cursor-pointer transition-all ${
                   isActive ? "bg-[var(--main-primary-20)]" : "hover:bg-[var(--color-bg-tetiary)]"
@@ -95,13 +111,13 @@ const LeftPanel = ({ onExpandChange }) => {
                   }`}
                 />
                 {isExpanded && (
-                  <span
-                    className={`text-sm font-medium ${
-                      isActive ? "text-[var(--color-main-primary)]" : "text-[var(--color-text-tetiary)]"
-                    }`}
+                  <Text
+                    textColor="rgb(31 41 55)"
+                    size={TypographySize.body}
+                    bold={TypographyBold.md}
                   >
                     {item.label}
-                  </span>
+                  </Text>
                 )}
               </div>
             </Link>
@@ -133,7 +149,7 @@ const LeftPanel = ({ onExpandChange }) => {
               className="rounded-full object-cover"
             />
           </div>
-          {isExpanded && <span className="text-sm text-[var(--color-text-tetiary)] truncate">pnedjoh@gmail.com</span>}
+          {isExpanded && <span className="text-sm text-[var(--color-text-tetiary)] truncate">{user?.email || 'Not logged in'}</span>}
         </div>
       </div>
     </div>

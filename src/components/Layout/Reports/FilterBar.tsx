@@ -7,6 +7,22 @@ import { BsBroadcast, BsCheckCircleFill } from 'react-icons/bs';
 import { MdSort, MdCheck } from 'react-icons/md';
 import Text from '@styles/components/text';
 import theme from '@styles/theme';
+import { FaSync } from 'react-icons/fa';
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { IconDownload, IconChevronDown } from "@tabler/icons-react";
 
 const statusOptions = [
   'All Statuses',
@@ -84,7 +100,31 @@ const Dropdown = ({ icon, options, selected, onChange }) => {
   );
 };
 
-const FilterBar = ({ onSearch, onStatusChange, onPriorityChange, onSortChange, onExport }) => {
+interface FilterBarProps {
+  onSearch: (value: string) => void;
+  onStatusChange: (value: string) => void;
+  onPriorityChange: (value: string) => void;
+  onSortChange: (value: string) => void;
+  onExport: (filters: any) => void;
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}
+
+const FilterBar: React.FC<FilterBarProps> = ({
+  onSearch,
+  onStatusChange,
+  onPriorityChange,
+  onSortChange,
+  onExport,
+  onRefresh,
+  isRefreshing,
+  currentPage,
+  totalPages,
+  onPageChange
+}) => {
   const [status, setStatus] = useState('All Statuses');
   const [priority, setPriority] = useState('All Priorities');
   const [sort, setSort] = useState('Newest First');
@@ -140,68 +180,123 @@ const FilterBar = ({ onSearch, onStatusChange, onPriorityChange, onSortChange, o
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-3 w-full max-w-[1140px] bg-white">
-      {/* Search Input */}
-      <div className="flex items-center gap-2 flex-1 min-w-[280px] h-[40px] bg-[#FBFBFB] border border-gray-200 rounded-[10px] px-3">
-        <FiSearch className="text-gray-400" size={16} />
-        <input
-          type="text"
-          placeholder="Search report id, title, description..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full outline-none bg-transparent placeholder:text-gray-400 text-sm"
-        />
-      </div>
-
-      {/* Dropdowns */}
-      <div className="flex flex-wrap gap-3">
-        <Dropdown 
-          icon={<BsBroadcast size={14} className="text-gray-400" />} 
-          options={statusOptions} 
-          selected={status} 
-          onChange={setStatus} 
-        />
-        <Dropdown 
-          icon={<BsCheckCircleFill size={14} className="text-gray-500" />} 
-          options={priorityOptions} 
-          selected={priority} 
-          onChange={setPriority} 
-        />
-        <Dropdown 
-          icon={<MdSort size={16} className="text-gray-400" />} 
-          options={sortOptions} 
-          selected={sort} 
-          onChange={setSort} 
-        />
-      </div>
-
-      {/* Export Button with Dropdown */}
-      <div className="relative ml-auto" ref={exportMenuRef}>
-        <button 
-          onClick={() => setExportMenuOpen(!exportMenuOpen)}
-          className="w-[120px] h-[40px] bg-[var(--color-main-primary)] hover:bg-[var(--color-main-primary)]/90 transition-colors rounded-[10px] text-white flex items-center justify-center gap-2.5 text-sm font-medium px-4 shadow-sm hover:shadow-md active:shadow-sm"
-        >
-          <RiDownload2Line size={16} className="flex-shrink-0" />
-          <span className="flex-shrink-0">Export</span>
-          <IoMdArrowDropdown size={16} className="ml-0.5 flex-shrink-0" />
-        </button>
-        
-        {exportMenuOpen && (
-          <div className="absolute top-[calc(100%+4px)] right-0 w-[140px] bg-white rounded-lg border border-gray-200 shadow-lg z-10">
-            <button
-              onClick={() => handleExport('csv')}
-              className="w-full flex items-center gap-2 text-sm text-gray-700 hover:bg-gray-50 px-4 py-2.5 rounded-t-lg transition-colors"
-            >
-              <span className="text-xs font-medium">CSV</span>
-            </button>
-            <button
-              onClick={() => handleExport('pdf')}
-              className="w-full flex items-center gap-2 text-sm text-gray-700 hover:bg-gray-50 px-4 py-2.5 rounded-b-lg transition-colors"
-            >
-              <span className="text-xs font-medium">PDF</span>
-            </button>
+    <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-200">
+      <div className="flex flex-wrap items-center gap-4 justify-between">
+        {/* Search Input */}
+        <div className="flex-1 min-w-[200px]">
+          <div className="flex items-center gap-2 h-10 bg-white border border-gray-200 rounded-lg px-3">
+            <FiSearch className="text-gray-400" size={16} />
+            <input
+              type="text"
+              placeholder="Search reports..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full outline-none bg-transparent placeholder:text-gray-400 text-sm"
+            />
           </div>
-        )}
+        </div>
+
+        {/* Filters */}
+        <div className="flex items-center gap-2">
+          <Select
+            defaultValue="All Statuses"
+            onValueChange={onStatusChange}
+          >
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="All Statuses">All Statuses</SelectItem>
+              <SelectItem value="Open">Open</SelectItem>
+              <SelectItem value="In Review">In Review</SelectItem>
+              <SelectItem value="Resolved">Resolved</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select
+            defaultValue="All Priorities"
+            onValueChange={onPriorityChange}
+          >
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="Priority" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="All Priorities">All Priorities</SelectItem>
+              <SelectItem value="High Priority">High Priority</SelectItem>
+              <SelectItem value="Medium Priority">Medium Priority</SelectItem>
+              <SelectItem value="Low Priority">Low Priority</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select
+            defaultValue="Newest First"
+            onValueChange={onSortChange}
+          >
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="Sort" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Newest First">Newest First</SelectItem>
+              <SelectItem value="Oldest First">Oldest First</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onRefresh}
+            disabled={isRefreshing}
+            className="h-10 bg-[var(--color-main-primary)] text-white hover:bg-[var(--color-main-primary)]/90 hover:text-white"
+          >
+            <FaSync className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            {isRefreshing ? 'Refreshing...' : 'Refresh'}
+          </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-10 bg-[var(--color-main-primary)] text-white hover:bg-[var(--color-main-primary)]/90 px-4 py-2 hover:text-white border border-gray-200 rounded-lg flex items-center gap-2">
+                <IconDownload className="h-4 w-4" />
+                <span>Export</span>
+                <IconChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => onExport({ format: 'csv' })}>
+                Export as CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onExport({ format: 'pdf' })}>
+                Export as PDF
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center gap-2 ml-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onPageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="h-10 px-4 py-2 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50"
+              >
+                Previous
+              </Button>
+              <span className="text-sm text-gray-600">
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onPageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="h-10 px-4 py-2 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50"
+              >
+                Next
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
