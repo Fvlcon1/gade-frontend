@@ -1,6 +1,8 @@
 "use client";
 import React from "react";
 import { MapPin } from "lucide-react";
+import Text, { Head1 } from '@/app/styles/components/text';
+import { TypographySize, TypographyBold } from '@/app/styles/style.types';
 
 interface ReportItemProps {
   id: string;
@@ -68,24 +70,51 @@ const ReportItem: React.FC<ReportItemProps> = ({
             className="h-[28px] rounded-full flex items-center justify-center px-4"
             style={{ backgroundColor: priorityStyles[priority].bg }}
           >
-            <span 
-              className="text-sm font-medium"
-              style={{ color: priorityStyles[priority].text }}
+            <Text
+              textColor={priorityStyles[priority].text}
+              size={TypographySize.body}
+              bold={TypographyBold.md}
             >
               {formattedPriority} Priority
-            </span>
+            </Text>
           </div>
-          <span className="text-gray-400 text-sm font-medium">{formatDate(createdAt)}</span>
+          <Text
+            textColor="rgb(156 163 175)"
+            size={TypographySize.body}
+            bold={TypographyBold.md}
+          >
+            {formatDate(createdAt)}
+          </Text>
         </div>
-        <span className="text-gray-400 text-sm font-semibold whitespace-nowrap">{id}</span>
+        <Text
+          textColor="rgb(156 163 175)"
+          size={TypographySize.body}
+          bold={TypographyBold.md2}
+          className="whitespace-nowrap"
+        >
+          {id}
+        </Text>
       </div>
 
       {/* Main Body */}
       <div className="px-6 py-4 grid grid-cols-[1fr_300px_1fr] gap-x-6 items-center min-h-[100px]">
         {/* Title + Description */}
         <div className="space-y-2">
-          <h3 className="text-[#1F2937] text-base font-semibold leading-6 line-clamp-1">{title || 'No Title'}</h3>
-          <p className="text-gray-500 text-sm leading-5 line-clamp-2">{description || 'No Description'}</p>
+          <Head1
+            textColor="rgb(31 41 55)"
+            size={TypographySize.HM}
+            bold={TypographyBold.md2}
+            className="line-clamp-1"
+          >
+            {title || 'No Title'}
+          </Head1>
+          <Text
+            textColor="rgb(107 114 128)"
+            size={TypographySize.body}
+            className="line-clamp-2"
+          >
+            {description || 'No Description'}
+          </Text>
         </div>
 
         {/* Location */}
@@ -94,20 +123,28 @@ const ReportItem: React.FC<ReportItemProps> = ({
           onClick={onViewOnMap}
         >
           <MapPin size={18} className="text-gray-400 shrink-0 group-hover:text-[var(--color-main-primary)]" />
-          <span className="text-sm truncate">{location}</span>
+          <Text
+            textColor="rgb(55 65 81)"
+            size={TypographySize.body}
+            className="truncate group-hover:text-[var(--color-main-primary)]"
+          >
+            {location}
+          </Text>
         </div>
 
         {/* Status */}
         <div className="flex justify-end">
-          <span
-            className="text-sm rounded-full px-4 py-1.5 font-semibold whitespace-nowrap"
+          <Text
+            textColor={statusStyles[status.toLowerCase()]?.text || statusStyles.default.text}
+            size={TypographySize.body}
+            bold={TypographyBold.md2}
+            className="rounded-full px-4 py-1.5 whitespace-nowrap"
             style={{ 
               backgroundColor: statusStyles[status.toLowerCase()]?.bg || statusStyles.default.bg,
-              color: statusStyles[status.toLowerCase()]?.text || statusStyles.default.text
             }}
           >
             {statusStyles[status.toLowerCase()]?.label || statusStyles.default.label}
-          </span>
+          </Text>
         </div>
       </div>
     </div>

@@ -3,6 +3,8 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import Text, { Head1 } from '@/app/styles/components/text';
+import { TypographySize, TypographyBold } from '@/app/styles/style.types';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -50,22 +52,49 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
                 className="rounded-full"
               />
             </div>
-            <h2 className="text-3xl font-bold">{title}</h2>
-            <p className="mt-2 text-sm text-gray-300">{subtitle}</p>
+            <Head1
+              textColor="white"
+              bold={TypographyBold.md2}
+              size={TypographySize.HL}
+            >
+              {title}
+            </Head1>
+            <Text
+              textColor="rgb(209 213 219)"
+              size={TypographySize.body}
+              className="mt-2"
+            >
+              {subtitle}
+            </Text>
           </div>
 
           {children}
 
-          <p className="text-center text-sm text-gray-300">
-            {footerText}{' '}
-            <Link
-              href={footerLink}
-              className="font-medium text-[#F7B600] hover:text-[#FFD700]"
+          <div className="text-center">
+            <Text
+              textColor="rgb(209 213 219)"
+              size={TypographySize.body}
             >
-              {footerLinkText}
-            </Link>
-          </p>
+              {footerText}{' '}
+              <Link
+                href={footerLink}
+                className="font-medium text-[#D4A000] hover:text-[#F7B600]"
+              >
+                {footerLinkText}
+              </Link>
+            </Text>
+          </div>
         </div>
+      </div>
+
+      {/* Copyright Text */}
+      <div className="absolute bottom-4 w-full text-center z-20">
+        <Text
+          textColor="rgb(229 231 235)"
+          size={TypographySize.body}
+        >
+          © {new Date().getFullYear()} Blvck Sapphire Ltd
+        </Text>
       </div>
     </div>
   );

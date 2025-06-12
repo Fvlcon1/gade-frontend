@@ -13,6 +13,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Label } from "@/components/ui/label";
+import Text, { Head1 } from '@/app/styles/components/text';
+import { TypographySize, TypographyBold } from '@/app/styles/style.types';
+import { useAccounts } from '@/hooks/use-accounts';
+import { toast } from '@/components/ui/toast';
 
 interface UserTableSectionProps {
   filteredUsers: User[];
@@ -23,6 +27,7 @@ interface UserTableSectionProps {
   showInviteModal: boolean;
   setShowInviteModal: (show: boolean) => void;
   onInviteUser: () => void;
+  onDeleteClick: (user: User) => void;
 }
 
 const UserTableSection: React.FC<UserTableSectionProps> = ({
@@ -34,31 +39,33 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
   showInviteModal,
   setShowInviteModal,
   onInviteUser,
+  onDeleteClick,
 }) => {
+  const { registerAccount, updateRole, updateStatus, updateDepartment, isMutating } = useAccounts();
+
   // Define the schema for invite user form validation
   const inviteUserSchema = z.object({
     email: z.string().email("Invalid email address"),
-    role: z.enum(["super admin", "admin", "user", "viewer"], { message: "Please select a role" }),
+    role: z.enum(["ADMIN", "USER"], { message: "Please select a role" }),
     department: z.string().min(1, "Department is required"),
   });
 
   type InviteUserFormData = z.infer<typeof inviteUserSchema>;
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<InviteUserFormData>({
+  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<InviteUserFormData>({
     resolver: zodResolver(inviteUserSchema),
   });
 
   // Define the schema for edit user form validation
   const editUserSchema = z.object({
-    name: z.string().min(1, "Full Name is required"),
-    email: z.string().email("Invalid email address"),
-    role: z.enum(["super admin", "admin", "user", "viewer"], { message: "Please select a role" }),
+    role: z.enum(["ADMIN", "USER"], { message: "Please select a role" }),
     department: z.string().min(1, "Department is required"),
+    status: z.enum(["ACTIVE", "INACTIVE", "PENDING"], { message: "Please select a status" }),
   });
 
   type EditUserFormData = z.infer<typeof editUserSchema>;
 
-  const { register: registerEdit, handleSubmit: handleSubmitEdit, formState: { errors: errorsEdit }, reset: resetEdit, setValue } = useForm<EditUserFormData>({
+  const { register: registerEdit, handleSubmit: handleSubmitEdit, formState: { errors: errorsEdit }, reset: resetEdit, setValue: setEditValue } = useForm<EditUserFormData>({
     resolver: zodResolver(editUserSchema),
   });
 
@@ -67,36 +74,63 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
   const [deletingUser, setDeletingUser] = React.useState<User | null>(null);
 
-  const handleSendInvite = (data: InviteUserFormData) => {
-    // Here you would typically call an API to send the invite
-    console.log('Inviting user:', data);
-    // Reset form and close modal
-    reset(); // Reset form fields
-    setShowInviteModal(false);
+  const handleSendInvite = async (data: InviteUserFormData) => {
+    try {
+      await registerAccount({
+        email: data.email,
+        role: data.role,
+        department: data.department
+      });
+
+      toast.success({
+        title: 'Invitation sent',
+        description: 'The user has been successfully invited.',
+      });
+
+      reset();
+      setShowInviteModal(false);
+    } catch (error) {
+      toast.error({
+        title: 'Invitation failed',
+        description: error instanceof Error ? error.message : 'Failed to send invitation',
+      });
+    }
   };
 
   const handleEditClick = (user: User) => {
     setEditingUser(user);
     setShowEditModal(true);
     // Set form values when opening the edit modal
-    setValue('name', user.name);
-    setValue('email', user.email);
-    setValue('role', user.role);
-    setValue('department', user.department);
+    setEditValue('role', user.role === 'STANDARD' ? 'USER' : user.role);
+    setEditValue('department', user.department);
+    setEditValue('status', user.status);
   };
 
-  const handleSaveEdit = (data: EditUserFormData) => {
+  const handleSaveEdit = async (data: EditUserFormData) => {
     if (editingUser) {
-      // Here you would typically call an API to update the user
-      console.log('Saving edited user:', { ...editingUser, ...data });
-      // Update the user in the parent component's state or context if needed
-      onRoleChange(editingUser.id, data.role);
-      onDepartmentChange(editingUser.id, data.department);
-      // Assuming email and name are not editable from here, or handled separately
+      try {
+        // Update all fields in parallel
+        await Promise.all([
+          updateRole({ id: editingUser.id, role: data.role === 'USER' ? 'STANDARD' : data.role }),
+          updateDepartment({ id: editingUser.id, department: data.department }),
+          updateStatus({ id: editingUser.id, status: data.status }),
+        ]);
+
+        toast.success({
+          title: 'User updated',
+          description: 'The user has been successfully updated.',
+        });
+
+        setShowEditModal(false);
+        setEditingUser(null);
+        resetEdit();
+      } catch (error) {
+        toast.error({
+          title: 'Update failed',
+          description: error instanceof Error ? error.message : 'Failed to update user',
+        });
+      }
     }
-    setShowEditModal(false);
-    setEditingUser(null);
-    resetEdit(); // Reset edit form fields
   };
 
   const handleDeleteClick = (user: User) => {
@@ -114,17 +148,34 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
     setDeletingUser(null);
   };
 
-  // Update the actions column in UserTable component
   const columns: ColumnDef<User>[] = [
     {
-      accessorKey: "name",
-      header: "Fullname",
-      cell: ({ row }) => <div className="font-medium">{row.getValue("name")}</div>,
+      accessorKey: "first_name",
+      header: "Full Name",
+      cell: ({ row }) => (
+        <Text
+          textColor="rgb(31 41 55)"
+          size={TypographySize.body}
+          bold={TypographyBold.sm2}
+        >
+          {row.original.first_name && row.original.last_name 
+            ? `${row.original.first_name} ${row.original.last_name}`
+            : 'Not Set'}
+        </Text>
+      ),
     },
     {
       accessorKey: "email",
       header: "Email",
-      cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+      cell: ({ row }) => (
+        <Text
+          textColor="rgb(31 41 55)"
+          size={TypographySize.body}
+          className="lowercase"
+        >
+          {row.getValue("email")}
+        </Text>
+      ),
     },
     {
       accessorKey: "role",
@@ -135,21 +186,13 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
         let colorClass = "";
 
         switch (role) {
-          case "super admin":
+          case "ADMIN":
             variant = "default";
-            colorClass = "bg-[#E6E6FA] text-[#800080]"; // Light purple
+            colorClass = "bg-[#E6E6FA] text-[#800080]";
             break;
-          case "admin":
+          case "STANDARD":
             variant = "secondary";
-            colorClass = "bg-[#CCE0FF] text-[#0066CC]"; // Light blue
-            break;
-          case "user":
-            variant = "outline";
-            colorClass = "text-gray-600 border-gray-300";
-            break;
-          case "viewer":
-            variant = "outline";
-            colorClass = "text-gray-500 border-gray-300";
+            colorClass = "bg-[#CCE0FF] text-[#0066CC]";
             break;
           default:
             variant = "outline";
@@ -158,7 +201,13 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
 
         return (
           <Badge variant={variant} className={`capitalize rounded-lg opacity-80 ${colorClass}`}>
-            {role}
+            <Text
+              textColor="inherit"
+              size={TypographySize.body}
+              bold={TypographyBold.sm2}
+            >
+              {role.toLowerCase()}
+            </Text>
           </Badge>
         );
       },
@@ -172,17 +221,17 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
         let colorClass = "";
 
         switch (status) {
-          case "active":
+          case "ACTIVE":
             variant = "default";
-            colorClass = "bg-[#E0F8E0] text-[#008000]"; // Light green
+            colorClass = "bg-[#E0F8E0] text-[#008000]";
             break;
-          case "inactive":
+          case "INACTIVE":
             variant = "secondary";
-            colorClass = "bg-[#FCE0E0] text-[#CC0000]"; // Light red
+            colorClass = "bg-[#FCE0E0] text-[#CC0000]";
             break;
-          case "pending":
+          case "PENDING":
             variant = "outline";
-            colorClass = "bg-[#FFF8E0] text-[#B38600]"; // Light yellow/orange
+            colorClass = "bg-[#FFF8E0] text-[#B38600]";
             break;
           default:
             variant = "outline";
@@ -191,7 +240,13 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
 
         return (
           <Badge variant={variant} className={`capitalize rounded-lg opacity-80 ${colorClass}`}>
-            {status}
+            <Text
+              textColor="inherit"
+              size={TypographySize.body}
+              bold={TypographyBold.sm2}
+            >
+              {status.toLowerCase()}
+            </Text>
           </Badge>
         );
       },
@@ -199,28 +254,60 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
     {
       accessorKey: "department",
       header: "Department",
-      cell: ({ row }) => <div className="capitalize">{row.getValue("department")}</div>,
+      cell: ({ row }) => (
+        <Text
+          textColor="rgb(31 41 55)"
+          size={TypographySize.body}
+          className="capitalize"
+        >
+          {row.getValue("department")}
+        </Text>
+      ),
     },
     {
-      accessorKey: "lastLogin",
+      accessorKey: "updated_at",
       header: "Last Active",
       cell: ({ row }) => {
-        const lastLogin = row.original.lastLogin;
-        if (!lastLogin) return <div className="text-muted-foreground">unknown</div>;
+        const updatedAt = row.original.updated_at;
+        if (!updatedAt) return (
+          <Text
+            textColor="rgb(156 163 175)"
+            size={TypographySize.body}
+          >
+            unknown
+          </Text>
+        );
 
-        const date = parseISO(lastLogin);
+        const date = parseISO(updatedAt);
         const now = new Date();
         const diffInMinutes = Math.abs(now.getTime() - date.getTime()) / (1000 * 60);
 
+        let timeText = "";
         if (diffInMinutes < 1) {
-          return <div className="text-muted-foreground">just now</div>;
+          timeText = "just now";
         } else if (diffInMinutes < 60) {
-          return <div className="text-muted-foreground">{Math.round(diffInMinutes)} minutes ago</div>;
-        } else if (diffInMinutes < 60 * 24) { // Less than 24 hours
-          return <div className="text-muted-foreground">{formatDistanceToNow(date, { addSuffix: true })}</div>;
+          timeText = `${Math.round(diffInMinutes)} minutes ago`;
+        } else if (diffInMinutes < 60 * 24) {
+          timeText = formatDistanceToNow(date, { addSuffix: true });
         } else {
-          return <div className="text-muted-foreground">{new Date(lastLogin).toLocaleString('en-US', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })}</div>;
+          timeText = new Date(updatedAt).toLocaleString('en-US', { 
+            day: '2-digit', 
+            month: 'short', 
+            year: 'numeric', 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            hour12: true 
+          });
         }
+
+        return (
+          <Text
+            textColor="rgb(156 163 175)"
+            size={TypographySize.body}
+          >
+            {timeText}
+          </Text>
+        );
       },
     },
     {
@@ -228,12 +315,12 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
       header: "Actions",
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => handleDeleteClick(row.original)}>
+          <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => onDeleteClick(row.original)}>
             <IconTrash className="h-4 w-4 text-red-500" />
           </Button>
           <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => handleEditClick(row.original)}>
             <IconEdit className="h-4 w-4 text-gray-600" />
-            </Button>
+          </Button>
         </div>
       ),
     },
@@ -242,7 +329,6 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
   return (
     <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6 min-h-[calc(100vh-24rem)]">
       <Tabs defaultValue="overview" className="h-full flex flex-col">
-       
         <TabsContent value="overview" className="flex-1 p-4 overflow-y-auto custom-scrollbar">
           <UserTable 
             data={filteredUsers}
@@ -277,35 +363,44 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
               </div>
               <div className="mb-4">
                 <Label htmlFor="inviteRole" className="block text-sm font-medium text-gray-700 mb-1">Role</Label>
-                <Select onValueChange={(value: User['role']) => register("role").onChange({ target: { value } })}>
+                <Select 
+                  onValueChange={(value) => setValue('role', value as 'ADMIN' | 'USER')}
+                  defaultValue=""
+                >
                   <SelectTrigger className="w-full" id="inviteRole">
                     <SelectValue placeholder="Select a role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="super admin">Super Admin</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="user">User</SelectItem>
-                    <SelectItem value="viewer">Viewer</SelectItem>
+                    <SelectItem value="ADMIN">Admin</SelectItem>
+                    <SelectItem value="USER">Standard</SelectItem>
                   </SelectContent>
                 </Select>
                 {errors.role && <p className="text-red-500 text-xs mt-1">{errors.role.message}</p>}
               </div>
               <div className="mb-4">
                 <Label htmlFor="inviteDepartment" className="block text-sm font-medium text-gray-700 mb-1">Department</Label>
-                <CustomInput 
-                  id="inviteDepartment"
-                  placeholder="Department" 
-                  {...register("department")}
-                  className="mb-1"
-                />
+                <Select 
+                  onValueChange={(value) => setValue('department', value)}
+                  defaultValue=""
+                >
+                  <SelectTrigger className="w-full" id="inviteDepartment">
+                    <SelectValue placeholder="Select a department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="GADE Team">GADE Team</SelectItem>
+                    <SelectItem value="Minerals Department">Minerals Department</SelectItem>
+                    <SelectItem value="Forestry Department">Forestry Department</SelectItem>
+                    <SelectItem value="Ghana Armed Forces">Ghana Armed Forces</SelectItem>
+                  </SelectContent>
+                </Select>
                 {errors.department && <p className="text-red-500 text-xs mt-1">{errors.department.message}</p>}
               </div>
               <div className="flex justify-end gap-4 mt-6">
                 <Button variant="outline" onClick={() => setShowInviteModal(false)} type="button">
                   Cancel
                 </Button>
-                <Button type="submit" className="bg-[var(--color-main-primary)] text-white hover:bg-[var(--color-main-primary)]/90">
-                  Send Invite
+                <Button type="submit" className="bg-[var(--color-main-primary)] text-white hover:bg-[var(--color-main-primary)]/90" disabled={isMutating}>
+                  {isMutating ? 'Sending...' : 'Send Invite'}
                 </Button>
               </div>
             </form>
@@ -320,36 +415,34 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
             <h2 className="text-xl font-bold mb-4">Edit User</h2>
             <form onSubmit={handleSubmitEdit(handleSaveEdit)}>
               <div className="mb-4">
-                <Label htmlFor="editFullName" className="block text-sm font-medium text-gray-700 mb-1">Full Name</Label>
-                <CustomInput 
-                  id="editFullName"
-                  placeholder="Full Name" 
-                  {...registerEdit("name")}
-                  className="mb-1"
-                />
-                {errorsEdit.name && <p className="text-red-500 text-xs mt-1">{errorsEdit.name.message}</p>}
-              </div>
-              <div className="mb-4">
-                <Label htmlFor="editEmail" className="block text-sm font-medium text-gray-700 mb-1">Email</Label>
-                <CustomInput 
-                  id="editEmail"
-                  placeholder="Email address" 
-                  {...registerEdit("email")}
-                  className="mb-1"
-                />
-                {errorsEdit.email && <p className="text-red-500 text-xs mt-1">{errorsEdit.email.message}</p>}
+                <Label htmlFor="editStatus" className="block text-sm font-medium text-gray-700 mb-1">Status</Label>
+                <Select 
+                  value={editingUser.status} 
+                  onValueChange={(value) => setEditValue('status', value as 'ACTIVE' | 'INACTIVE' | 'PENDING')}
+                >
+                  <SelectTrigger className="w-full" id="editStatus">
+                    <SelectValue placeholder="Select a status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ACTIVE">Active</SelectItem>
+                    <SelectItem value="INACTIVE">Inactive</SelectItem>
+                    <SelectItem value="PENDING">Pending</SelectItem>
+                  </SelectContent>
+                </Select>
+                {errorsEdit.status && <p className="text-red-500 text-xs mt-1">{errorsEdit.status.message}</p>}
               </div>
               <div className="mb-4">
                 <Label htmlFor="editRole" className="block text-sm font-medium text-gray-700 mb-1">Role</Label>
-                <Select value={editingUser.role} onValueChange={(value: User['role']) => setValue('role', value)}>
+                <Select 
+                  value={editingUser.role === 'STANDARD' ? 'USER' : editingUser.role}
+                  onValueChange={(value) => setEditValue('role', value as 'ADMIN' | 'USER')}
+                >
                   <SelectTrigger className="w-full" id="editRole">
                     <SelectValue placeholder="Select a role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="super admin">Super Admin</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="user">User</SelectItem>
-                    <SelectItem value="viewer">Viewer</SelectItem>
+                    <SelectItem value="ADMIN">Admin</SelectItem>
+                    <SelectItem value="USER">Standard</SelectItem>
                   </SelectContent>
                 </Select>
                 {errorsEdit.role && <p className="text-red-500 text-xs mt-1">{errorsEdit.role.message}</p>}
@@ -382,7 +475,7 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
         <div className="fixed inset-0 border border-gray-100 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-md border border-gray-900">
             <h2 className="text-xl font-bold mb-4">Confirm Deletion</h2>
-            <p className="text-gray-700 mb-6">Are you sure you want to delete user <span className="font-bold">{deletingUser.name} ({deletingUser.email})</span>? This action cannot be undone.</p>
+            <p className="text-gray-700 mb-6">Are you sure you want to delete user <span className="font-bold">{deletingUser.first_name} {deletingUser.last_name} ({deletingUser.email})</span>? This action cannot be undone.</p>
             <div className="flex justify-end gap-4 mt-6">
               <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
                 Cancel

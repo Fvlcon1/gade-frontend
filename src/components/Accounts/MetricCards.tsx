@@ -9,7 +9,7 @@ const MetricDisplayCard = ({ title, value, icon: IconComponent, iconBgColor, tex
     <div className={`absolute -top-8 -right-8 w-28 h-28 ${iconBgColor} rounded-full`}></div>
     {/* Icon container - positioned closer to the corner, directly on the background */}
     <div className={`absolute top-4 right-4 z-10 flex items-center justify-center`}>
-      <IconComponent className={`w-6 h-6 ${textColor}`} />
+      <IconComponent className={`w-9 h-9 ${textColor}`} />
     </div>
     <h3 className="text-sm font-medium text-gray-500 mb-2">{title}</h3>
     <p className="text-3xl font-bold text-gray-800">{value}</p>

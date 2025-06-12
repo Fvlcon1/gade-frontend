@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { FaLayerGroup, FaLocationArrow } from "react-icons/fa";
 import { FaSliders } from "react-icons/fa6";
 import { BsFillClockFill } from "react-icons/bs";
-import { useSpatialStore, setupReportsRefresh, cleanupReportsRefresh } from '@/lib/store/spatialStore';
+import { setupReportsRefresh, cleanupReportsRefresh } from '@/lib/store/spatialStore';
 
 import LeftPanel from "@components/Layout/LeftPanel/LeftPanel";
 import LayersControl from "../../components/Controllers/LayersControl";
@@ -33,7 +33,7 @@ const Page = () => {
   const [showTimeline, setShowTimeline] = useState(false);
   const [activeTab, setActiveTab] = useState(null);
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
-  const [activeBasemap, setActiveBasemap] = useState('satellite');
+  const [activeBasemap, setActiveBasemap] = useState('osm');
   const [activeFeatureLayers, setActiveFeatureLayers] = useState<Layer[]>(initialLayers.filter(layer => layer.checked));
 
   useEffect(() => {

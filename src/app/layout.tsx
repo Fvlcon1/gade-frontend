@@ -4,6 +4,8 @@ import "./globals.css";
 import "./styles/css/loader.css"
 import { Providers } from "./providers";
 import SpatialDataInitializer from './SpatialDataInitializer';
+import { QueryProvider } from '@/providers/query-provider';
+import { Toaster } from '@/components/ui/sonner';
 
 const montserrat = Montserrat({
 	variable: "--font-montserrat",
@@ -25,10 +27,13 @@ export default function RootLayout({
 			<body
 				className={`${montserrat.variable} antialiased`}
 			>
+				<QueryProvider>
 				<Providers>
 					<SpatialDataInitializer />
 				{children}
+						<Toaster />
 				</Providers>
+				</QueryProvider>
 			</body>
 		</html>
 	);

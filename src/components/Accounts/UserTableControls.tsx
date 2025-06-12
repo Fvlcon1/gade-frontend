@@ -32,7 +32,7 @@ export function UserTableControls<TData>({
   currentRoleFilter,
 }: UserTableControlsProps<TData>) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-2 px-4 mb-6">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-2 px-4 mb-2">
       <div className="flex flex-col md:flex-row items-center justify-between py-4 space-y-4 md:space-y-0 md:space-x-4">
         <Input
           placeholder="Search user, eg: Dennis Boachie"
@@ -61,9 +61,9 @@ export function UserTableControls<TData>({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="All Statuses">All Statuses</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="ACTIVE">Active</SelectItem>
+              <SelectItem value="INACTIVE">Inactive</SelectItem>
+              <SelectItem value="PENDING">Pending</SelectItem>
             </SelectContent>
           </Select>
 
@@ -74,10 +74,8 @@ export function UserTableControls<TData>({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="All Roles">All Roles</SelectItem>
-              <SelectItem value="super admin">Super Admin</SelectItem>
-              <SelectItem value="admin">Admin</SelectItem>
-              <SelectItem value="user">User</SelectItem>
-              <SelectItem value="viewer">Viewer</SelectItem>
+              <SelectItem value="ADMIN">Admin</SelectItem>
+              <SelectItem value="STANDARD">Standard</SelectItem>
             </SelectContent>
           </Select>
 

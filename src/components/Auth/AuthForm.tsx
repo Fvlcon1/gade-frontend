@@ -11,6 +11,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { IconEye, IconEyeOff, IconCheck, IconX } from '@tabler/icons-react';
 import Link from 'next/link';
 
+type AuthFormMode = 'signin' | 'signup' | 'setup';
+
 // Form validation schema
 const authSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -25,7 +27,9 @@ const authSchema = z.object({
 // For sign up, extend the schema
 const signUpSchema = authSchema.extend({
   confirmPassword: z.string(),
-  name: z.string().min(2, 'Name must be at least 2 characters'),
+  first_name: z.string().min(2, 'First name must be at least 2 characters'),
+  last_name: z.string().min(2, 'Last name must be at least 2 characters'),
+  user_name: z.string().min(2, 'Username must be at least 2 characters'),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -37,7 +41,7 @@ type SignUpFormData = z.infer<typeof signUpSchema>;
 type CombinedFormData = SignInFormData & Partial<Omit<SignUpFormData, keyof SignInFormData>>;
 
 type AuthFormProps = {
-  mode: 'signin' | 'signup';
+  mode: AuthFormMode;
   onSubmit: (data: CombinedFormData) => void;
   isLoading?: boolean;
   error?: string;
@@ -48,7 +52,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit, isLoading, error })
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [password, setPassword] = useState('');
 
-  const schema = mode === 'signup' ? signUpSchema : authSchema;
+  const schema = mode === 'setup' ? signUpSchema : authSchema;
 
   const {
     register,
@@ -80,20 +84,50 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit, isLoading, error })
         </Alert>
       )}
 
-      {mode === 'signup' && (
-        <div className="space-y-2 text-gray-200">
-          <Label htmlFor="name">Full Name</Label>
-          <Input
-            id="name"
-            type="text"
-            placeholder="John Doe"
-            {...register('name', { required: mode === 'signup' })}
-            className={`bg-white/10 border-white/20 text-white placeholder-gray-400 ${errors.name ? 'border-red-500' : ''}`}
-          />
-          {errors.name && (
-            <p className="text-sm text-red-400">{errors.name.message}</p>
-          )}
-        </div>
+      {mode === 'setup' && (
+        <>
+          <div className="space-y-2 text-gray-200">
+            <Label htmlFor="first_name">First Name</Label>
+            <Input
+              id="first_name"
+              type="text"
+              placeholder="John"
+              {...register('first_name', { required: mode === 'setup' })}
+              className={`bg-white/10 border-white/20 text-white placeholder-gray-400 ${errors.first_name ? 'border-red-500' : ''}`}
+            />
+            {errors.first_name && (
+              <p className="text-sm text-red-400">{errors.first_name.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2 text-gray-200">
+            <Label htmlFor="last_name">Last Name</Label>
+            <Input
+              id="last_name"
+              type="text"
+              placeholder="Doe"
+              {...register('last_name', { required: mode === 'setup' })}
+              className={`bg-white/10 border-white/20 text-white placeholder-gray-400 ${errors.last_name ? 'border-red-500' : ''}`}
+            />
+            {errors.last_name && (
+              <p className="text-sm text-red-400">{errors.last_name.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2 text-gray-200">
+            <Label htmlFor="user_name">Username</Label>
+            <Input
+              id="user_name"
+              type="text"
+              placeholder="johndoe"
+              {...register('user_name', { required: mode === 'setup' })}
+              className={`bg-white/10 border-white/20 text-white placeholder-gray-400 ${errors.user_name ? 'border-red-500' : ''}`}
+            />
+            {errors.user_name && (
+              <p className="text-sm text-red-400">{errors.user_name.message}</p>
+            )}
+          </div>
+        </>
       )}
 
       <div className="space-y-2 text-gray-200">
@@ -135,7 +169,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit, isLoading, error })
           <p className="text-sm text-red-400">{errors.password.message}</p>
         )}
 
-        {mode === 'signup' && password.length > 0 && (
+        {mode === 'setup' && password.length > 0 && (
           <div className="mt-2 text-sm space-y-1">
             {passwordCriteria.map((criterion, index) => (
               <div key={index} className={`flex items-center ${criterion.met ? 'text-green-400' : 'text-gray-400'}`}>
@@ -149,13 +183,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit, isLoading, error })
 
       {mode === 'signin' && (
         <div className="text-right text-sm">
-          <Link href="#" className="font-medium text-[#F7B600] hover:text-[#FFD700]">
+          <Link href="#" className="font-medium text-[#D4A000] hover:text-[#F7B600]">
             Forgot password?
           </Link>
         </div>
       )}
 
-      {mode === 'signup' && (
+      {mode === 'setup' && (
         <div className="space-y-2 text-gray-200">
           <Label htmlFor="confirmPassword">Confirm Password</Label>
           <div className="relative">
@@ -163,7 +197,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit, isLoading, error })
               id="confirmPassword"
               type={showConfirmPassword ? 'text' : 'password'}
               placeholder="••••••••"
-              {...register('confirmPassword', { required: mode === 'signup' })}
+              {...register('confirmPassword', { required: mode === 'setup' })}
               className={`bg-white/10 border-white/20 text-white placeholder-gray-400 ${errors.confirmPassword ? 'border-red-500' : ''}`}
             />
             <button
@@ -182,7 +216,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit, isLoading, error })
 
       <Button
         type="submit"
-        className="w-full bg-[#F7B600] hover:bg-[#FFD700] text-white py-3 rounded-lg"
+        className="w-full bg-[#D4A000] hover:bg-[#F7B600] text-white py-3 rounded-lg transition-all duration-200"
         disabled={isLoading}
       >
         {isLoading ? (

@@ -2,6 +2,8 @@
 import React from 'react';
 import { AiFillAlert } from "react-icons/ai";
 import { useSpatialStore } from '@/lib/store/spatialStore';
+import Text, { Head1 } from '@/app/styles/components/text';
+import { TypographySize, TypographyBold } from '@/app/styles/style.types';
 
 // Define valid status types
 type ReportStatus = 'OPEN' | 'IN REVIEW' | 'RESOLVED' | 'CLOSED';
@@ -46,12 +48,22 @@ const PriorityCard = ({
     <div className={`rounded-2xl ${styles.container} w-[229px] h-[78px] border px-4 py-3 flex justify-between items-start`}>
       {/* Text section: priority + count */}
       <div className="flex flex-col items-start">
-        <h3 className={`text-xs font-[300] ${styles.title}`}>
+        <Text
+          textColor={type === 'high' ? 'rgb(220 38 38)' : type === 'medium' ? 'rgb(215 126 0)' : 'rgb(13 148 136)'}
+          size={TypographySize.xs}
+          bold={TypographyBold.sm}
+          className={styles.title}
+        >
           {priority}
-        </h3>
-        <div className={`text-[38px] leading-[46px] font-bold ${styles.count}`}>
+        </Text>
+        <Head1
+          textColor={type === 'high' ? 'rgb(220 38 38)' : type === 'medium' ? 'rgb(215 126 0)' : 'rgb(13 148 136)'}
+          bold={TypographyBold.lg}
+          size={TypographySize.HL}
+          className={styles.count}
+        >
           {count.toString().padStart(2, '0')}
-        </div>
+        </Head1>
       </div>
 
       {/* Icon section */}

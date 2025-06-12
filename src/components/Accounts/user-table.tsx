@@ -47,16 +47,30 @@ import { formatDistanceToNow, parseISO } from 'date-fns';
 // Schema for user data
 export const userSchema = z.object({
   id: z.string(),
-  name: z.string(),
+  user_name: z.string(),
+  first_name: z.string(),
+  last_name: z.string(),
   email: z.string().email(),
-  role: z.enum(["super admin", "admin", "user", "viewer"]),
-  status: z.enum(["active", "inactive", "pending"]),
+  role: z.enum(["ADMIN", "USER"]),
+  status: z.enum(["ACTIVE", "INACTIVE", "PENDING"]),
   department: z.string(),
   lastLogin: z.string().datetime().nullable(),
-  createdAt: z.string().datetime(),
+  created_at: z.string().datetime(),
+  updated_at: z.string().datetime(),
 })
 
-export type User = z.infer<typeof userSchema>
+export type User = {
+  id: string;
+  user_name: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  role: 'ADMIN' | 'STANDARD';
+  status: 'ACTIVE' | 'INACTIVE' | 'PENDING';
+  department: string;
+  created_at: string;
+  updated_at: string;
+};
 
 interface UserTableProps {
   data: User[];
@@ -67,6 +81,19 @@ interface UserTableProps {
   onRemoveUser: (userId: string) => void;
   onInviteUser: () => void;
 }
+
+const getStatusBadge = (status: User['status']) => {
+  switch (status) {
+    case 'ACTIVE':
+      return <Badge className="bg-green-100 text-green-800">Active</Badge>;
+    case 'INACTIVE':
+      return <Badge className="bg-red-100 text-red-800">Inactive</Badge>;
+    case 'PENDING':
+      return <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>;
+    default:
+      return null;
+  }
+};
 
 export function UserTable({
   data,

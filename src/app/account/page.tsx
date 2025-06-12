@@ -10,283 +10,342 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { UserTableControls } from "@components/Accounts/UserTableControls";
+import Text, { Head1 } from '@/app/styles/components/text';
+import { TypographySize, TypographyBold } from '@/app/styles/style.types';
+import { useAccounts } from '@/hooks/use-accounts';
+import { toast } from '@/components/ui/toast';
+import { Skeleton } from "@/components/ui/skeleton";
 
- const userSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  email: z.string().email(),
-  role: z.enum(["super admin", "admin", "user", "viewer"]),
-  status: z.enum(["active", "inactive", "pending"]),
-  department: z.string(),
-  lastLogin: z.string().datetime().nullable(),
-  createdAt: z.string().datetime(),
-})
-
-export type User = z.infer<typeof userSchema>
+// Update the User type to match the backend
+type User = {
+  id: string;
+  user_name: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  role: 'ADMIN' | 'STANDARD';
+  status: 'ACTIVE' | 'INACTIVE' | 'PENDING';
+  department: string;
+  created_at: string;
+  updated_at: string;
+};
 
 // Dummy data (adjusting for the new UI)
 const dummyUsers: User[] = [
   {
     id: '1',
-    name: 'chris chris',
+    user_name: 'chris_chris',
+    first_name: 'Chris',
+    last_name: 'Chris',
     email: 'bluebird23szn@gmail.com',
-    role: 'super admin',
+    role: 'ADMIN',
+    status: 'ACTIVE',
     department: 'Engineering',
-    status: 'active',
-    lastLogin: '2025-06-08T11:28:00Z',
-    createdAt: '2023-09-01T00:00:00Z',
+    created_at: '2023-09-01T00:00:00Z',
+    updated_at: '2023-09-01T00:00:00Z',
   },
   {
     id: '2',
-    name: 'Prince Nedjoh',
+    user_name: 'prince_nedjoh',
+    first_name: 'Prince',
+    last_name: 'Nedjoh',
     email: 'princenedjoh5@gmail.com',
-    role: 'admin',
+    role: 'ADMIN',
+    status: 'ACTIVE',
     department: 'Sales',
-    status: 'active',
-    lastLogin: '2025-06-08T10:47:00Z',
-    createdAt: '2023-09-05T00:00:00Z',
+    created_at: '2023-09-05T00:00:00Z',
+    updated_at: '2023-09-05T00:00:00Z',
   },
   {
     id: '3',
-    name: 'Chris Blam',
+    user_name: 'chris_blam',
+    first_name: 'Chris',
+    last_name: 'Blam',
     email: 'campeh9@gmail.com',
-    role: 'admin',
+    role: 'ADMIN',
+    status: 'INACTIVE',
     department: 'Marketing',
-    status: 'inactive',
-    lastLogin: null,
-    createdAt: '2023-09-10T00:00:00Z',
+    created_at: '2023-09-10T00:00:00Z',
+    updated_at: '2023-09-10T00:00:00Z',
   },
   {
     id: '4',
-    name: 'string string',
+    user_name: 'string_string',
+    first_name: 'String',
+    last_name: 'String',
     email: 'bluebird@gmail.com',
-    role: 'super admin',
-    status: 'active',
+    role: 'ADMIN',
+    status: 'ACTIVE',
     department: 'Support',
-    lastLogin: null,
-    createdAt: '2023-10-01T00:00:00Z',
+    created_at: '2023-10-01T00:00:00Z',
+    updated_at: '2023-10-01T00:00:00Z',
   },
   {
     id: '5',
-    name: 'Prince Nedjoh',
+    user_name: 'prince_nedjoh_2',
+    first_name: 'Prince',
+    last_name: 'Nedjoh',
     email: 'princenedjoh5+5@gmail.com',
-    role: 'admin',
-    status: 'active',
+    role: 'ADMIN',
+    status: 'ACTIVE',
     department: 'IT',
-    lastLogin: '2025-06-08T10:47:00Z',
-    createdAt: '2023-09-15T00:00:00Z',
+    created_at: '2023-09-15T00:00:00Z',
+    updated_at: '2023-09-15T00:00:00Z',
   },
   {
     id: '6',
-    name: 'chris ampeh',
+    user_name: 'chris_ampeh',
+    first_name: 'Chris',
+    last_name: 'Ampeh',
     email: 'hello@gmail.com',
-    role: 'admin',
-    status: 'active',
+    role: 'ADMIN',
+    status: 'ACTIVE',
     department: 'Finance',
-    lastLogin: '2025-06-07T05:00:00Z',
-    createdAt: '2023-09-20T00:00:00Z',
+    created_at: '2023-09-20T00:00:00Z',
+    updated_at: '2023-09-20T00:00:00Z',
   },
   {
     id: '7',
-    name: 'Prince Nedjoh',
+    user_name: 'prince_nedjoh_3',
+    first_name: 'Prince',
+    last_name: 'Nedjoh',
     email: 'princenedjoh5+3@gmail.com',
-    role: 'admin',
-    status: 'active',
+    role: 'ADMIN',
+    status: 'ACTIVE',
     department: 'Finance',
-    lastLogin: '2025-06-07T10:22:00Z',
-    createdAt: '2023-09-20T00:00:00Z',
+    created_at: '2023-09-20T00:00:00Z',
+    updated_at: '2023-09-20T00:00:00Z',
   },
   {
     id: '8',
-    name: 'Prince Nedjoh',
+    user_name: 'prince_nedjoh_4',
+    first_name: 'Prince',
+    last_name: 'Nedjoh',
     email: 'princenedjoh5+6@gmail.com',
-    role: 'admin',
-    status: 'active',
+    role: 'ADMIN',
+    status: 'ACTIVE',
     department: 'Finance',
-    lastLogin: '2025-06-08T10:47:00Z',
-    createdAt: '2023-09-20T00:00:00Z',
+    created_at: '2023-09-20T00:00:00Z',
+    updated_at: '2023-09-20T00:00:00Z',
   },
   {
     id: '9',
-    name: 'hello world',
+    user_name: 'hello_world',
+    first_name: 'Hello',
+    last_name: 'World',
     email: 'blvcksapphire@gmail.com',
-    role: 'super admin',
-    status: 'active',
+    role: 'ADMIN',
+    status: 'ACTIVE',
     department: 'Finance',
-    lastLogin: '2025-06-08T10:47:00Z',
-    createdAt: '2023-09-20T00:00:00Z',
+    created_at: '2023-09-20T00:00:00Z',
+    updated_at: '2023-09-20T00:00:00Z',
   },
   {
     id: '10',
-    name: 'Prince Nedjoh',
+    user_name: 'prince_nedjoh_5',
+    first_name: 'Prince',
+    last_name: 'Nedjoh',
     email: 'princenedjoh5+4@gmail.com',
-    role: 'admin',
-    status: 'pending',
+    role: 'ADMIN',
+    status: 'PENDING',
     department: 'Finance',
-    lastLogin: null,
-    createdAt: '2023-09-20T00:00:00Z',
+    created_at: '2023-09-20T00:00:00Z',
+    updated_at: '2023-09-20T00:00:00Z',
   },
   {
     id: '11',
-    name: '-',
+    user_name: 'user_1',
+    first_name: 'User',
+    last_name: 'One',
     email: 'princenedjoh5+1@gmail.com',
-    role: 'admin',
-    status: 'pending',
+    role: 'ADMIN',
+    status: 'PENDING',
     department: 'Finance',
-    lastLogin: null,
-    createdAt: '2023-09-20T00:00:00Z',
+    created_at: '2023-09-20T00:00:00Z',
+    updated_at: '2023-09-20T00:00:00Z',
   },
   {
     id: '12',
-    name: '-',
+    user_name: 'user_2',
+    first_name: 'User',
+    last_name: 'Two',
     email: 'princenedjoh5+2@gmail.com',
-    role: 'admin',
-    status: 'pending',
+    role: 'ADMIN',
+    status: 'PENDING',
     department: 'Finance',
-    lastLogin: null,
-    createdAt: '2023-09-20T00:00:00Z',
+    created_at: '2023-09-20T00:00:00Z',
+    updated_at: '2023-09-20T00:00:00Z',
   },
   {
     id: '13',
-    name: 'Prince Nedjoh',
+    user_name: 'prince_nedjoh_6',
+    first_name: 'Prince',
+    last_name: 'Nedjoh',
     email: 'princenedjoh5+7@gmail.com',
-    role: 'admin',
-    status: 'pending',
+    role: 'ADMIN',
+    status: 'PENDING',
     department: 'Finance',
-    lastLogin: '2025-06-07T11:09:00Z',
-    createdAt: '2023-09-20T00:00:00Z',
-  },
-];
-
-const columns: ColumnDef<User>[] = [
-  {
-    accessorKey: "name",
-    header: "Fullname",
-    cell: ({ row }) => <div className="font-medium">{row.getValue("name")}</div>,
-  },
-  {
-    accessorKey: "email",
-    header: "Email",
-    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
-  },
-  {
-    accessorKey: "role",
-    header: "Role",
-    cell: ({ row }) => {
-      const role = row.original.role;
-      let variant: "default" | "secondary" | "destructive" | "outline" = "outline";
-      let colorClass = "";
-
-      switch (role) {
-        case "super admin":
-          variant = "default";
-          colorClass = "bg-[#E6E6FA] text-[#800080]"; // Light purple
-          break;
-        case "admin":
-          variant = "secondary";
-          colorClass = "bg-[#CCE0FF] text-[#0066CC]"; // Light blue
-          break;
-        case "user":
-          variant = "outline";
-          colorClass = "text-gray-600 border-gray-300";
-          break;
-        case "viewer":
-          variant = "outline";
-          colorClass = "text-gray-500 border-gray-300";
-          break;
-        default:
-          variant = "outline";
-          break;
-      }
-
-      return (
-        <Badge variant={variant} className={`capitalize rounded-lg opacity-80 ${colorClass}`}>
-          {role}
-        </Badge>
-      );
-    },
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => {
-      const status = row.original.status;
-      let variant: "default" | "secondary" | "destructive" | "outline" = "outline";
-      let colorClass = "";
-
-      switch (status) {
-        case "active":
-          variant = "default";
-          colorClass = "bg-[#E0F8E0] text-[#008000]"; // Light green
-          break;
-        case "inactive":
-          variant = "secondary";
-          colorClass = "bg-[#FCE0E0] text-[#CC0000]"; // Light red
-          break;
-        case "pending":
-          variant = "outline";
-          colorClass = "bg-[#FFF8E0] text-[#B38600]"; // Light yellow/orange
-          break;
-        default:
-          variant = "outline";
-          break;
-      }
-
-      return (
-        <Badge variant={variant} className={`capitalize rounded-lg opacity-80 ${colorClass}`}>
-          {status}
-        </Badge>
-      );
-    },
-  },
-  {
-    accessorKey: "lastLogin",
-    header: "Last Active",
-    cell: ({ row }) => {
-      const lastLogin = row.original.lastLogin;
-      if (!lastLogin) return <div className="text-muted-foreground">unknown</div>;
-
-      const date = parseISO(lastLogin);
-      const now = new Date();
-      const diffInMinutes = Math.abs(now.getTime() - date.getTime()) / (1000 * 60);
-
-      if (diffInMinutes < 1) {
-        return <div className="text-muted-foreground">just now</div>;
-      } else if (diffInMinutes < 60) {
-        return <div className="text-muted-foreground">{Math.round(diffInMinutes)} minutes ago</div>;
-      } else if (diffInMinutes < 60 * 24) { // Less than 24 hours
-        return <div className="text-muted-foreground">{formatDistanceToNow(date, { addSuffix: true })}</div>;
-      } else {
-        return <div className="text-muted-foreground">{new Date(lastLogin).toLocaleString('en-US', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })}</div>;
-      }
-    },
-  },
-  {
-    id: "actions",
-    header: "Actions",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <IconTrash className="h-4 w-4 text-red-500" />
-        </Button>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <IconEdit className="h-4 w-4 text-blue-500" />
-        </Button>
-      </div>
-    ),
+    created_at: '2023-09-20T00:00:00Z',
+    updated_at: '2023-09-20T00:00:00Z',
   },
 ];
 
 const AccountManagement = () => {
-  const [users, setUsers] = useState(dummyUsers);
+  const { 
+    accounts: users,
+    isLoading,
+    error,
+    refetch,
+    updateRole,
+    updateStatus,
+    updateDepartment,
+    deleteAccount,
+    isMutating
+  } = useAccounts();
+
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [statusFilter, setStatusFilter] = useState('All Statuses');
   const [roleFilter, setRoleFilter] = useState('All Roles');
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+
+  const handleRemoveUser = async (userId: string) => {
+    try {
+      await deleteAccount(userId);
+    } catch (error) {
+      toast.error({
+        title: 'Deletion failed',
+        description: 'Failed to delete user account.',
+      });
+    }
+  };
+
+  const columns: ColumnDef<User>[] = [
+    {
+      accessorKey: "name",
+      header: "Full Name",
+      cell: ({ row }) => (
+        <Text
+          textColor="rgb(31 41 55)"
+          size={TypographySize.body}
+          bold={TypographyBold.sm2}
+        >
+          {`${row.original.first_name} ${row.original.last_name}`}
+        </Text>
+      ),
+    },
+    {
+      accessorKey: "email",
+      header: "Email",
+      cell: ({ row }) => (
+        <Text
+          textColor="rgb(31 41 55)"
+          size={TypographySize.body}
+          className="lowercase"
+        >
+          {row.getValue("email")}
+        </Text>
+      ),
+    },
+    {
+      accessorKey: "role",
+      header: "Role",
+      cell: ({ row }) => (
+        <Badge className="bg-blue-100 text-blue-800">
+          {row.getValue("role")}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = row.getValue("status") as User['status'];
+        switch (status) {
+          case 'ACTIVE':
+            return <Badge className="bg-green-100 text-green-800">Active</Badge>;
+          case 'INACTIVE':
+            return <Badge className="bg-red-100 text-red-800">Inactive</Badge>;
+          case 'PENDING':
+            return <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>;
+          default:
+            return null;
+        }
+      },
+    },
+    {
+      accessorKey: "department",
+      header: "Department",
+      cell: ({ row }) => (
+        <Text
+          textColor="rgb(31 41 55)"
+          size={TypographySize.body}
+        >
+          {row.getValue("department")}
+        </Text>
+      ),
+    },
+    {
+      accessorKey: "updated_at",
+      header: "Last Active",
+      cell: ({ row }) => {
+        const date = parseISO(row.getValue("updated_at"));
+        const now = new Date();
+        const diffInMinutes = Math.abs(now.getTime() - date.getTime()) / (1000 * 60);
+
+        let timeText = "";
+        if (diffInMinutes < 1) {
+          timeText = "just now";
+        } else if (diffInMinutes < 60) {
+          timeText = `${Math.round(diffInMinutes)} minutes ago`;
+        } else if (diffInMinutes < 60 * 24) {
+          timeText = formatDistanceToNow(date, { addSuffix: true });
+        } else {
+          timeText = date.toLocaleString('en-US', { 
+            day: '2-digit', 
+            month: 'short', 
+            year: 'numeric', 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            hour12: true 
+          });
+        }
+
+        return (
+          <Text
+            textColor="rgb(156 163 175)"
+            size={TypographySize.body}
+          >
+            {timeText}
+          </Text>
+        );
+      },
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => {
+        const handleDelete = () => deleteAccount(row.original.id);
+        const handleEdit = () => {
+          // TODO: Implement edit functionality
+          console.log('Edit user:', row.original);
+        };
+
+        return (
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={handleDelete}>
+              <IconTrash className="h-4 w-4 text-red-500" />
+            </Button>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={handleEdit}>
+              <IconEdit className="h-4 w-4 text-gray-600" />
+            </Button>
+          </div>
+        );
+      },
+    },
+  ];
 
   const table = useReactTable({
     data: users,
@@ -306,54 +365,107 @@ const AccountManagement = () => {
   })
 
   const handleRefresh = async () => {
-    setIsRefreshing(true);
-    // Simulate fetching new data
-    await new Promise(resolve => setTimeout(resolve, 1000)); 
-    // In a real application, you would re-fetch your user data here
-    // For now, we'll just cycle the dummy data to show refresh effect
-    setUsers([...dummyUsers.sort(() => Math.random() - 0.5)]); 
-    setIsRefreshing(false);
+    try {
+      await refetch();
+      toast.success({
+        title: 'Accounts refreshed',
+        description: 'The account list has been successfully updated.',
+      });
+    } catch (error) {
+      toast.error({
+        title: 'Refresh failed',
+        description: 'Failed to refresh the account list.',
+      });
+    }
   };
 
-  const handleStatusChange = (userId: string, newStatus: User['status']) => {
-    setUsers(users.map(user => 
-      user.id === userId ? { ...user, status: newStatus } : user
-    ));
+  const handleStatusChange = async (userId: string, newStatus: User['status']) => {
+    try {
+      await updateStatus({ id: userId, status: newStatus });
+    } catch (error) {
+      toast.error({
+        title: 'Status update failed',
+        description: 'Failed to update user status.',
+      });
+    }
   };
 
-  const handleRoleChange = (userId: string, newRole: User['role']) => {
-    setUsers(users.map(user => 
-      user.id === userId ? { ...user, role: newRole } : user
-    ));
+  const handleRoleChange = async (userId: string, newRole: User['role']) => {
+    try {
+      await updateRole({ id: userId, role: newRole });
+    } catch (error) {
+      toast.error({
+        title: 'Role update failed',
+        description: 'Failed to update user role.',
+      });
+    }
   };
 
-  const handleDepartmentChange = (userId: string, newDepartment: string) => {
-    setUsers(users.map(user => 
-      user.id === userId ? { ...user, department: newDepartment } : user
-    ));
-  };
-
-  const handleRemoveUser = (userId: string) => {
-    setUsers(users.filter(user => user.id !== userId));
+  const handleDepartmentChange = async (userId: string, newDepartment: string) => {
+    try {
+      await updateDepartment({ id: userId, department: newDepartment });
+    } catch (error) {
+      toast.error({
+        title: 'Department update failed',
+        description: 'Failed to update user department.',
+      });
+    }
   };
 
   const handleInviteUser = () => {
     setShowInviteModal(true);
   };
 
+  const handleDeleteClick = (user: User) => {
+    handleRemoveUser(user.id);
+  };
+
+  const handleEditClick = (user: User) => {
+    // TODO: Implement edit functionality
+    console.log('Edit user:', user);
+  };
+
   const filteredUsers = users.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const matchesSearch = user.user_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          user.email.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'All Statuses' || user.status === statusFilter.toLowerCase();
-    const matchesRole = roleFilter === 'All Roles' || user.role === roleFilter.toLowerCase();
+    const matchesStatus = statusFilter === 'All Statuses' || user.status === statusFilter;
+    const matchesRole = roleFilter === 'All Roles' || user.role === roleFilter;
     return matchesSearch && matchesStatus && matchesRole;
   });
 
-  // Calculate counts for new MetricDisplayCard components
+  // Calculate counts for metric cards
   const totalUsers = users.length;
-  const activeUsers = users.filter(user => user.status === 'active').length;
-  const inactiveUsers = users.filter(user => user.status === 'inactive').length;
-  const pendingInvites = users.filter(user => user.status === 'pending').length;
+  const activeUsers = users.filter(user => user.status === 'ACTIVE').length;
+  const inactiveUsers = users.filter(user => user.status === 'INACTIVE').length;
+  const pendingUsers = users.filter(user => user.status === 'PENDING').length;
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <Text
+            textColor="rgb(239 68 68)"
+            size={TypographySize.body}
+            bold={TypographyBold.sm2}
+          >
+            Error loading accounts
+          </Text>
+          <Text
+            textColor="rgb(156 163 175)"
+            size={TypographySize.body}
+          >
+            {error instanceof Error ? error.message : 'An error occurred while loading accounts'}
+          </Text>
+          <Button 
+            onClick={handleRefresh}
+            className="mt-4"
+          >
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 
@@ -370,14 +482,13 @@ const AccountManagement = () => {
         totalUsers={totalUsers} 
         activeUsers={activeUsers} 
         inactiveUsers={inactiveUsers} 
-        pendingInvites={pendingInvites} 
+        pendingInvites={pendingUsers} 
       />
 
-      {/* User Table Controls (Search and Pagination) */}
       <UserTableControls 
         table={table}
         onRefresh={handleRefresh}
-        isRefreshing={isRefreshing}
+        isRefreshing={isLoading || isMutating}
         onSearchChange={setSearchQuery}
         onStatusFilterChange={setStatusFilter}
         onRoleFilterChange={setRoleFilter}
@@ -385,16 +496,34 @@ const AccountManagement = () => {
         currentRoleFilter={roleFilter}
       />
 
-      <UserTableSection 
-        filteredUsers={filteredUsers}
-        onStatusChange={handleStatusChange}
-        onRoleChange={handleRoleChange}
-        onDepartmentChange={handleDepartmentChange}
-        onRemoveUser={handleRemoveUser}
-        showInviteModal={showInviteModal}
-        setShowInviteModal={setShowInviteModal}
-        onInviteUser={handleInviteUser}
-      />
+      {isLoading ? (
+        <div className="rounded-md border">
+          <div className="h-12 border-b bg-white px-4 flex items-center">
+            {Array.from({ length: 7 }).map((_, i) => (
+              <Skeleton key={i} className="h-4 w-[100px] mx-4" />
+            ))}
+          </div>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-16 border-b bg-white px-4 flex items-center">
+              {Array.from({ length: 7 }).map((_, j) => (
+                <Skeleton key={j} className="h-4 w-[100px] mx-4" />
+              ))}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <UserTableSection 
+          filteredUsers={filteredUsers}
+          onStatusChange={handleStatusChange}
+          onRoleChange={handleRoleChange}
+          onDepartmentChange={handleDepartmentChange}
+          onRemoveUser={handleRemoveUser}
+          showInviteModal={showInviteModal}
+          setShowInviteModal={setShowInviteModal}
+          onInviteUser={handleInviteUser}
+          onDeleteClick={handleDeleteClick}
+        />
+      )}
     </div>
   );
 };
