@@ -25,11 +25,17 @@ const authSchema = z.object({
 });
 
 // For sign up, extend the schema
-const signUpSchema = authSchema.extend({
-  confirmPassword: z.string(),
+const signUpSchema = z.object({
   first_name: z.string().min(2, 'First name must be at least 2 characters'),
   last_name: z.string().min(2, 'Last name must be at least 2 characters'),
   user_name: z.string().min(2, 'Username must be at least 2 characters'),
+  password: z.string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number')
+    .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
+  confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -48,6 +54,7 @@ type AuthFormProps = {
 };
 
 const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit, isLoading, error }) => {
+  console.log('AuthForm - rendering with mode:', mode, 'isLoading:', isLoading, 'error:', error);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [password, setPassword] = useState('');
@@ -61,6 +68,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit, isLoading, error })
   } = useForm<CombinedFormData>({
     resolver: zodResolver(schema),
   });
+
+  console.log('AuthForm - form errors:', errors);
 
   const hasMinLength = password.length >= 8;
   const hasUppercase = /[A-Z]/.test(password);
@@ -82,6 +91,23 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit, isLoading, error })
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
+      )}
+
+      {/* Email input field - only render for signin mode */}
+      {mode === 'signin' && (
+        <div className="space-y-2 text-gray-200">
+          <Label htmlFor="email">Email address</Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="name@example.com"
+            {...register('email')}
+            className={`bg-white/10 border-white/20 text-white placeholder-gray-400 ${errors.email ? 'border-red-500' : ''}`}
+          />
+          {errors.email && (
+            <p className="text-sm text-red-400">{errors.email.message}</p>
+          )}
+        </div>
       )}
 
       {mode === 'setup' && (
@@ -129,20 +155,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit, isLoading, error })
           </div>
         </>
       )}
-
-      <div className="space-y-2 text-gray-200">
-        <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          type="email"
-          placeholder="you@example.com"
-          {...register('email', { required: true })}
-          className={`bg-white/10 border-white/20 text-white placeholder-gray-400 ${errors.email ? 'border-red-500' : ''}`}
-        />
-        {errors.email && (
-          <p className="text-sm text-red-400">{errors.email.message}</p>
-        )}
-      </div>
 
       <div className="space-y-2 text-gray-200">
         <Label htmlFor="password">Password</Label>

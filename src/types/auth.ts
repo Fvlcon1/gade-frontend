@@ -9,6 +9,7 @@ export interface User {
   status: 'ACTIVE' | 'INACTIVE' | 'PENDING';
   created_at: string;
   updated_at: string;
+  last_active?: string;
 }
 
 export interface LoginCredentials {
@@ -58,7 +59,7 @@ export interface OTPVerificationResponse {
 export interface AccountRegistrationRequest {
   email: string;
   department: string;
-  role: 'ADMIN' | 'USER';
+  role: 'ADMIN' | 'STANDARD';
 }
 
 export interface PaginatedResponse<T> {

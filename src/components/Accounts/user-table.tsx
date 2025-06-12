@@ -54,7 +54,7 @@ export const userSchema = z.object({
   role: z.enum(["ADMIN", "USER"]),
   status: z.enum(["ACTIVE", "INACTIVE", "PENDING"]),
   department: z.string(),
-  lastLogin: z.string().datetime().nullable(),
+  last_active: z.string().datetime().nullable(),
   created_at: z.string().datetime(),
   updated_at: z.string().datetime(),
 })
@@ -70,6 +70,7 @@ export type User = {
   department: string;
   created_at: string;
   updated_at: string;
+  last_active?: string;
 };
 
 interface UserTableProps {

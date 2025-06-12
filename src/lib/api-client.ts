@@ -65,11 +65,13 @@ class ApiClient {
         body: JSON.stringify(credentials),
       }),
 
-    setup: (data: SetupAccountRequest) =>
-      this.request<SetupAccountResponse>('/accounts/setup', {
+    setup: (data: SetupAccountRequest) => {
+      console.log('apiClient.auth.setup - sending data:', data);
+      return this.request<SetupAccountResponse>('/accounts/setup', {
         method: 'POST',
         body: JSON.stringify(data),
-      }),
+      });
+    },
 
     logout: () =>
       this.request<void>('/auth/logout', {

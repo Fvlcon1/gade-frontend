@@ -28,7 +28,7 @@ export default function SignInPage() {
         mode="signin"
         onSubmit={handleSubmit}
         isLoading={isLoading}
-        error={error?.message}
+        error={error?.message ? `Sign In Failed: ${error.message}` : undefined}
       />
     </AuthLayout>
   );

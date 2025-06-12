@@ -28,6 +28,7 @@ type User = {
   department: string;
   created_at: string;
   updated_at: string;
+  last_active?: string;
 };
 
 // Dummy data (adjusting for the new UI)
@@ -203,6 +204,8 @@ const AccountManagement = () => {
     isMutating
   } = useAccounts();
 
+  console.log('AccountManagement Component - isLoading:', isLoading, 'isMutating:', isMutating, 'isRefreshing prop:', isLoading || isMutating);
+
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All Statuses');
@@ -216,7 +219,6 @@ const AccountManagement = () => {
       await deleteAccount(userId);
     } catch (error) {
       toast.error({
-        title: 'Deletion failed',
         description: 'Failed to delete user account.',
       });
     }
@@ -322,9 +324,55 @@ const AccountManagement = () => {
     },
     {
       accessorKey: "updated_at",
-      header: "Last Active",
+      header: "Last Modified",
       cell: ({ row }) => {
         const date = parseISO(row.getValue("updated_at"));
+        return (
+          <Text
+            textColor="rgb(156 163 175)"
+            size={TypographySize.body}
+          >
+            {date.toLocaleString('en-US', { 
+              day: '2-digit', 
+              month: 'short', 
+              year: 'numeric', 
+              hour: '2-digit', 
+              minute: '2-digit', 
+              hour12: true 
+            })}
+          </Text>
+        );
+      },
+    },
+    {
+      accessorKey: "last_active",
+      header: "Last Active",
+      cell: ({ row }) => {
+        const lastActive = row.original.last_active;
+        if (!lastActive) return (
+          <Text
+            textColor="rgb(156 163 175)"
+            size={TypographySize.body}
+          >
+            Never logged in
+          </Text>
+        );
+
+        const date = parseISO(lastActive);
+        const thresholdDate = new Date('2024-01-01');
+        
+        // If date is before 2024 or is the default zero value (Dec 31, 0001)
+        if (date < thresholdDate || date.getFullYear() === 1) {
+          return (
+            <Text
+              textColor="rgb(156 163 175)"
+              size={TypographySize.body}
+            >
+              Never logged in
+            </Text>
+          );
+        }
+
         const now = new Date();
         const diffInMinutes = Math.abs(now.getTime() - date.getTime()) / (1000 * 60);
 
@@ -401,13 +449,11 @@ const AccountManagement = () => {
     try {
       await refetch();
       toast.success({
-        title: 'Accounts refreshed',
-        // description: 'The account list has been successfully updated.',
-      })
+        description: 'The account list has been successfully updated.',
+      });
     } catch (error) {
       toast.error({
-        title: 'Refresh failed',
-        description: 'Failed to refresh the account list.',
+        description: `${error instanceof Error ? error.message : 'Failed to refresh the account list.'}`,
       });
     }
   };
@@ -417,8 +463,7 @@ const AccountManagement = () => {
       await updateStatus({ id: userId, status: newStatus });
     } catch (error) {
       toast.error({
-        title: 'Status update failed',
-        description: 'Failed to update user status.',
+        description: `${error instanceof Error ? error.message : 'Failed to update user status.'}`,
       });
     }
   };
@@ -428,8 +473,7 @@ const AccountManagement = () => {
       await updateRole({ id: userId, role: newRole });
     } catch (error) {
       toast.error({
-        title: 'Role update failed',
-        description: 'Failed to update user role.',
+        description: `${error instanceof Error ? error.message : 'Failed to update user role.'}`,
       });
     }
   };
@@ -439,8 +483,7 @@ const AccountManagement = () => {
       await updateDepartment({ id: userId, department: newDepartment });
     } catch (error) {
       toast.error({
-        title: 'Department update failed',
-        description: 'Failed to update user department.',
+        description: `${error instanceof Error ? error.message : 'Failed to update user department.'}`,
       });
     }
   };
@@ -540,14 +583,14 @@ const AccountManagement = () => {
       {isLoading ? (
         <div className="rounded-md border w-full">
           <div className="h-12 border-b bg-white px-4 flex items-center justify-between">
-            {Array.from({ length: 7 }).map((_, i) => (
-              <Skeleton key={i} className="h-4 w-[calc(100%/7 - 1rem)] mx-2" />
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Skeleton key={i} className="h-4 w-24" />
             ))}
           </div>
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="h-16 border-b bg-white px-4 flex items-center justify-between">
-              {Array.from({ length: 7 }).map((_, j) => (
-                <Skeleton key={j} className="h-4 w-[calc(100%/7 - 1rem)] mx-2" />
+              {Array.from({ length: 8 }).map((_, j) => (
+                <Skeleton key={j} className="h-4 w-24" />
               ))}
             </div>
           ))}
@@ -563,6 +606,22 @@ const AccountManagement = () => {
           setShowInviteModal={setShowInviteModal}
           onInviteUser={handleInviteUser}
         />
+      )}
+
+      {/* Loading Spinner */}
+      {(isLoading || isMutating) && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-4 flex items-center gap-2">
+            <div className="animate-spin rounded-full h-6 w-6 border-2 border-[var(--color-main-primary)] border-t-transparent" />
+            <Text
+              textColor="rgb(31 41 55)"
+              size={TypographySize.body}
+              bold={TypographyBold.sm2}
+            >
+              {isLoading ? 'Loading accounts...' : 'Updating...'}
+            </Text>
+          </div>
+        </div>
       )}
     </div>
   );

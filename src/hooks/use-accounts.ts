@@ -23,8 +23,7 @@ export const useAccounts = () => {
         return response;
       } catch (error) {
         toast.error({
-          title: 'Failed to fetch accounts',
-          description: error instanceof Error ? error.message : 'An error occurred while fetching accounts',
+          description: error instanceof Error ? `Failed to fetch accounts: ${error.message}` : 'An error occurred while fetching accounts',
         });
         throw error;
       }
@@ -40,8 +39,7 @@ export const useAccounts = () => {
         return response;
       } catch (error) {
         toast.error({
-          title: 'Failed to fetch account details',
-          description: error instanceof Error ? error.message : 'An error occurred while fetching account details',
+          description: error instanceof Error ? `Failed to fetch account details: ${error.message}` : 'An error occurred while fetching account details',
         });
         throw error;
       }
@@ -54,14 +52,12 @@ export const useAccounts = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [ACCOUNTS_QUERY_KEY] });
       toast.success({
-        title: 'Account registered',
         description: 'The account has been successfully registered.',
       });
     },
     onError: (error) => {
       toast.error({
-        title: 'Registration failed',
-        description: error instanceof Error ? error.message : 'Failed to register account',
+        description: error instanceof Error ? `${error.message}` : 'Failed to register account',
       });
     },
   });
@@ -71,14 +67,12 @@ export const useAccounts = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [ACCOUNTS_QUERY_KEY] });
       toast.success({
-        title: 'Account deleted',
         description: 'The account has been successfully deleted.',
       });
     },
     onError: (error) => {
       toast.error({
-        title: 'Deletion failed',
-        description: error instanceof Error ? error.message : 'Failed to delete account',
+        description: error instanceof Error ? `${error.message}` : 'Failed to delete account',
       });
     },
   });
@@ -88,15 +82,13 @@ export const useAccounts = () => {
       apiClient.accounts.updateDepartment(id, department),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [ACCOUNTS_QUERY_KEY] });
-      toast.success({
-        title: 'Department updated',
-        description: 'The department has been successfully updated.',
-      });
+      // toast.success({
+      //   description: 'The department has been successfully updated.',
+      // });
     },
     onError: (error) => {
       toast.error({
-        title: 'Update failed',
-        description: error instanceof Error ? error.message : 'Failed to update department',
+        description: error instanceof Error ? `${error.message}` : 'Failed to update department',
       });
     },
   });
@@ -106,15 +98,13 @@ export const useAccounts = () => {
       apiClient.accounts.updateRole(id, role),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [ACCOUNTS_QUERY_KEY] });
-      toast.success({
-        title: 'Role updated',
-        description: 'The role has been successfully updated.',
-      });
+      // toast.success({
+      //   description: 'The role has been successfully updated.',
+      // });
     },
     onError: (error) => {
       toast.error({
-        title: 'Update failed',
-        description: error instanceof Error ? error.message : 'Failed to update role',
+        description: error instanceof Error ? `${error.message}` : 'Failed to update role',
       });
     },
   });
@@ -125,14 +115,12 @@ export const useAccounts = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [ACCOUNTS_QUERY_KEY] });
       toast.success({
-        title: 'Status updated',
         description: 'The status has been successfully updated.',
       });
     },
     onError: (error) => {
       toast.error({
-        title: 'Update failed',
-        description: error instanceof Error ? error.message : 'Failed to update status',
+        description: error instanceof Error ? `${error.message}` : 'Failed to update status',
       });
     },
   });

@@ -46,7 +46,7 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
   // Define the schema for invite user form validation
   const inviteUserSchema = z.object({
     email: z.string().email("Invalid email address"),
-    role: z.enum(["ADMIN", "USER"], { message: "Please select a role" }),
+    role: z.enum(["ADMIN", "STANDARD"], { message: "Please select a role" }),
     department: z.string().min(1, "Department is required"),
   });
 
@@ -58,7 +58,7 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
 
   // Define the schema for edit user form validation
   const editUserSchema = z.object({
-    role: z.enum(["ADMIN", "USER"], { message: "Please select a role" }),
+    role: z.enum(["ADMIN", "STANDARD"], { message: "Please select a role" }),
     department: z.string().min(1, "Department is required"),
   });
 
@@ -82,16 +82,14 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
       });
 
       toast.success({
-        title: 'Invitation sent',
-        // description: 'The user has been successfully invited.',
+          description: 'The user has been successfully invited.',
       });
 
       reset();
-      setShowInviteModal(false);
+    setShowInviteModal(false);
     } catch (error) {
       toast.error({
-        title: 'Invitation failed',
-        description: error instanceof Error ? error.message : 'Failed to send invitation',
+        description: error instanceof Error ? `${error.message}` : 'Failed to send invitation',
       });
     }
   };
@@ -100,7 +98,7 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
     setEditingUser(user);
     setShowEditModal(true);
     // Set form values when opening the edit modal
-    setEditValue('role', user.role === 'STANDARD' ? 'USER' : user.role);
+    setEditValue('role', user.role);
     setEditValue('department', user.department);
   };
 
@@ -109,22 +107,20 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
       try {
         // Update all fields in parallel
         await Promise.all([
-          updateRole({ id: editingUser.id, role: data.role === 'USER' ? 'STANDARD' : data.role }),
+          updateRole({ id: editingUser.id, role: data.role }),
           updateDepartment({ id: editingUser.id, department: data.department }),
         ]);
 
         toast.success({
-          title: 'User updated',
           description: 'The user has been successfully updated.',
         });
 
-        setShowEditModal(false);
-        setEditingUser(null);
+    setShowEditModal(false);
+    setEditingUser(null);
         resetEdit();
       } catch (error) {
         toast.error({
-          title: 'Update failed',
-          description: error instanceof Error ? error.message : 'Failed to update user',
+          description: error instanceof Error ? `${error.message}` : 'Failed to update user',
         });
       }
     }
@@ -136,13 +132,11 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
       await updateStatus({ id: userId, status: newStatus });
       
       toast.success({
-        title: 'Status updated',
         description: `User is now ${newStatus.toLowerCase()}`,
       });
     } catch (error) {
       toast.error({
-        title: 'Status update failed',
-        description: error instanceof Error ? error.message : 'Failed to update status',
+        description: error instanceof Error ? `${error.message}` : 'Failed to update status',
       });
     }
   };
@@ -313,7 +307,7 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
     },
     {
       accessorKey: "updated_at",
-      header: "Last Active",
+      header: "Last Modified",
       cell: ({ row }) => {
         const updatedAt = row.original.updated_at;
         if (!updatedAt) return (
@@ -326,6 +320,52 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
         );
 
         const date = parseISO(updatedAt);
+        return (
+          <Text
+            textColor="rgb(156 163 175)"
+            size={TypographySize.body}
+          >
+            {date.toLocaleString('en-US', { 
+              day: '2-digit', 
+              month: 'short', 
+              year: 'numeric', 
+              hour: '2-digit', 
+              minute: '2-digit', 
+              hour12: true 
+            })}
+          </Text>
+        );
+      },
+    },
+    {
+      accessorKey: "last_active",
+      header: "Last Active",
+      cell: ({ row }) => {
+        const lastActive = row.original.last_active;
+        if (!lastActive) return (
+          <Text
+            textColor="rgb(156 163 175)"
+            size={TypographySize.body}
+          >
+            Never logged in
+          </Text>
+        );
+
+        const date = parseISO(lastActive);
+        const thresholdDate = new Date('2024-01-01');
+        
+        // If date is before 2024 or is the default zero value (Dec 31, 0001)
+        if (date < thresholdDate || date.getFullYear() === 1) {
+          return (
+            <Text
+              textColor="rgb(156 163 175)"
+              size={TypographySize.body}
+            >
+              Never logged in
+            </Text>
+          );
+        }
+
         const now = new Date();
         const diffInMinutes = Math.abs(now.getTime() - date.getTime()) / (1000 * 60);
 
@@ -337,7 +377,7 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
         } else if (diffInMinutes < 60 * 24) {
           timeText = formatDistanceToNow(date, { addSuffix: true });
         } else {
-          timeText = new Date(updatedAt).toLocaleString('en-US', { 
+          timeText = date.toLocaleString('en-US', { 
             day: '2-digit', 
             month: 'short', 
             year: 'numeric', 
@@ -387,7 +427,7 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
         };
 
         return (
-          <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="sm"
@@ -395,8 +435,8 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
               onClick={() => handleDeleteClick(row.original)}
               title="Delete user"
             >
-              <IconTrash className="h-4 w-4 text-red-500" />
-            </Button>
+            <IconTrash className="h-4 w-4 text-red-500" />
+          </Button>
             <Button
               variant="ghost"
               size="sm"
@@ -404,7 +444,7 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
               onClick={() => handleEditClick(row.original)}
               title="Edit user"
             >
-              <IconEdit className="h-4 w-4 text-gray-600" />
+            <IconEdit className="h-4 w-4 text-gray-600" />
             </Button>
             <div title={isActive ? "Set inactive" : "Set active"}>
               <Switch
@@ -449,7 +489,7 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
                 </div>
               </div>
             )}
-          </div>
+        </div>
         );
       },
     },
@@ -474,6 +514,22 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
         </TabsContent>
       </Tabs>
 
+      {/* Loading Spinner */}
+      {isMutating && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-4 flex items-center gap-2">
+            <div className="animate-spin rounded-full h-6 w-6 border-2 border-[var(--color-main-primary)] border-t-transparent" />
+            <Text
+              textColor="rgb(31 41 55)"
+              size={TypographySize.body}
+              bold={TypographyBold.sm2}
+            >
+              Updating...
+            </Text>
+          </div>
+        </div>
+      )}
+
       {/* Invite Modal */}
       {showInviteModal && (
         <div className="fixed inset-0 border border-gray-100 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50">
@@ -493,7 +549,7 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
               <div className="mb-4">
                 <Label htmlFor="inviteRole" className="block text-sm font-medium text-gray-700 mb-1">Role</Label>
                 <Select 
-                  onValueChange={(value) => setValue('role', value as 'ADMIN' | 'USER')}
+                  onValueChange={(value) => setValue('role', value as 'ADMIN' | 'STANDARD')}
                   defaultValue=""
                 >
                   <SelectTrigger className="w-full" id="inviteRole">
@@ -501,7 +557,7 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="ADMIN">Admin</SelectItem>
-                    <SelectItem value="USER">Standard</SelectItem>
+                    <SelectItem value="STANDARD">Standard</SelectItem>
                   </SelectContent>
                 </Select>
                 {errors.role && <p className="text-red-500 text-xs mt-1">{errors.role.message}</p>}
@@ -546,15 +602,15 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
               <div className="mb-4">
                 <Label htmlFor="editRole" className="block text-sm font-medium text-gray-700 mb-1">Role</Label>
                 <Select 
-                  value={editingUser.role === 'STANDARD' ? 'USER' : editingUser.role}
-                  onValueChange={(value) => setEditValue('role', value as 'ADMIN' | 'USER')}
+                  value={editingUser.role}
+                  onValueChange={(value) => setEditValue('role', value as 'ADMIN' | 'STANDARD')}
                 >
                   <SelectTrigger className="w-full" id="editRole">
                     <SelectValue placeholder="Select a role" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="ADMIN">Admin</SelectItem>
-                    <SelectItem value="USER">Standard</SelectItem>
+                    <SelectItem value="STANDARD">Standard</SelectItem>
                   </SelectContent>
                 </Select>
                 {errorsEdit.role && <p className="text-red-500 text-xs mt-1">{errorsEdit.role.message}</p>}

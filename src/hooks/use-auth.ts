@@ -3,7 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { useAuthStore } from '@/lib/store/auth-store';
 import { toast } from '@/components/ui/toast';
-import type { LoginCredentials } from '@/types/auth';
+import type { LoginCredentials, SetupAccountRequest } from '@/types/auth';
 
 export const useAuth = () => {
   const router = useRouter();
@@ -16,33 +16,32 @@ export const useAuth = () => {
       setPendingLogin(variables);
       router.push('/2fa');
       toast.success({
-        title: 'Success',
-        description: 'Verify OTP to complete sign in',
+        description: 'Success: Verify OTP to complete sign in',
       });
     },
     onError: (error) => {
       toast.error({
-        title: 'Error',
         description: error.message || 'Failed to sign in',
       });
     },
   });
 
   const setupMutation = useMutation({
-    mutationFn: apiClient.auth.setup,
+    mutationFn: (data: SetupAccountRequest) => {
+      console.log('useAuth - setupMutation - mutationFn called with data:', data);
+      return apiClient.auth.setup(data);
+    },
     onSuccess: (data) => {
       setUser(data.user);
       toast.success({
-        title: 'Account setup complete!',
-        description: 'Your account has been successfully set up.',
+        description: 'Account setup complete! Your account has been successfully set up.',
       });
       router.push('/');
     },
     onError: (error: Error) => {
       setError(error.message);
       toast.error({
-        title: 'Setup failed',
-        description: error.message || 'Please check your information and try again.',
+        description: error.message || 'Setup failed: Please check your information and try again.',
       });
     },
   });
@@ -52,16 +51,14 @@ export const useAuth = () => {
     onSuccess: () => {
       clearAuth();
       toast.success({
-        title: 'Signed out',
-        description: 'You have been successfully signed out.',
+        description: 'Signed out: You have been successfully signed out.',
       });
       router.push('/signin');
     },
     onError: (error: Error) => {
       setError(error.message);
       toast.error({
-        title: 'Sign out failed',
-        description: error.message || 'There was an error signing out.',
+        description: error.message || 'Sign out failed: There was an error signing out.',
       });
     },
   });
@@ -70,15 +67,13 @@ export const useAuth = () => {
     mutationFn: apiClient.auth.sendOTP,
     onSuccess: () => {
       toast.success({
-        title: 'OTP sent',
-        description: 'Please check your email for the verification code.',
+        description: 'OTP sent: Please check your email for the verification code.',
       });
     },
     onError: (error: Error) => {
       setError(error.message);
       toast.error({
-        title: 'Failed to send OTP',
-        description: error.message || 'Please try again later.',
+        description: error.message || 'Failed to send OTP: Please try again later.',
       });
     },
   });
@@ -94,8 +89,7 @@ export const useAuth = () => {
       await new Promise(resolve => setTimeout(resolve, 100));
       
       toast.success({
-        title: 'OTP verified',
-        description: 'Your account has been successfully verified.',
+        description: 'OTP verified: Your account has been successfully verified.',
       });
       
       // Get the redirect URL from the pending login data
@@ -105,8 +99,7 @@ export const useAuth = () => {
     onError: (error: Error) => {
       setError(error.message);
       toast.error({
-        title: 'OTP verification failed',
-        description: error.message || 'Please check the code and try again.',
+        description: error.message || 'OTP verification failed: Please check the code and try again.',
       });
     },
   });

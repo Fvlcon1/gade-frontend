@@ -45,14 +45,27 @@ export function UserTableControls<TData>({
         />
         <div className="flex items-center space-x-2 flex-wrap justify-center md:justify-end gap-2">
           {/* Refresh Button */}
-          <Button
-            className="bg-[var(--color-main-primary)] text-white hover:bg-[var(--color-main-primary)]/90"
-            onClick={onRefresh}
-            disabled={isRefreshing}
-          >
-            <IconRefresh className={isRefreshing ? "animate-spin" : ""} />
-            Refresh
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onRefresh}
+              disabled={isRefreshing}
+              className="h-8 bg-[var(--color-main-primary)] text-white hover:bg-[var(--color-main-primary)]/90 hover:text-white"
+            >
+              {isRefreshing ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                  <span>Refreshing...</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <IconRefresh className="h-4 w-4" />
+                  <span>Refresh</span>
+                </div>
+              )}
+            </Button>
+          </div>
 
           {/* Status Filter */}
           <Select value={currentStatusFilter} onValueChange={onStatusFilterChange}>
