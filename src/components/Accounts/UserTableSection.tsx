@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import CustomInput from "@/components/ui/input/input";
 import { UserTable, User } from "@components/Accounts/user-table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { IconDotsVertical, IconEdit, IconTrash } from "@tabler/icons-react";
+import { IconDotsVertical, IconEdit, IconTrash, IconCheck, IconX } from "@tabler/icons-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { parseISO, formatDistanceToNow } from "date-fns";
@@ -17,6 +17,8 @@ import Text, { Head1 } from '@/app/styles/components/text';
 import { TypographySize, TypographyBold } from '@/app/styles/style.types';
 import { useAccounts } from '@/hooks/use-accounts';
 import { toast } from '@/components/ui/toast';
+import { Switch } from '@/components/ui/switch';
+import { useState } from 'react';
 
 interface UserTableSectionProps {
   filteredUsers: User[];
@@ -27,7 +29,6 @@ interface UserTableSectionProps {
   showInviteModal: boolean;
   setShowInviteModal: (show: boolean) => void;
   onInviteUser: () => void;
-  onDeleteClick: (user: User) => void;
 }
 
 const UserTableSection: React.FC<UserTableSectionProps> = ({
@@ -39,7 +40,6 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
   showInviteModal,
   setShowInviteModal,
   onInviteUser,
-  onDeleteClick,
 }) => {
   const { registerAccount, updateRole, updateStatus, updateDepartment, isMutating } = useAccounts();
 
@@ -60,7 +60,6 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
   const editUserSchema = z.object({
     role: z.enum(["ADMIN", "USER"], { message: "Please select a role" }),
     department: z.string().min(1, "Department is required"),
-    status: z.enum(["ACTIVE", "INACTIVE", "PENDING"], { message: "Please select a status" }),
   });
 
   type EditUserFormData = z.infer<typeof editUserSchema>;
@@ -103,7 +102,6 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
     // Set form values when opening the edit modal
     setEditValue('role', user.role === 'STANDARD' ? 'USER' : user.role);
     setEditValue('department', user.department);
-    setEditValue('status', user.status);
   };
 
   const handleSaveEdit = async (data: EditUserFormData) => {
@@ -113,7 +111,6 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
         await Promise.all([
           updateRole({ id: editingUser.id, role: data.role === 'USER' ? 'STANDARD' : data.role }),
           updateDepartment({ id: editingUser.id, department: data.department }),
-          updateStatus({ id: editingUser.id, status: data.status }),
         ]);
 
         toast.success({
@@ -130,6 +127,23 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
           description: error instanceof Error ? error.message : 'Failed to update user',
         });
       }
+    }
+  };
+
+  const handleStatusToggle = async (userId: string, newStatus: User['status']) => {
+    console.log('handleStatusToggle called with:', { userId, newStatus });
+    try {
+      await updateStatus({ id: userId, status: newStatus });
+      
+      toast.success({
+        title: 'Status updated',
+        description: `User is now ${newStatus.toLowerCase()}`,
+      });
+    } catch (error) {
+      toast.error({
+        title: 'Status update failed',
+        description: error instanceof Error ? error.message : 'Failed to update status',
+      });
     }
   };
 
@@ -313,16 +327,86 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
     {
       id: "actions",
       header: "Actions",
-      cell: ({ row }) => (
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => onDeleteClick(row.original)}>
-            <IconTrash className="h-4 w-4 text-red-500" />
-          </Button>
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => handleEditClick(row.original)}>
-            <IconEdit className="h-4 w-4 text-gray-600" />
-          </Button>
-        </div>
-      ),
+      cell: ({ row }) => {
+        const isActive = row.original.status === 'ACTIVE';
+        const [showConfirm, setShowConfirm] = useState(false);
+        const [pendingStatus, setPendingStatus] = useState<'ACTIVE' | 'INACTIVE' | null>(null);
+
+        const handleToggleClick = () => {
+          const targetStatus = isActive ? 'INACTIVE' : 'ACTIVE';
+          console.log('handleToggleClick: Current isActive:', isActive, 'Setting pendingStatus to:', targetStatus);
+          setPendingStatus(targetStatus);
+          setShowConfirm(true);
+        };
+
+        const handleConfirm = async () => {
+          console.log('handleConfirm: Confirming status change to:', pendingStatus);
+          setShowConfirm(false);
+          if (pendingStatus) {
+            await handleStatusToggle(row.original.id, pendingStatus);
+          }
+          setPendingStatus(null);
+        };
+
+        const handleCancel = () => {
+          setShowConfirm(false);
+          setPendingStatus(null);
+        };
+
+        return (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={() => handleDeleteClick(row.original)}
+              title="Delete user"
+            >
+              <IconTrash className="h-4 w-4 text-red-500" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={() => handleEditClick(row.original)}
+              title="Edit user"
+            >
+              <IconEdit className="h-4 w-4 text-gray-600" />
+            </Button>
+            <div title={isActive ? "Set inactive" : "Set active"}>
+              <Switch
+                checked={isActive}
+                onCheckedChange={handleToggleClick}
+                className={`relative ${isActive ? 'bg-[#39D0A4] data-[state=checked]:bg-green-300' : 'bg-[#FF4D4D]'} border border-gray-200`}
+              >
+                {/* Removed custom icon spans - relying on default Switch thumb for now */}
+              </Switch>
+            </div>
+            {/* Confirmation Dialog */}
+            {showConfirm && (
+              <div className="fixed inset-0 z-50 flex items-center backdrop-blur-sm justify-center bg-opacity-30">
+                <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+                  <h3 className="text-lg font-semibold mb-2">Confirm Status Change</h3>
+                  <p className="mb-4">
+                    {pendingStatus === 'ACTIVE'
+                      ? "Do you want to activate this user's account?"
+                      : "Do you want to deactivate this user's account?"}
+                  </p>
+                  <div className="flex justify-end gap-2">
+                    <Button variant="outline" onClick={handleCancel}>Cancel</Button>
+                    <Button
+                      onClick={handleConfirm}
+                      className={pendingStatus === 'ACTIVE' ? "bg-[var(--color-main-primary)] text-white hover:bg-[var(--color-main-primary)]/90" : "bg-red-500 text-white hover:bg-red-600"}
+                    >
+                      Confirm
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      },
     },
   ];
 
@@ -414,23 +498,6 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
           <div className="bg-white rounded-xl p-6 w-full max-w-md border border-gray-900">
             <h2 className="text-xl font-bold mb-4">Edit User</h2>
             <form onSubmit={handleSubmitEdit(handleSaveEdit)}>
-              <div className="mb-4">
-                <Label htmlFor="editStatus" className="block text-sm font-medium text-gray-700 mb-1">Status</Label>
-                <Select 
-                  value={editingUser.status} 
-                  onValueChange={(value) => setEditValue('status', value as 'ACTIVE' | 'INACTIVE' | 'PENDING')}
-                >
-                  <SelectTrigger className="w-full" id="editStatus">
-                    <SelectValue placeholder="Select a status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ACTIVE">Active</SelectItem>
-                    <SelectItem value="INACTIVE">Inactive</SelectItem>
-                    <SelectItem value="PENDING">Pending</SelectItem>
-                  </SelectContent>
-                </Select>
-                {errorsEdit.status && <p className="text-red-500 text-xs mt-1">{errorsEdit.status.message}</p>}
-              </div>
               <div className="mb-4">
                 <Label htmlFor="editRole" className="block text-sm font-medium text-gray-700 mb-1">Role</Label>
                 <Select 
