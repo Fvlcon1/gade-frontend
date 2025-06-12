@@ -5,7 +5,7 @@ import { Table } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { IconChevronDown } from "@tabler/icons-react";
+import { IconChevronDown, IconRefresh } from "@tabler/icons-react";
 import { FaSync } from 'react-icons/fa';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
@@ -45,14 +45,14 @@ export function UserTableControls<TData>({
         />
         <div className="flex items-center space-x-2 flex-wrap justify-center md:justify-end gap-2">
           {/* Refresh Button */}
-          <button
+          <Button
+            className="bg-[var(--color-main-primary)] text-white hover:bg-[var(--color-main-primary)]/90"
             onClick={onRefresh}
             disabled={isRefreshing}
-            className={`flex items-center justify-center size-8 p-0 rounded-md text-gray-600 hover:bg-gray-50 border border-gray-200 transition-colors
-              ${isRefreshing ? 'cursor-not-allowed animate-spin' : 'cursor-pointer'}`}
           >
-            <FaSync className="size-4" />
-          </button>
+            <IconRefresh className={isRefreshing ? "animate-spin" : ""} />
+            Refresh
+          </Button>
 
           {/* Status Filter */}
           <Select value={currentStatusFilter} onValueChange={onStatusFilterChange}>

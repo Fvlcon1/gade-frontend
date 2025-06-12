@@ -288,6 +288,39 @@ const AccountManagement = () => {
       ),
     },
     {
+      accessorKey: "created_at",
+      header: "Created At",
+      cell: ({ row }) => {
+        const createdAt = row.original.created_at;
+        if (!createdAt) return (
+          <Text
+            textColor="rgb(156 163 175)"
+            size={TypographySize.body}
+          >
+            unknown
+          </Text>
+        );
+
+        const date = parseISO(createdAt);
+
+        return (
+          <Text
+            textColor="rgb(156 163 175)"
+            size={TypographySize.body}
+          >
+            {date.toLocaleString('en-US', { 
+              day: '2-digit', 
+              month: 'short', 
+              year: 'numeric', 
+              hour: '2-digit', 
+              minute: '2-digit', 
+              hour12: true 
+            })}
+          </Text>
+        );
+      },
+    },
+    {
       accessorKey: "updated_at",
       header: "Last Active",
       cell: ({ row }) => {
@@ -369,8 +402,8 @@ const AccountManagement = () => {
       await refetch();
       toast.success({
         title: 'Accounts refreshed',
-        description: 'The account list has been successfully updated.',
-      });
+        // description: 'The account list has been successfully updated.',
+      })
     } catch (error) {
       toast.error({
         title: 'Refresh failed',
@@ -478,12 +511,20 @@ const AccountManagement = () => {
     >
       <AccountHeader onInviteUser={handleInviteUser} />
 
-      <MetricCards 
-        totalUsers={totalUsers} 
-        activeUsers={activeUsers} 
-        inactiveUsers={inactiveUsers} 
-        pendingInvites={pendingUsers} 
-      />
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-28 w-full rounded-lg" />
+          ))}
+        </div>
+      ) : (
+        <MetricCards 
+          totalUsers={totalUsers} 
+          activeUsers={activeUsers} 
+          inactiveUsers={inactiveUsers} 
+          pendingInvites={pendingUsers} 
+        />
+      )}
 
       <UserTableControls 
         table={table}
@@ -497,16 +538,16 @@ const AccountManagement = () => {
       />
 
       {isLoading ? (
-        <div className="rounded-md border">
-          <div className="h-12 border-b bg-white px-4 flex items-center">
+        <div className="rounded-md border w-full">
+          <div className="h-12 border-b bg-white px-4 flex items-center justify-between">
             {Array.from({ length: 7 }).map((_, i) => (
-              <Skeleton key={i} className="h-4 w-[100px] mx-4" />
+              <Skeleton key={i} className="h-4 w-[calc(100%/7 - 1rem)] mx-2" />
             ))}
           </div>
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-16 border-b bg-white px-4 flex items-center">
+            <div key={i} className="h-16 border-b bg-white px-4 flex items-center justify-between">
               {Array.from({ length: 7 }).map((_, j) => (
-                <Skeleton key={j} className="h-4 w-[100px] mx-4" />
+                <Skeleton key={j} className="h-4 w-[calc(100%/7 - 1rem)] mx-2" />
               ))}
             </div>
           ))}
@@ -521,7 +562,6 @@ const AccountManagement = () => {
           showInviteModal={showInviteModal}
           setShowInviteModal={setShowInviteModal}
           onInviteUser={handleInviteUser}
-          onDeleteClick={handleDeleteClick}
         />
       )}
     </div>

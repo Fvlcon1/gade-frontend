@@ -83,7 +83,7 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
 
       toast.success({
         title: 'Invitation sent',
-        description: 'The user has been successfully invited.',
+        // description: 'The user has been successfully invited.',
       });
 
       reset();
@@ -279,6 +279,39 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
       ),
     },
     {
+      accessorKey: "created_at",
+      header: "Created At",
+      cell: ({ row }) => {
+        const createdAt = row.original.created_at;
+        if (!createdAt) return (
+          <Text
+            textColor="rgb(156 163 175)"
+            size={TypographySize.body}
+          >
+            unknown
+          </Text>
+        );
+
+        const date = parseISO(createdAt);
+
+        return (
+          <Text
+            textColor="rgb(156 163 175)"
+            size={TypographySize.body}
+          >
+            {date.toLocaleString('en-US', { 
+              day: '2-digit', 
+              month: 'short', 
+              year: 'numeric', 
+              hour: '2-digit', 
+              minute: '2-digit', 
+              hour12: true 
+            })}
+          </Text>
+        );
+      },
+    },
+    {
       accessorKey: "updated_at",
       header: "Last Active",
       cell: ({ row }) => {
@@ -377,9 +410,21 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
               <Switch
                 checked={isActive}
                 onCheckedChange={handleToggleClick}
-                className={`relative ${isActive ? 'bg-[#39D0A4] data-[state=checked]:bg-green-300' : 'bg-[#FF4D4D]'} border border-gray-200`}
+                className={`relative border cursor-pointer border-gray-200
+                  data-[state=checked]:bg-green-300
+                  data-[state=unchecked]:bg-red-300
+                `}
               >
-                {/* Removed custom icon spans - relying on default Switch thumb for now */}
+                <span className="absolute left-1 top-1/2 -translate-y-1/2 pointer-events-none transition-opacity duration-200"
+                  style={{ opacity: isActive ? 1 : 0 }}
+                >
+                  <IconCheck className="h-3 w-3 text-white" />
+                </span>
+                <span className="absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none transition-opacity duration-200"
+                  style={{ opacity: isActive ? 0 : 1 }}
+                >
+                  <IconX className="h-3 w-3 text-white" />
+                </span>
               </Switch>
             </div>
             {/* Confirmation Dialog */}
