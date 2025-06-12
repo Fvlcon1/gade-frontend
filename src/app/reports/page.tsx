@@ -13,6 +13,7 @@ import { useSpatialStore, setupReportsRefresh, cleanupReportsRefresh } from '@/l
 import { exportToCSV } from '@/utils/export';
 import { exportToPDF } from '@/utils/export';
 import { formatReportId } from '@/utils/format';
+import { Button } from '@/components/ui/button';
 
 
 export default function ReportsPage() {
@@ -31,6 +32,8 @@ export default function ReportsPage() {
   const [statusFilter, setStatusFilter] = useState('All Statuses');
   const [priorityFilter, setPriorityFilter] = useState('All Priorities');
   const [sortOrder, setSortOrder] = useState('Newest First');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   // Get reports from spatial store
   const { reports, isLoading, error, fetchReports } = useSpatialStore();
@@ -120,6 +123,13 @@ export default function ReportsPage() {
     return sortOrder === 'Newest First' ? dateB - dateA : dateA - dateB;
   }) || [];
 
+  // Pagination
+  const totalPages = Math.ceil(filteredReports.length / itemsPerPage);
+  const paginatedReports = filteredReports.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   // Show error state if there's an error
   if (error) {
     return (
@@ -176,22 +186,46 @@ export default function ReportsPage() {
                 No reports found
               </div>
             ) : (
-              <div className="space-y-4">
-                {filteredReports.map((report) => (
-                  <ReportItem
-                    key={report.id}
-                    id={formatReportId(report.id)}
-                    status={report.status}
-                    priority={report.severity}
-                    createdAt={report.created_at}
-                    updatedAt={report.updated_at || report.created_at}
-                    location={report.locality}
-                    title={report.title}
-                    description={report.description}
-                    onViewOnMap={() => handleViewOnMap(report)}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="space-y-4">
+                  {paginatedReports.map((report) => (
+                    <ReportItem
+                      key={report.id}
+                      id={formatReportId(report.id)}
+                      status={report.status}
+                      priority={report.severity}
+                      createdAt={report.created_at}
+                      updatedAt={report.updated_at || report.created_at}
+                      location={report.locality}
+                      title={report.title}
+                      description={report.description}
+                      onViewOnMap={() => handleViewOnMap(report)}
+                    />
+                  ))}
+                </div>
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="flex justify-center items-center gap-2 mt-6">
+                    <Button
+                      variant="outline"
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                    >
+                      Previous
+                    </Button>
+                    <span className="text-sm text-gray-600">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </ReportList>
         </div>

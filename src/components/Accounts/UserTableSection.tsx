@@ -617,12 +617,20 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
               </div>
               <div className="mb-4">
                 <Label htmlFor="editDepartment" className="block text-sm font-medium text-gray-700 mb-1">Department</Label>
-                <CustomInput 
-                  id="editDepartment"
-                  placeholder="Department" 
-                  {...registerEdit("department")}
-                  className="mb-1"
-                />
+                <Select 
+                  value={editingUser.department}
+                  onValueChange={(value) => setEditValue('department', value)}
+                >
+                  <SelectTrigger className="w-full" id="editDepartment">
+                    <SelectValue placeholder="Select a department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="GADE Team">GADE Team</SelectItem>
+                    <SelectItem value="Minerals Department">Minerals Department</SelectItem>
+                    <SelectItem value="Forestry Department">Forestry Department</SelectItem>
+                    <SelectItem value="Ghana Armed Forces">Ghana Armed Forces</SelectItem>
+                  </SelectContent>
+                </Select>
                 {errorsEdit.department && <p className="text-red-500 text-xs mt-1">{errorsEdit.department.message}</p>}
               </div>
               <div className="flex justify-end gap-4 mt-6">

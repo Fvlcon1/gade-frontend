@@ -99,7 +99,7 @@ const ReportItem: React.FC<ReportItemProps> = ({
       {/* Main Body */}
       <div className="px-6 py-4 grid grid-cols-[1fr_300px_1fr] gap-x-6 items-center min-h-[100px]">
         {/* Title + Description */}
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <Head1
             textColor="rgb(31 41 55)"
             size={TypographySize.HM}
@@ -134,17 +134,20 @@ const ReportItem: React.FC<ReportItemProps> = ({
 
         {/* Status */}
         <div className="flex justify-end">
-          <Text
-            textColor={statusStyles[status.toLowerCase()]?.text || statusStyles.default.text}
-            size={TypographySize.body}
-            bold={TypographyBold.md2}
+          <div 
             className="rounded-full px-4 py-1.5 whitespace-nowrap"
             style={{ 
               backgroundColor: statusStyles[status.toLowerCase()]?.bg || statusStyles.default.bg,
             }}
           >
-            {statusStyles[status.toLowerCase()]?.label || statusStyles.default.label}
-          </Text>
+            <Text
+              textColor={statusStyles[status.toLowerCase()]?.text || statusStyles.default.text}
+              size={TypographySize.body}
+              bold={TypographyBold.md2}
+            >
+              {statusStyles[status.toLowerCase()]?.label || statusStyles.default.label}
+            </Text>
+          </div>
         </div>
       </div>
     </div>
