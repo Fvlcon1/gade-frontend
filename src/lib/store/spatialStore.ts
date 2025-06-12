@@ -73,7 +73,7 @@ const fetchReportsData = async (baseUrl: string): Promise<Report[]> => {
   if (!baseUrl) {
     throw new Error('API base URL is not configured');
   }
-  const response = await fetch(`${baseUrl}/admin/report?page_id=1&page_size=1000`);
+  const response = await fetch(`${baseUrl}/admin/report?page_id=1&page_size=1000`, {credentials: 'include'});
   if (!response.ok) {
     throw new Error('Failed to fetch reports');
   }

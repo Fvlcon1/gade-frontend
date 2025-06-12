@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useAuthStore } from '@/lib/store/auth-store';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -27,10 +28,10 @@ interface SpatialData {
 interface DistrictSearchResponse {
   result: string[];
 }
-
+  
 // Fetch function for each data type
 export const fetchSpatialData = async (endpoint: string): Promise<SpatialData> => {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`);
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {credentials: 'include'});
   if (!response.ok) {
     throw new Error(`Failed to fetch ${endpoint}`);
   }
@@ -40,7 +41,7 @@ export const fetchSpatialData = async (endpoint: string): Promise<SpatialData> =
 // Fetch function for searching districts
 export const fetchDistrictSearch = async (search_term: string): Promise<DistrictSearchResponse> => {
   if (!search_term) return { result: [] };
-  const response = await fetch(`${API_BASE_URL}/data/districts/search?name=${encodeURIComponent(search_term)}`);
+  const response = await fetch(`${API_BASE_URL}/data/districts/search?name=${encodeURIComponent(search_term)}`, {credentials: 'include'});
   if (!response.ok) {
     throw new Error(`Failed to fetch districts for search: ${search_term}`);
   }
@@ -66,38 +67,47 @@ export const spatialDataKeys = {
 // };
 
 export const useMiningSites = () => {
+  const { isAuthenticated } = useAuthStore();
   return useQuery({
     queryKey: spatialDataKeys.miningSites,
     queryFn: () => fetchSpatialData('/data/mining-sites'),
+    enabled: isAuthenticated,
   });
 };
 
 export const useDistricts = () => {
+  const { isAuthenticated } = useAuthStore();
   return useQuery({
     queryKey: spatialDataKeys.districts,
     queryFn: () => fetchSpatialData('/data/districts'),
+    enabled: isAuthenticated,
   });
 };
 
 export const useForestReserves = () => {
+  const { isAuthenticated } = useAuthStore();
   return useQuery({
     queryKey: spatialDataKeys.forestReserves,
     queryFn: () => fetchSpatialData('/data/forest-reserves'),
+    enabled: isAuthenticated,
   });
 };
 
 export const useRivers = () => {
+  const { isAuthenticated } = useAuthStore();
   return useQuery({
     queryKey: spatialDataKeys.rivers,
     queryFn: () => fetchSpatialData('/data/rivers'),
+    enabled: isAuthenticated,
   });
 };
 
 export const useDistrictSearch = (searchTerm: string) => {
+  const { isAuthenticated } = useAuthStore();
   return useQuery<DistrictSearchResponse, Error>({
     queryKey: spatialDataKeys.districtSearch(searchTerm),
     queryFn: () => fetchDistrictSearch(searchTerm),
-    enabled: !!searchTerm, // Only run the query if searchTerm is not empty
+    enabled: isAuthenticated && !!searchTerm, // Only run if authenticated and searchTerm exists
     staleTime: 1000 * 60 * 60 * 24 * 28, // 4 weeks
     gcTime: 1000 * 60 * 60 * 24 * 28, // 4 weeks
   });
