@@ -4,10 +4,13 @@ import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import { useSpatialStore } from '@/lib/store/spatialStore';
 import L from 'leaflet';
+import 'leaflet.markercluster';
 import { useSearchParams } from "next/navigation";
-import { GrLocationPin } from "react-icons/gr";
+import { TiLocation } from "react-icons/ti";
 import { renderToStaticMarkup } from "react-dom/server";
 
 const MouseCoordinateDisplay = () => {
@@ -185,7 +188,7 @@ const ReportsLayer: React.FC<{ reports: any[], activeFeatureLayers: Layer[] }> =
   const map = useMap();
 
   const getLocationPinIcon = () => {
-    const iconMarkup = renderToStaticMarkup(<GrLocationPin size={24} color="#FFD06C" />);
+    const iconMarkup = renderToStaticMarkup(<TiLocation size={24} color="#1E90FF" />);
     return L.divIcon({
       html: iconMarkup,
       iconSize: [24, 24],
@@ -206,7 +209,22 @@ const ReportsLayer: React.FC<{ reports: any[], activeFeatureLayers: Layer[] }> =
         map.removeLayer(reportsLayer);
       }
     } else if (shouldShowReports && reports.length > 0) {
-      const markersLayer = L.layerGroup().addTo(map);
+      // Create MarkerClusterGroup with custom cluster icon
+      const markersLayer = L.markerClusterGroup({
+        iconCreateFunction: (cluster: L.MarkerCluster) => {
+          const count = cluster.getChildCount();
+          return L.divIcon({
+            html: `<div style="background-color: #1E90FF; color: white; font-size: 12px; font-weight: bold; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white;">${count}</div>`,
+            className: 'custom-cluster-icon',
+            iconSize: [30, 30],
+          });
+        },
+        maxClusterRadius: 50,
+        spiderfyOnMaxZoom: true,
+        showCoverageOnHover: false,
+        zoomToBoundsOnClick: true,
+      });
+
       (map as any).reportsLayer = markersLayer;
 
       reports.forEach(report => {
@@ -223,6 +241,8 @@ const ReportsLayer: React.FC<{ reports: any[], activeFeatureLayers: Layer[] }> =
 
         markersLayer.addLayer(marker);
       });
+
+      map.addLayer(markersLayer);
     }
 
     return () => {
@@ -278,7 +298,7 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
     if (bounds.isValid()) {
       map.fitBounds(bounds, {
         padding: [50, 50],
-        maxZoom: districtsToZoom.length > 0 ? 12 : 9, // Lower maxZoom for all districts
+        maxZoom: districtsToZoom.length > 0 ? 12 : 9,
         animate: true,
         duration: 0.5,
       });
@@ -302,11 +322,11 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
     const isSelected = selectedDistricts.includes(district);
 
     if (selectedDistricts.length === 0 && highlightedDistricts.length === 0) {
-      return LAYER_STYLES.admin; // Brown outline, thick stroke
+      return LAYER_STYLES.admin;
     }
 
     if (isHighlighted) {
-      return HIGHLIGHT_STYLE.admin; // Yellow with reduced opacity
+      return HIGHLIGHT_STYLE.admin;
     }
 
     if (isSelected) {
@@ -322,7 +342,6 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
     return { opacity: 0, fillOpacity: 0 };
   };
 
-  // Generate a key for GeoJSON to force re-render when filteredDistricts changes
   const adminLayerKey = useMemo(() => {
     return filteredDistricts?.features
       ? JSON.stringify(filteredDistricts.features.map(f => f.properties.district))
@@ -353,7 +372,7 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
             if (layer.id === 'admin') {
               return (
                 <GeoJSON
-                  key={adminLayerKey} // Force re-render on filteredDistricts change
+                  key={adminLayerKey}
                   data={data}
                   style={(feature) => getDistrictStyle(feature)}
                   onEachFeature={(feature, leafletLayer) => {
@@ -486,9 +505,11 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
               setTimeout(() => {
                 const reportsLayer = (map as any).reportsLayer;
                 if (reportsLayer) {
-                  reportsLayer.eachLayer((layer) => {
-                    if (layer.getLatLng().equals([report.location.lat, report.location.lon])) {
-                      layer.openPopup();
+                  reportsLayer.eachLayer((layer: L.Layer) => {
+                    if (layer instanceof L.Marker && layer.getLatLng().equals([report.location.lat, report.location.lon])) {
+                      reportsLayer.zoomToShowLayer(layer, () => {
+                        layer.openPopup();
+                      });
                     }
                   });
                 }
