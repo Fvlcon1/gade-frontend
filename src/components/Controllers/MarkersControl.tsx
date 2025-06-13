@@ -11,11 +11,8 @@ import { useDebounce } from 'react-use';
 import { Loader2 } from 'lucide-react';
 import { useSpatialStore } from '@/lib/store/spatialStore';
 
-// Initial districts list
-const initialDistricts: string[] = [];
 const DateRanges = ["Last month", "Last 2 months"];
 
-// Helper function to get last 6 months
 const getLastSixMonths = () => {
   const now = new Date();
   const months = [];
@@ -30,7 +27,6 @@ const getLastSixMonths = () => {
 };
 
 const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
-  // State hooks
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isDateCollapsed, setIsDateCollapsed] = useState(false);
@@ -43,7 +39,6 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
   const [pendingDistricts, setPendingDistricts] = useState<string[]>([]);
   const [monthRange, setMonthRange] = useState([0, getLastSixMonths().length - 1]);
 
-  // Zustand store
   const { 
     setSelectedDistricts, 
     setHighlightedDistricts,
@@ -55,14 +50,11 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
 
   const months = useMemo(() => getLastSixMonths(), []);
 
-  // Refs
   const searchResultsRef = useRef<HTMLDivElement>(null);
   const selectedDistrictsRef = useRef<HTMLDivElement>(null);
 
-  // Fetch district search results
   const { data: searchResults, isLoading: isSearching } = useDistrictSearch(debouncedSearchTerm);
 
-  // Process districts data
   const { districtsToShow, searchResultDistricts } = useMemo(() => {
     const searchResultDistricts = searchResults?.result || [];
     const districtsToShow = searchResultDistricts.filter(district => 
@@ -71,13 +63,14 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
     return { districtsToShow, searchResultDistricts };
   }, [searchResults?.result, pendingDistricts]);
 
-  // Callbacks
   const toggleDistrict = useCallback((district: string) => {
     setPendingDistricts(prev => {
       const isSelected = prev.includes(district);
-      return isSelected ? prev.filter(d => d !== district) : [...prev, district];
+      const newPending = isSelected ? prev.filter(d => d !== district) : [...prev, district];
+      setHighlightedDistricts(newPending); // Update highlighted districts immediately
+      return newPending;
     });
-  }, []);
+  }, [setHighlightedDistricts]);
 
   const handleRefresh = useCallback(() => {
     setIsRefreshing(true);
@@ -86,7 +79,6 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
 
   const toggleCollapse = useCallback(() => setIsCollapsed(!isCollapsed), [isCollapsed]);
 
-  // Debounce search term
   useDebounce(
     () => {
       setDebouncedSearchTerm(searchTerm);
@@ -95,12 +87,13 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
     [searchTerm]
   );
 
-  // Update store when selections change
+  // Sync selected districts with store
   useEffect(() => {
     setSelectedDistricts(selected);
-  }, [selected, setSelectedDistricts]);
+    applyFilters();
+  }, [selected, setSelectedDistricts, applyFilters]);
 
-  // Update store when date range changes
+  // Sync date range with store
   useEffect(() => {
     if (fromDate || toDate) {
       setDateRange({
@@ -122,7 +115,6 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
       if (fromIndex !== -1 && toIndex !== -1) {
         setMonthRange([fromIndex, toIndex]);
       } else {
-        // Fallback to closest months if exact match not found
         const fromDateObj = new Date(fromDate);
         const toDateObj = new Date(toDate);
         const fromDiffs = months.map((m, i) => ({
@@ -140,7 +132,7 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
     }
   }, [fromDate, toDate, months]);
 
-  // Update pending districts when store selection changes
+  // Sync pending districts with store selections
   useEffect(() => {
     setPendingDistricts(storeSelectedDistricts);
   }, [storeSelectedDistricts]);
@@ -150,31 +142,30 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
     setHighlightedDistricts(pendingDistricts);
   }, [pendingDistricts, setHighlightedDistricts]);
 
-  // Reset all filters
   const handleReset = useCallback(() => {
     setPendingDistricts([]);
+    setSelected([]);
     setSelectedDistricts([]);
     setHighlightedDistricts([]);
     setFromDate("");
     setToDate("");
     setMonthRange([0, months.length - 1]);
     setActiveRange("");
+    setDateRange({ from: null, to: null });
     applyFilters();
-  }, [setSelectedDistricts, setHighlightedDistricts, applyFilters, months.length]);
+  }, [setSelectedDistricts, setHighlightedDistricts, setDateRange, applyFilters, months.length]);
 
-  // Apply district filter changes
   const handleApplyDistricts = () => {
     if (pendingDistricts.length === 0) {
       handleReset();
     } else {
-      setSelectedDistricts(pendingDistricts);
-      setHighlightedDistricts([]);
       setSelected(pendingDistricts);
+      setSelectedDistricts(pendingDistricts);
+      setHighlightedDistricts([]); // Clear highlights after applying
       applyFilters();
     }
   };
 
-  // Handle preset date range
   const handlePresetRange = (range: string) => {
     setActiveRange(range);
     const now = new Date();
@@ -205,27 +196,23 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
     setFromDate(fromStr);
     setToDate(toStr);
 
-    // Map dates to monthRange indices
     const monthValues = months.map(m => m.value);
     const fromIndex = monthValues.indexOf(fromStr) !== -1 ? monthValues.indexOf(fromStr) : 0;
     const toIndex = monthValues.indexOf(toStr) !== -1 ? monthValues.indexOf(toStr) : months.length - 1;
     setMonthRange([fromIndex, toIndex]);
   };
 
-  // Handle month range slider change
   const handleMonthRangeChange = (index: number, value: number) => {
     const newRange = [...monthRange];
     if (index === 0) {
-      // Start handle: can't move past end handle
       newRange[0] = Math.min(value, monthRange[1]);
     } else {
-      // End handle: can't move before start handle
       newRange[1] = Math.max(value, monthRange[0]);
     }
     setMonthRange(newRange);
     setFromDate(months[newRange[0]].value);
     setToDate(months[newRange[1]].value);
-    setActiveRange(""); // Clear preset when using slider
+    setActiveRange("");
   };
 
   if (!isOpen) return null;
@@ -237,7 +224,6 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
       transition={{ duration: 0.5, ease: "easeInOut" }}
       className="absolute top-[10px] z-[1001] w-[300px]"
     >
-      {/* Header */}
       <div className="w-full h-[33px] bg-white/80 backdrop-blur-sm shadow-md px-4 flex mb-2 items-center justify-between rounded-[10px]">
         <Text size={theme.text.size.body} bold={theme.text.bold.md} className="!text-[var(--color-text-primary)]">
           Filter
@@ -245,7 +231,6 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
         <button onClick={onClose} className="text-gray-600 hover:text-gray-800 text-xl leading-none">×</button>
       </div>
 
-      {/* Filter by Districts */}
       <motion.div
         animate={{ height: isCollapsed ? 35 : 'auto' }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
@@ -363,11 +348,7 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
                     {pendingDistricts.map((district) => (
                       <button
                         key={district}
-                        onClick={() => {
-                          setPendingDistricts(prev => 
-                            prev.filter(d => d !== district)
-                          );
-                        }}
+                        onClick={() => toggleDistrict(district)}
                         className="flex items-center gap-1 h-[24px] px-2 rounded-full border border-[var(--color-main-primary)] text-[var(--color-main-primary)] text-xs font-medium transition cursor-pointer hover:bg-[var(--color-main-primary)]/10 whitespace-nowrap overflow-hidden text-ellipsis"
                       >
                         <span className="w-[14px] h-[14px] rounded-full bg-[var(--color-main-primary)] flex items-center justify-center flex-shrink-0">
@@ -397,7 +378,6 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
         )}
       </motion.div>
     
-      {/* Filter by Date Range */}
       <motion.div
         animate={{ height: isDateCollapsed ? 35 : 'auto' }}
         transition={{ duration: 0.3, ease: "easeInOut" }}

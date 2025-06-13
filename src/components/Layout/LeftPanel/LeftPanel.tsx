@@ -96,6 +96,7 @@ const LeftPanel = ({ onExpandChange }) => {
               href={item.href} 
               className="w-full"
               prefetch={false}
+              legacyBehavior={false}
             >
               <div
                 className={`flex items-center gap-2 px-2 py-[8px] rounded-lg cursor-pointer transition-all ${
