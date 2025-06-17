@@ -82,7 +82,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit, isLoading, error })
     { text: 'At least one uppercase letter', met: hasUppercase },
     { text: 'At least one lowercase letter', met: hasLowercase },
     { text: 'At least one number', met: hasNumber },
-    { text: 'At least one special character', met: hasSpecialChar },
+    { text: 'At least one special character eg. #,{,},&,%,$,!,(,),*,/,?,@, etc..', met: hasSpecialChar },
   ];
 
   return (
