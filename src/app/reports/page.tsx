@@ -150,9 +150,11 @@ export default function ReportsPage() {
           sidebarExpanded ? "px-3" : "px-5"
         } pt-4`}
       >
+        {/* Title */}
+        <Title activeTitle={activeTitle} activeIcon={activeIcon} isActive={true} />
 
         {/* Scrollable content area */}
-        <div className="flex-1 flex flex-col overflow-y-auto pr-2 space-y-4 hide-scrollbar">
+        <div className="flex-1 flex flex-col overflow-y-auto pr-2 space-y-4 hide-scrollbar mt-6">
           <Summary />
           <FilterBar
             onSearch={setSearchTerm}

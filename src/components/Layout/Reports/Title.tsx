@@ -11,7 +11,7 @@ interface TitleProps {
 
 const Title: React.FC<TitleProps> = ({ activeTitle, activeIcon, isActive = false }) => {
   return (
-    <div className="flex  gap-2  pt-2 shrink-0">
+    <div className="flex items-center gap-2 pt-2 shrink-0">
       {activeIcon && (
         <div
           className={`w-[32px] h-[30px] rounded-[5px] flex items-center justify-center
@@ -30,7 +30,7 @@ const Title: React.FC<TitleProps> = ({ activeTitle, activeIcon, isActive = false
       <Text
         size={theme.text.size.HL}
         bold={theme.text.bold.lg}
-        className="!text-[var(--color-main-primary)]"
+        className="!text-[var(--color-main-primary)] leading-none"
       >
         {activeTitle}
       </Text>
