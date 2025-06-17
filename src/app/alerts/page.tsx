@@ -1,9 +1,9 @@
 'use client';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import LeftPanel from "@components/layout/LeftPanel/LeftPanel";
-import { menuItems } from "@components/layout/LeftPanel/menuItems";
-import Title from '@components/layout/Reports/Title';
+import LeftPanel from "@components/Layout/LeftPanel/LeftPanel";
+import { menuItems } from "@components/Layout/LeftPanel/menuItems";
+import Title from '@components/Layout/Reports/Title';
 
 
 export default function Home() {

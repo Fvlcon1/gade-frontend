@@ -2,53 +2,31 @@
 
 import { hexOpacity } from "@/utils/hexOpacity"
 import theme from "@styles/theme"
-import { ChangeEventHandler, DetailedHTMLProps, Dispatch, FocusEventHandler, HTMLInputAutoCompleteAttribute, InputHTMLAttributes, ReactNode, SetStateAction, useEffect, useRef, useState } from "react"
+import { InputHTMLAttributes, ReactNode, useEffect, useRef, useState } from "react"
+import { Label } from "@/components/ui/label"
 
-type InputProps = {
+type InputProps = InputHTMLAttributes<HTMLInputElement> & {
     className?: string;
-    onClick?: () => void;
-    placeholder?: string;
-    type?: "text" | "number" | "password";
+    inputClassName?: string;
     PreIcon?: ReactNode;
     PostIcon?: ReactNode;
-    required?: boolean;
     borderColor?: string;
-    inputClassName?: string;
-    autofocus?: boolean;
-    onChange?: ChangeEventHandler<HTMLInputElement>;
-    onBlur?: FocusEventHandler<HTMLInputElement>;
-    name?: string;
-    ref?: React.Ref<HTMLInputElement>;
     autoSelect?: boolean;
-    autoComplete?: HTMLInputAutoCompleteAttribute;
-    inputProps?: DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
-} & (
-    | { value: string; setValue?: Dispatch<SetStateAction<string>> }
-    | { value: number; setValue?: Dispatch<SetStateAction<number>> }
-);
+    label?: string; 
+};
 
 const Input = ({
-    inputProps,
-    className,
-    inputClassName,
-    placeholder,
-    type,
-    value,
-    autofocus,
-    setValue,
+    className, // For the outer div
+    inputClassName, // For the inner input
     PreIcon,
     PostIcon,
-    name,
-    onClick,
-    onChange,
-    onBlur,
-    required,
     borderColor,
-    ref,
     autoSelect,
-    autoComplete
+    label,
+    autoFocus,
+    ...props
 }: InputProps) => {
-    const [inputFocus, setInputFocus] = useState<boolean>(autofocus ?? false);
+    const [inputFocus, setInputFocus] = useState<boolean>(autoFocus ?? false);
     const [hover, setHover] = useState<boolean>(false);
     
     const inputRef = useRef<HTMLInputElement | null>(null);
@@ -62,43 +40,33 @@ const Input = ({
     return (
         <div
             className={`flex w-full h-fit flex-1 gap-2 px-[15px] py-[10px] items-center rounded-xl bg-bg-secondary border-border-tetiary border-[1px] border-solid duration-200 ${className}`}
-            onClick={onClick}
             style={{
                 borderColor: (inputFocus || hover) ? theme.colors.main.primary : borderColor || theme.colors.border.secondary
             }}
         >
+            {label && <Label className="!text-gray-700 text-sm font-medium pr-2">{label}</Label>}
             {PreIcon && PreIcon}
             <input
-                {...inputProps}
-                ref={ref ?? inputRef}
-                placeholder={placeholder ?? inputProps?.placeholder ?? "Input text"}
-                type={type ?? inputProps?.type ?? "text"}
-                required={required ?? inputProps?.required}
+                ref={inputRef}
                 className={`flex w-full flex-1 bg-transparent h-fit outline-none placeholder:text-[12px] placeholder:text-text-tetiary text-text-primary md:text-[12px] text-[16px] ${inputClassName}`}
                 onFocus={(e) => {
                     setInputFocus(true);
-                    inputProps?.onFocus?.(e);
+                    props.onFocus?.(e);
                 }}
                 onBlur={(e) => {
                     setInputFocus(false);
-                    inputProps?.onBlur?.(e);
+                    props.onBlur?.(e);
                 }}
                 onMouseOver={(e) => {
                     setHover(true);
-                    inputProps?.onMouseOver?.(e);
+                    props.onMouseOver?.(e);
                 }}
                 onMouseLeave={(e) => {
                     setHover(false);
-                    inputProps?.onMouseLeave?.(e);
+                    props.onMouseLeave?.(e);
                 }}
-                value={value}
-                autoFocus={autofocus ?? inputProps?.autoFocus}
-                name={name ?? inputProps?.name}
-                onChange={(e) => {
-                    onChange ? onChange(e) : setValue && setValue(e.target.value as any);
-                    inputProps?.onChange?.(e);
-                }}
-                autoComplete={autoComplete ?? inputProps?.autoComplete}
+                autoFocus={autoFocus}
+                {...props}
             />
             {PostIcon && PostIcon}
         </div>
