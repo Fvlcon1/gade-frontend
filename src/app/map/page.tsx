@@ -1,20 +1,28 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import { FaLayerGroup, FaMapMarkerAlt, FaChartBar, FaLocationArrow } from "react-icons/fa";
+import { FaLayerGroup, FaLocationArrow } from "react-icons/fa";
 import { FaSliders } from "react-icons/fa6";
 import { BsFillClockFill } from "react-icons/bs";
+import { setupReportsRefresh, cleanupReportsRefresh } from '@/lib/store/spatialStore';
 
-import LeftPanel from "@components/layout/LeftPanel/LeftPanel";
+import LeftPanel from "@components/Layout/LeftPanel/LeftPanel";
 import LayersControl from "../../components/Controllers/LayersControl";
 import MarkersControl from "../../components/Controllers/MarkersControl";
 import TimelineController from "../../components/Controllers/TimelineController";
 import ComparisonSlider from "../../components/Controllers/ComparisonSlider";
+import { initialLayers } from "../../components/Controllers/LayersControl";
 
-const InteractiveMapClient = dynamic(() => import("./InteractiveMapClient"), {
+const InteractiveMapClient = dynamic(() => import("../../components/Layout/MiddlePanel/Map/InteractiveMapClient"), {
   ssr: false,
 });
+
+interface Layer {
+  id: string;
+  label: string;
+  checked: boolean;
+}
 
 const Page = () => {
   const mapRef = useRef(null);
@@ -25,13 +33,30 @@ const Page = () => {
   const [showTimeline, setShowTimeline] = useState(false);
   const [activeTab, setActiveTab] = useState(null);
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
+  const [activeBasemap, setActiveBasemap] = useState('osm');
+  const [activeFeatureLayers, setActiveFeatureLayers] = useState<Layer[]>(initialLayers.filter(layer => layer.checked));
+
+  useEffect(() => {
+    setupReportsRefresh();
+    return () => cleanupReportsRefresh();
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => setMapReady(true), 300);
     return () => clearTimeout(timer);
   }, []);
 
-  const handleTabClick = (tabName) => {
+  const handleBasemapChange = useCallback((basemapId: string) => {
+    setActiveBasemap(basemapId);
+  }, []);
+
+  const handleLayerChange = useCallback((layers: Layer[]) => {
+    setTimeout(() => {
+      setActiveFeatureLayers(layers.filter(layer => layer.checked));
+    }, 0);
+  }, []);
+
+  const handleTabClick = (tabName: string) => {
     if (tabName === "layers") {
       setShowLayers(!showLayers);
       setShowMarkers(false);
@@ -59,7 +84,13 @@ const Page = () => {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden">
-      {mapReady && <InteractiveMapClient mapRef={mapRef} />}
+      {mapReady && (
+        <InteractiveMapClient
+          mapRef={mapRef}
+          activeBasemap={activeBasemap}
+          activeFeatureLayers={activeFeatureLayers}
+        />
+      )}
 
       {/* Left Panel */}
       <div className="absolute top-0 left-1.5 z-[1001] h-full">
@@ -70,7 +101,7 @@ const Page = () => {
       <motion.div
         animate={{ left: floatingNavLeft }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
-        className="absolute top-[10px] z-[1001] w-[54px] h-[127px] bg-white/40 backdrop-blur-md rounded-xl shadow-md flex flex-col items-center justify-around p-2"
+        className="absolute top-[10px] z-[1001] w-[54px] h-[127px] bg-white/90 backdrop-blur-md rounded-xl shadow-md flex flex-col items-center justify-around p-2"
       >
         <ToolButton
           icon={<FaLayerGroup size={16} />}
@@ -97,6 +128,8 @@ const Page = () => {
           setShowLayers(false);
           setActiveTab(null);
         }}
+        onBasemapChange={handleBasemapChange}
+        onLayerChange={handleLayerChange}
       />
 
       {/* Floating Markers Panel */}
@@ -122,32 +155,35 @@ const Page = () => {
       )}
 
       {/* Zoom Buttons */}
-      <div className="absolute top-[10px] left-[1398px] z-[1001] bg-white/80 text-sm font-bold w-[30px] h-[71px] rounded-[10px]">
-        <div className="flex flex-col items-center justify-center h-full">
+      <div className="fixed right-4 top-4 z-[1001] bg-white/90 text-sm font-bold w-[30px] rounded-[10px] shadow-sm">
+        <div className="flex flex-col items-center justify-center">
           <button
             onClick={() => mapRef.current?.zoomIn()}
-            className="text-[var(--color-text-tetiary)] text-lg leading-none p-2 rounded"
+            className="text-[var(--color-text-tetiary)] text-lg leading-none p-2 rounded cursor-pointer hover:bg-gray-100 w-full"
           >
             +
           </button>
 
-          <div className="w-full h-[13px] bg-[#b4adad]" />
+          <div className="w-full h-[1px] bg-[#b4adad]" />
 
           <button
             onClick={() => mapRef.current?.zoomOut()}
-            className="text-[var(--color-text-tetiary)] text-xl leading-none p-2 rounded"
+            className="text-[var(--color-text-tetiary)] text-xl leading-none p-2 rounded cursor-pointer hover:bg-gray-100 w-full"
           >
             −
           </button>
         </div>
 
-        <div className="mt-4 w-[30px] h-[30px] bg-white/80 rounded-[10px] flex items-center text-gray-500 justify-center">
+        <div className="w-full h-[1px] bg-[#b4adad]" />
+        <div className="mt-1 w-full h-[30px] bg-white/90 rounded-[10px] flex items-center text-gray-500 justify-center cursor-pointer hover:bg-gray-100">
           <FaLocationArrow size={10} />
         </div>
       </div>
 
       {/* Comparison Slider Overlay */}
       <ComparisonSlider isVisible={showTimeline} sidebarExpanded={sidebarExpanded} />
+
+     
     </div>
   );
 };
@@ -157,11 +193,10 @@ const ToolButton = ({ icon, isActive, onClick }) => (
   <motion.button
     whileTap={{ scale: 0.9 }}
     transition={{ duration: 0.3, ease: "easeOut" }}
-    className={`flex items-center justify-center rounded-md ${
-      isActive
-        ? "text-[var(--color-main-primary)] bg-[rgba(96,96,208,0.2)] w-[36px] h-[36px]"
-        : "text-[var(--color-text-tetiary)] w-[24px] h-[24px]"
-    }`}
+    className={`flex items-center justify-center rounded-md cursor-pointer ${isActive
+      ? "text-[var(--color-main-primary)] bg-[rgba(96,96,208,0.2)] w-[36px] h-[36px]"
+      : "text-[var(--color-text-tetiary)] w-[24px] h-[24px] hover:bg-gray-100"
+      }`}
     onClick={onClick}
   >
     {icon}

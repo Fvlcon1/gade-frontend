@@ -6,10 +6,10 @@ import Button from "@components/ui/button/button";
 import { IoAddCircleOutline } from "react-icons/io5";
 import OutlineButton from "@components/ui/button/outlineButton";
 import theme from "@styles/theme";
-import LeftPanel from "@components/layout/LeftPanel/LeftPanel";
-import Mid from "@components/layout/MiddlePanel/Mid";
-import { menuItems } from "@components/layout/LeftPanel/menuItems";
-import Right from '@components/layout/RightPanel/Right';
+import LeftPanel from "@components/Layout/LeftPanel/LeftPanel";
+import Mid from "@components/Layout/MiddlePanel/Mid";
+import { menuItems } from "@components/Layout/LeftPanel/menuItems";
+import Right from '@components/Layout/RightPanel/Right';
 
 export default function Home() {
   const pathname = usePathname();
