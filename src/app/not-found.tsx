@@ -123,7 +123,7 @@ export default function NotFound() {
 
             {/* Footer */}
             <div className="absolute bottom-4 text-xs text-slate-500">
-                © {new Date().getFullYear()} Your Company • All rights reserved
+                © {new Date().getFullYear()} Blvck Sapphire • All rights reserved
             </div>
         </div>
     );
