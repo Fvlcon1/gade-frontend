@@ -115,19 +115,21 @@ export const useDistrictSearch = (searchTerm: string) => {
 
 // Aggregate hook for all spatial data
 export const useSpatialData = () => {
-  // const concessions = useConcessions();
+  const { isAuthenticated } = useAuthStore();
+  
+  // Only fetch data if user is authenticated
   const miningSites = useMiningSites();
   const districts = useDistricts();
   const forestReserves = useForestReserves();
   const rivers = useRivers();
 
   return {
-    // concessions,
     miningSites,
     districts,
     forestReserves,
     rivers,
-    isLoading: miningSites.isLoading || districts.isLoading || forestReserves.isLoading || rivers.isLoading,
-    isError: miningSites.isError || districts.isError || forestReserves.isError || rivers.isError,
+    isLoading: isAuthenticated && (miningSites.isLoading || districts.isLoading || forestReserves.isLoading || rivers.isLoading),
+    isError: isAuthenticated && (miningSites.isError || districts.isError || forestReserves.isError || rivers.isError),
+    isAuthenticated
   };
 }; 

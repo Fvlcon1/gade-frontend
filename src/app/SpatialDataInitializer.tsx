@@ -1,14 +1,27 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useSpatialStore } from '@/lib/store/spatialStore';
+import { useSpatialStore, setupReportsRefresh, cleanupReportsRefresh } from '@/lib/store/spatialStore';
+import { useAuthStore } from '@/lib/store/auth-store';
 
 const SpatialDataInitializer = () => {
-  const fetchAllData = useSpatialStore(state => state.fetchAllData);
+  const { isAuthenticated } = useAuthStore();
+  const { fetchAllData, fetchReports } = useSpatialStore();
 
   useEffect(() => {
-    fetchAllData();
-  }, [fetchAllData]);
+    if (isAuthenticated) {
+      // Fetch initial data
+      fetchAllData();
+      
+      // Set up reports refresh
+      setupReportsRefresh();
+
+      // Cleanup on unmount
+      return () => {
+        cleanupReportsRefresh();
+      };
+    }
+  }, [isAuthenticated, fetchAllData, fetchReports]);
 
   return null;
 };

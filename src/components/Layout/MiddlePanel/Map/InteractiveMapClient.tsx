@@ -79,10 +79,10 @@ const LAYER_STYLES = {
     fillOpacity: 0.2,
   },
   admin: {
-    color: "#8B4513", // Brown outline
-    weight: 3, // Thick stroke
-    opacity: 0.7,
-    fillOpacity: 0, // No fill
+    color: "#757575",
+    weight: 3,
+    opacity: 0.3,
+    fillOpacity: 0,
     dashArray: 'none',
   },
   rivers: {
@@ -107,10 +107,10 @@ const HIGHLIGHT_STYLE = {
     fillOpacity: 0.4,
   },
   admin: {
-    color: "#FFFF00", // Bright yellow
+    color: "#FFFF00",
     weight: 2,
-    opacity: 0.6, // Reduced opacity
-    fillOpacity: 0.3, // Slightly transparent fill
+    opacity: 0.6,
+    fillOpacity: 0.3,
   },
   rivers: {
     color: "#29B6F6",
@@ -192,8 +192,8 @@ const ReportsLayer: React.FC<{ reports: any[], activeFeatureLayers: Layer[] }> =
     return L.divIcon({
       html: iconMarkup,
       iconSize: [24, 24],
-      iconAnchor: [12, 24], // Anchor at bottom center
-      popupAnchor: [0, -24], // Popup above the icon
+      iconAnchor: [12, 24],
+      popupAnchor: [0, -24],
       className: 'location-pin-marker',
     });
   };
@@ -209,7 +209,6 @@ const ReportsLayer: React.FC<{ reports: any[], activeFeatureLayers: Layer[] }> =
         map.removeLayer(reportsLayer);
       }
     } else if (shouldShowReports && reports.length > 0) {
-      // Create MarkerClusterGroup with custom cluster icon
       const markersLayer = L.markerClusterGroup({
         iconCreateFunction: (cluster: L.MarkerCluster) => {
           const count = cluster.getChildCount();
@@ -228,7 +227,7 @@ const ReportsLayer: React.FC<{ reports: any[], activeFeatureLayers: Layer[] }> =
       (map as any).reportsLayer = markersLayer;
 
       reports.forEach(report => {
-        const marker = L.marker([report.location.lat, report.location.lon], { 
+        const marker = L.marker([report.location.lat, report.location.lon], {
           icon: getLocationPinIcon(),
         }).bindPopup(`
           <div class="p-2">
@@ -239,6 +238,8 @@ const ReportsLayer: React.FC<{ reports: any[], activeFeatureLayers: Layer[] }> =
           </div>
         `);
 
+        // Store report ID on marker for easier lookup
+        (marker as any).reportId = report.id;
         markersLayer.addLayer(marker);
       });
 
@@ -248,9 +249,52 @@ const ReportsLayer: React.FC<{ reports: any[], activeFeatureLayers: Layer[] }> =
     return () => {
       if (reportsLayer) {
         map.removeLayer(reportsLayer);
+        (map as any).reportsLayer = null;
       }
     };
   }, [map, activeFeatureLayers, reports]);
+
+  return null;
+};
+
+// New component to handle report zooming and popup
+const ReportZoomHandler: React.FC<{ reports: any[], searchParams: any }> = ({ reports, searchParams }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!map || !reports) return;
+
+    const reportId = searchParams.get('report');
+    if (!reportId) return;
+
+    const report = reports.find(r => r.id.toString() === reportId);
+    if (!report) return;
+
+    // Zoom to report coordinates
+    map.flyTo([report.location.lat, report.location.lon], 14, {
+      duration: 1.5,
+      easeLinearity: 0.25,
+    });
+
+    // Wait for reportsLayer to be available and open popup
+    const checkLayer = () => {
+      const reportsLayer = (map as any).reportsLayer;
+      if (reportsLayer) {
+        reportsLayer.eachLayer((layer: any) => {
+          if (layer.reportId === reportId) {
+            reportsLayer.zoomToShowLayer(layer, () => {
+              layer.openPopup();
+            });
+          }
+        });
+      } else {
+        // Retry if reportsLayer is not yet available
+        setTimeout(checkLayer, 100);
+      }
+    };
+
+    checkLayer();
+  }, [map, searchParams, reports]);
 
   return null;
 };
@@ -280,7 +324,6 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
     applyFilters();
   }, [selectedDistricts, dateRange, applyFilters]);
 
-  // Compute bounds for highlighted, selected, or all districts
   useEffect(() => {
     if (!filteredDistricts || !filteredDistricts.features) return;
 
@@ -447,7 +490,7 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
   activeBasemap = 'osm', 
   activeFeatureLayers 
 }) => {
-  const { reports } = useSpatialStore();
+  const { reports, fetchReports } = useSpatialStore();
   const searchParams = useSearchParams();
 
   const [currentBasemap, setCurrentBasemap] = useState(activeBasemap);
@@ -456,7 +499,12 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
     if (activeBasemap !== currentBasemap) {
       setCurrentBasemap(activeBasemap);
     }
-  }, [activeBasemap]);
+  }, [activeBasemap, currentBasemap]);
+
+  // Fetch reports on mount to ensure data is available
+  useEffect(() => {
+    fetchReports();
+  }, [fetchReports]);
 
   const initialView = useMemo(() => {
     const lat = searchParams.get('lat');
@@ -485,45 +533,13 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
         zoom={initialView.zoom}
         zoomControl={false}
         className="w-full h-full"
-        whenReady={() => {
-          const map = mapRef.current;
-          if (!map) return;
-
-          const reportId = searchParams.get('report');
-          if (reportId && reports) {
-            const report = reports.find(r => r.id === reportId);
-            if (report) {
-              map.flyTo(
-                [report.location.lat, report.location.lon],
-                14,
-                {
-                  duration: 1.5,
-                  easeLinearity: 0.25,
-                }
-              );
-
-              setTimeout(() => {
-                const reportsLayer = (map as any).reportsLayer;
-                if (reportsLayer) {
-                  reportsLayer.eachLayer((layer: L.Layer) => {
-                    if (layer instanceof L.Marker && layer.getLatLng().equals([report.location.lat, report.location.lon])) {
-                      reportsLayer.zoomToShowLayer(layer, () => {
-                        layer.openPopup();
-                      });
-                    }
-                  });
-                }
-              }, 1500);
-            }
-          }
-        }}
       >
         <TileLayer
           url={BASEMAP_URLS[currentBasemap]}
           attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        
         <MapLayers activeBasemap={currentBasemap} activeFeatureLayers={activeFeatureLayers} />
+        <ReportZoomHandler reports={reports} searchParams={searchParams} />
         <MouseCoordinateDisplay />
       </MapContainer>
     </>

@@ -1,13 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import AuthLayout from '@/components/Auth/AuthLayout';
 import AuthForm from '@/components/Auth/AuthForm';
 import type { SetupAccountRequest } from '@/types/auth';
 
-export default function SetupPage() {
+function SetupPageContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
   const { setup, isLoading, error } = useAuth();
@@ -47,5 +47,25 @@ export default function SetupPage() {
         error={error?.message}
       />
     </AuthLayout>
+  );
+}
+
+export default function SetupPage() {
+  return (
+    <Suspense fallback={
+      <AuthLayout
+        title="Loading..."
+        subtitle="Please wait while we load your setup page"
+        footerText="Already have an account?"
+        footerLink="/signin"
+        footerLinkText="Sign in"
+      >
+        <div className="text-center text-gray-100 dark:text-[#8E98A3]">
+          Loading...
+        </div>
+      </AuthLayout>
+    }>
+      <SetupPageContent />
+    </Suspense>
   );
 } 

@@ -22,36 +22,41 @@ export default function TwoFactorPage() {
   }, [pendingLogin, router]);
 
   useEffect(() => {
-    // Start countdown
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          setCanResend(true);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    if (!canResend) {
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            setCanResend(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
 
-    return () => clearInterval(timer);
-  }, []);
+      return () => clearInterval(timer);
+    }
+  }, [canResend]);
 
   const handleVerifyCode = async (data: { otp: string }) => {
     if (!pendingLogin?.email) return;
     try {
       await verifyOTP({ email: pendingLogin.email, otp: data.otp });
     } catch (error) {
-      // Error is handled by the mutation
       console.error('Verification failed:', error);
     }
   };
 
   const handleResendCode = async () => {
     if (!pendingLogin?.email) return;
-    sendOTP({ email: pendingLogin.email });
-    setCountdown(60);
-    setCanResend(false);
+
+    try {
+      await sendOTP({ email: pendingLogin.email });
+      setCountdown(60);
+      setCanResend(false);
+    } catch (err) {
+      console.error('Failed to resend code:', err);
+    }
   };
 
   return (
@@ -72,4 +77,4 @@ export default function TwoFactorPage() {
       />
     </AuthLayout>
   );
-} 
+}

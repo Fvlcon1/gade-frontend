@@ -1,12 +1,13 @@
 import { create } from 'zustand';
 import { fetchSpatialData } from '@/hooks/spatial-data';
+import { useAuthStore } from '@/lib/store/auth-store';
 
 // Define SpatialData type
 interface SpatialData {
   type: 'FeatureCollection';
   features: Array<{
     type: 'Feature';
-    properties: {
+    properties: { 
       assets?: string;
       category?: string;
       district?: string;
@@ -197,12 +198,24 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
 let refreshInterval: NodeJS.Timeout | null = null;
 
 export const setupReportsRefresh = () => {
+  const { isAuthenticated } = useAuthStore.getState();
+  
+  if (!isAuthenticated) return;
+  
   if (refreshInterval) {
     clearInterval(refreshInterval);
   }
   
+  // Initial fetch
+  useSpatialStore.getState().fetchReports();
+  
   refreshInterval = setInterval(() => {
-    useSpatialStore.getState().fetchReports();
+    const { isAuthenticated } = useAuthStore.getState();
+    if (isAuthenticated) {
+      useSpatialStore.getState().fetchReports();
+    } else {
+      cleanupReportsRefresh();
+    }
   }, 10000); // Refresh every 10 seconds
 };
 

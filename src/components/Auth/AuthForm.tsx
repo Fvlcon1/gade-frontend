@@ -86,78 +86,78 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit, isLoading, error })
   ];
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 w-full max-w-sm">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 sm:space-y-4 w-full max-w-[320px] sm:max-w-sm mx-auto">
       {error && (
         <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription className="text-sm">{error}</AlertDescription>
         </Alert>
       )}
 
       {/* Email input field - only render for signin mode */}
       {mode === 'signin' && (
-        <div className="space-y-2 text-gray-200">
-          <Label htmlFor="email">Email address</Label>
+        <div className="space-y-1.5 sm:space-y-2 text-gray-200">
+          <Label htmlFor="email" className="text-sm sm:text-base">Email address</Label>
           <Input
             id="email"
             type="email"
             placeholder="name@example.com"
             {...register('email')}
-            className={`bg-white/10 border-white/20 text-white placeholder-gray-400 ${errors.email ? 'border-red-500' : ''}`}
+            className={`bg-white/10 border-white/20 text-white placeholder-gray-400 text-sm sm:text-base ${errors.email ? 'border-red-500' : ''}`}
           />
           {errors.email && (
-            <p className="text-sm text-red-400">{errors.email.message}</p>
+            <p className="text-xs sm:text-sm text-red-400">{errors.email.message}</p>
           )}
         </div>
       )}
 
       {mode === 'setup' && (
         <>
-          <div className="space-y-2 text-gray-200">
-            <Label htmlFor="first_name">First Name</Label>
+          <div className="space-y-1.5 sm:space-y-2 text-gray-200">
+            <Label htmlFor="first_name" className="text-sm sm:text-base">First Name</Label>
             <Input
               id="first_name"
               type="text"
               placeholder="John"
               {...register('first_name', { required: mode === 'setup' })}
-              className={`bg-white/10 border-white/20 text-white placeholder-gray-400 ${errors.first_name ? 'border-red-500' : ''}`}
+              className={`bg-white/10 border-white/20 text-white placeholder-gray-400 text-sm sm:text-base ${errors.first_name ? 'border-red-500' : ''}`}
             />
             {errors.first_name && (
-              <p className="text-sm text-red-400">{errors.first_name.message}</p>
+              <p className="text-xs sm:text-sm text-red-400">{errors.first_name.message}</p>
             )}
           </div>
 
-          <div className="space-y-2 text-gray-200">
-            <Label htmlFor="last_name">Last Name</Label>
+          <div className="space-y-1.5 sm:space-y-2 text-gray-200">
+            <Label htmlFor="last_name" className="text-sm sm:text-base">Last Name</Label>
             <Input
               id="last_name"
               type="text"
               placeholder="Doe"
               {...register('last_name', { required: mode === 'setup' })}
-              className={`bg-white/10 border-white/20 text-white placeholder-gray-400 ${errors.last_name ? 'border-red-500' : ''}`}
+              className={`bg-white/10 border-white/20 text-white placeholder-gray-400 text-sm sm:text-base ${errors.last_name ? 'border-red-500' : ''}`}
             />
             {errors.last_name && (
-              <p className="text-sm text-red-400">{errors.last_name.message}</p>
+              <p className="text-xs sm:text-sm text-red-400">{errors.last_name.message}</p>
             )}
           </div>
 
-          <div className="space-y-2 text-gray-200">
-            <Label htmlFor="user_name">Username</Label>
+          <div className="space-y-1.5 sm:space-y-2 text-gray-200">
+            <Label htmlFor="user_name" className="text-sm sm:text-base">Username</Label>
             <Input
               id="user_name"
               type="text"
               placeholder="johndoe"
               {...register('user_name', { required: mode === 'setup' })}
-              className={`bg-white/10 border-white/20 text-white placeholder-gray-400 ${errors.user_name ? 'border-red-500' : ''}`}
+              className={`bg-white/10 border-white/20 text-white placeholder-gray-400 text-sm sm:text-base ${errors.user_name ? 'border-red-500' : ''}`}
             />
             {errors.user_name && (
-              <p className="text-sm text-red-400">{errors.user_name.message}</p>
+              <p className="text-xs sm:text-sm text-red-400">{errors.user_name.message}</p>
             )}
           </div>
         </>
       )}
 
-      <div className="space-y-2 text-gray-200">
-        <Label htmlFor="password">Password</Label>
+      <div className="space-y-1.5 sm:space-y-2 text-gray-200">
+        <Label htmlFor="password" className="text-sm sm:text-base">Password</Label>
         <div className="relative">
           <Input
             id="password"
@@ -167,25 +167,25 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit, isLoading, error })
               onChange: (e) => setPassword(e.target.value),
               required: true,
             })}
-            className={`bg-white/10 border-white/20 text-white placeholder-gray-400 ${errors.password ? 'border-red-500' : ''}`}
+            className={`bg-white/10 border-white/20 text-white placeholder-gray-400 text-sm sm:text-base ${errors.password ? 'border-red-500' : ''}`}
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
           >
-            {showPassword ? <IconEyeOff size={18} /> : <IconEye size={18} />}
+            {showPassword ? <IconEyeOff size={16} className="sm:w-[18px] sm:h-[18px]" /> : <IconEye size={16} className="sm:w-[18px] sm:h-[18px]" />}
           </button>
         </div>
         {errors.password && (
-          <p className="text-sm text-red-400">{errors.password.message}</p>
+          <p className="text-xs sm:text-sm text-red-400">{errors.password.message}</p>
         )}
 
         {mode === 'setup' && password.length > 0 && (
-          <div className="mt-2 text-sm space-y-1">
+          <div className="mt-2 text-xs sm:text-sm space-y-1">
             {passwordCriteria.map((criterion, index) => (
               <div key={index} className={`flex items-center ${criterion.met ? 'text-green-400' : 'text-gray-400'}`}>
-                {criterion.met ? <IconCheck size={16} className="mr-2" /> : <IconX size={16} className="mr-2" />}
+                {criterion.met ? <IconCheck size={14} className="mr-2 sm:w-4 sm:h-4" /> : <IconX size={14} className="mr-2 sm:w-4 sm:h-4" />}
                 <span>{criterion.text}</span>
               </div>
             ))}
@@ -194,7 +194,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit, isLoading, error })
       </div>
 
       {mode === 'signin' && (
-        <div className="text-right text-sm">
+        <div className="text-right text-xs sm:text-sm">
           <Link href="#" className="font-medium text-[#D4A000] hover:text-[#F7B600]">
             Forgot password?
           </Link>
@@ -202,38 +202,38 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit, isLoading, error })
       )}
 
       {mode === 'setup' && (
-        <div className="space-y-2 text-gray-200">
-          <Label htmlFor="confirmPassword">Confirm Password</Label>
+        <div className="space-y-1.5 sm:space-y-2 text-gray-200">
+          <Label htmlFor="confirmPassword" className="text-sm sm:text-base">Confirm Password</Label>
           <div className="relative">
             <Input
               id="confirmPassword"
               type={showConfirmPassword ? 'text' : 'password'}
               placeholder="••••••••"
               {...register('confirmPassword', { required: mode === 'setup' })}
-              className={`bg-white/10 border-white/20 text-white placeholder-gray-400 ${errors.confirmPassword ? 'border-red-500' : ''}`}
+              className={`bg-white/10 border-white/20 text-white placeholder-gray-400 text-sm sm:text-base ${errors.confirmPassword ? 'border-red-500' : ''}`}
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
             >
-              {showConfirmPassword ? <IconEyeOff size={18} /> : <IconEye size={18} />}
+              {showConfirmPassword ? <IconEyeOff size={16} className="sm:w-[18px] sm:h-[18px]" /> : <IconEye size={16} className="sm:w-[18px] sm:h-[18px]" />}
             </button>
           </div>
           {errors.confirmPassword && (
-            <p className="text-sm text-red-400">{errors.confirmPassword.message}</p>
+            <p className="text-xs sm:text-sm text-red-400">{errors.confirmPassword.message}</p>
           )}
         </div>
       )}
 
       <Button
         type="submit"
-        className="w-full bg-[#D4A000] hover:bg-[#F7B600] text-white py-3 rounded-lg transition-all duration-200"
+        className="w-full bg-[#D4A000] hover:bg-[#F7B600] text-white py-2 sm:py-3 rounded-lg transition-all duration-200 text-sm sm:text-base"
         disabled={isLoading}
       >
         {isLoading ? (
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
             {mode === 'signin' ? 'Signing in...' : 'Creating account...'}
           </div>
         ) : (

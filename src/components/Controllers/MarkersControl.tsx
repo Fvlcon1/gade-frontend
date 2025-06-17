@@ -66,11 +66,9 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
   const toggleDistrict = useCallback((district: string) => {
     setPendingDistricts(prev => {
       const isSelected = prev.includes(district);
-      const newPending = isSelected ? prev.filter(d => d !== district) : [...prev, district];
-      setHighlightedDistricts(newPending); // Update highlighted districts immediately
-      return newPending;
+      return isSelected ? prev.filter(d => d !== district) : [...prev, district];
     });
-  }, [setHighlightedDistricts]);
+  }, []);
 
   const handleRefresh = useCallback(() => {
     setIsRefreshing(true);

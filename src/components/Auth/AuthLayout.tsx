@@ -27,7 +27,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
     <div className="min-h-screen relative flex items-center justify-center">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-black/60 z-10" /> {/* Darker overlay for better contrast */}
+        <div className="absolute inset-0 bg-black/60 z-10" />
         <Image
           src="/g1.webp"
           alt="Background"
@@ -39,30 +39,32 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
       </div>
 
       {/* Auth Form Section - Centered */}
-      <div className="relative z-20 w-full max-w-md mx-auto p-8">
-        <div className="bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-xl p-8 space-y-8 text-white">
+      <div className="relative z-20 w-full max-w-md mx-auto p-3 sm:p-5 md:p-8">
+        <div className="bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-xl p-4 sm:p-5 md:p-8 space-y-5 sm:space-y-6 md:space-y-8 text-white">
           <div className="text-center">
-            {/* Placeholder for Logo */}
-            <div className="mb-6 flex justify-center">
+            {/* Logo */}
+            <div className="mb-3 sm:mb-4 md:mb-6 flex justify-center">
               <Image
                 src="/minerals.png"
                 alt="Minerals Commission Ghana Logo"
-                width={120}
-                height={120}
-                className="rounded-full"
+                width={90}
+                height={90}
+                className="rounded-full w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28"
+                priority
               />
             </div>
             <Head1
               textColor="white"
               bold={TypographyBold.md2}
               size={TypographySize.HL}
+              className="text-2xl sm:text-3xl md:text-4xl"
             >
               {title}
             </Head1>
             <Text
               textColor="rgb(209 213 219)"
               size={TypographySize.body}
-              className="mt-2"
+              className="mt-1 sm:mt-2 text-sm sm:text-base"
             >
               {subtitle}
             </Text>
@@ -70,16 +72,14 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
 
           {children}
 
-          <div className="text-center">
+          <div className="text-center text-sm sm:text-base">
             <Text
               textColor="rgb(209 213 219)"
               size={TypographySize.body}
+              className="inline"
             >
               {footerText}{' '}
-              <Link
-                href={footerLink}
-                className="font-medium text-[#D4A000] hover:text-[#F7B600]"
-              >
+              <Link href={footerLink} className="text-[#D4A000] hover:text-[#F7B600] font-medium">
                 {footerLinkText}
               </Link>
             </Text>
@@ -88,10 +88,11 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
       </div>
 
       {/* Copyright Text */}
-      <div className="absolute bottom-4 w-full text-center z-20">
+      <div className="absolute bottom-2 w-full text-center z-20">
         <Text
           textColor="rgb(229 231 235)"
           size={TypographySize.body}
+          className="text-sm"
         >
           © {new Date().getFullYear()} Blvck Sapphire Ltd
         </Text>
@@ -100,4 +101,4 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
   );
 };
 
-export default AuthLayout; 
+export default AuthLayout;
