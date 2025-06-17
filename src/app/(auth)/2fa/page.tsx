@@ -14,12 +14,12 @@ export default function TwoFactorPage() {
   const [countdown, setCountdown] = useState(60);
   const [canResend, setCanResend] = useState(false);
 
-  useEffect(() => {
-    // If no pending login, redirect to sign in
-    if (!pendingLogin) {
-      router.push('/signin');
-    }
-  }, [pendingLogin, router]);
+  // useEffect(() => {
+  //   // If no pending login, redirect to sign in
+  //   if (!pendingLogin) {
+  //     router.push('/signin');
+  //   }
+  // }, [pendingLogin, router]);
 
   useEffect(() => {
     if (!canResend) {
