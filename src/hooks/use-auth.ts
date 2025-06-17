@@ -36,7 +36,7 @@ export const useAuth = () => {
       toast.success({
         description: 'Account setup complete! Your account has been successfully set up.',
       });
-      router.push('/');
+      router.push('/signin');
     },
     onError: (error: Error) => {
       setError(error.message);
@@ -93,8 +93,8 @@ export const useAuth = () => {
       });
       
       // Get the redirect URL from the pending login data
-      const redirectUrl = variables.redirectUrl || '/';
-      router.push(redirectUrl);
+      // const redirectUrl = variables.redirectUrl || '/';
+      router.push("/");
     },
     onError: (error: Error) => {
       setError(error.message);
