@@ -4,13 +4,13 @@ import { useMap } from "react-leaflet";
 import L from 'leaflet';
 import { TiLocation } from "react-icons/ti";
 import { renderToStaticMarkup } from "react-dom/server";
-import { ReportsLayerProps } from "./types";
+import { ReportsLayerProps } from "../types";
 
 const ReportsLayer: React.FC<ReportsLayerProps> = ({ reports, activeFeatureLayers }) => {
   const map = useMap();
 
   const getLocationPinIcon = () => {
-    const iconMarkup = renderToStaticMarkup(<TiLocation size={24} color="#8F3C19" />);
+    const iconMarkup = renderToStaticMarkup(<TiLocation size={24} color="#1E90FF" />);
     return L.divIcon({
       html: iconMarkup,
       iconSize: [24, 24],
@@ -35,7 +35,7 @@ const ReportsLayer: React.FC<ReportsLayerProps> = ({ reports, activeFeatureLayer
         iconCreateFunction: (cluster: L.MarkerCluster) => {
           const count = cluster.getChildCount();
           return L.divIcon({
-            html: `<div style="background-color: #8F3C19; color: white; font-size: 12px; font-weight: bold; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white;">${count}</div>`,
+            html: `<div style="background-color: #1E90FF; color: white; font-size: 12px; font-weight: bold; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white;">${count}</div>`,
             className: 'custom-cluster-icon',
             iconSize: [30, 30],
           });

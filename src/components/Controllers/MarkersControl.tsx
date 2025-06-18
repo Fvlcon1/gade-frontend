@@ -230,7 +230,7 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
       </div>
 
       <motion.div
-        animate={{ height: isCollapsed ? 35 : 'auto' }}
+        animate={{ height: isCollapsed ? 35 : 360 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className="w-full overflow-hidden bg-white/80 backdrop-blur-sm shadow-md px-4 py-[8px] rounded-[10px] relative"
       >
@@ -377,7 +377,7 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
       </motion.div>
     
       <motion.div
-        animate={{ height: isDateCollapsed ? 35 : 'auto' }}
+        animate={{ height: isDateCollapsed ? 35 : 325 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className="w-full overflow-hidden bg-white/80 backdrop-blur-sm shadow-md px-4 py-[8px] rounded-[10px] mt-2"
       >

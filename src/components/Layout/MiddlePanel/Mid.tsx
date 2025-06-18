@@ -20,16 +20,16 @@ const Mid: React.FC<MidProps> = ({ activeTitle, activeIcon, isActive = false }) 
       {/* Header section */}
       <div className="flex items-center gap-3 mb-2 shrink-0">
         {activeIcon && (
-          <div
-            className={`w-[32px] h-[30px] rounded-[5px] flex items-center justify-center
-              ${isActive ? "bg-[var(--main-primary-20)] text-[var(--color-main-primary)]" : "bg-[var(--bg-secondary)] text-[var(--color-text-tetiary)]"}
-            `}
-          >
-            <span className="w-[14px] h-[14px] flex items-center justify-center">
-              {activeIcon}
-            </span>
-          </div>
-        )}
+  <div
+    className={`w-[32px] h-[30px] rounded-[5px] flex items-center justify-center
+      ${isActive ? "bg-[var(--main-primary-20)] text-[var(--color-main-primary)]" : "bg-[var(--bg-secondary)] text-[var(--color-text-tetiary)]"}
+    `}
+  >
+    <span className="w-[14px] h-[14px] flex items-center justify-center">
+      {activeIcon}
+    </span>
+  </div>
+)}
 
         <Text
           size={theme.text.size.HL}

@@ -8,6 +8,8 @@ export interface MapContainerProps {
   mapRef: React.RefObject<any>;
   activeBasemap: string;
   activeFeatureLayers: Layer[];
+  timelineMode?: 'timeline' | 'comparison' | null;
+  onTimelineModeChange?: (mode: 'timeline' | 'comparison' | null) => void;
 }
 
 export interface LayerProps {

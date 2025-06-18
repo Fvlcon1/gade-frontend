@@ -16,13 +16,13 @@ const AccountHeader: React.FC<AccountHeaderProps> = ({ onInviteUser }) => {
         <div className="bg-[var(--main-primary-20)] p-2 rounded-lg">
           <FaUsers className="h-6 w-6 text-[var(--color-main-primary)]" />
         </div>
-        <Text
-          size={TypographySize.HL}
-          bold={TypographyBold.lg}
-          className="!text-[var(--color-main-primary)]"
-        >
-          {'User Account Management'}
-        </Text>
+     <Text
+size={TypographySize.HL}
+bold={TypographyBold.lg}
+className="!text-[var(--color-main-primary)]"
+>
+{'User Account Management'}
+</Text>
       </div>
       <Button size="sm" onClick={onInviteUser} className="bg-[var(--color-main-primary)] hover:bg-[var(--color-main-primary)]/90 text-white rounded-lg px-4 py-2 flex items-center space-x-2">
         <IconUserPlus className="h-4 w-4" />

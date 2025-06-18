@@ -35,6 +35,7 @@ const Page = () => {
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [activeBasemap, setActiveBasemap] = useState('osm');
   const [activeFeatureLayers, setActiveFeatureLayers] = useState<Layer[]>(initialLayers.filter(layer => layer.checked));
+  const [timelineMode, setTimelineMode] = useState<'timeline' | 'comparison' | null>(null);
 
   useEffect(() => {
     setupReportsRefresh();
@@ -54,6 +55,10 @@ const Page = () => {
     setTimeout(() => {
       setActiveFeatureLayers(layers.filter(layer => layer.checked));
     }, 0);
+  }, []);
+
+  const handleTimelineModeChange = useCallback((mode: 'timeline' | 'comparison' | null) => {
+    setTimelineMode(mode);
   }, []);
 
   const handleTabClick = (tabName: string) => {
@@ -89,6 +94,8 @@ const Page = () => {
           mapRef={mapRef}
           activeBasemap={activeBasemap}
           activeFeatureLayers={activeFeatureLayers}
+          timelineMode={timelineMode}
+          onTimelineModeChange={handleTimelineModeChange}
         />
       )}
 
@@ -150,7 +157,9 @@ const Page = () => {
           onClose={() => {
             setShowTimeline(false);
             setActiveTab(null);
+            setTimelineMode(null);
           }}
+          onModeChange={handleTimelineModeChange}
         />
       )}
 

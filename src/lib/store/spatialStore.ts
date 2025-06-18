@@ -7,7 +7,7 @@ interface SpatialData {
   type: 'FeatureCollection';
   features: Array<{
     type: 'Feature';
-    properties: { 
+    properties: {
       assets?: string;
       category?: string;
       district?: string;
@@ -212,7 +212,7 @@ export const setupReportsRefresh = () => {
   refreshInterval = setInterval(() => {
     const { isAuthenticated } = useAuthStore.getState();
     if (isAuthenticated) {
-      useSpatialStore.getState().fetchReports();
+    useSpatialStore.getState().fetchReports();
     } else {
       cleanupReportsRefresh();
     }

@@ -15,6 +15,8 @@ import { MapContainerProps, LayerProps } from "./types";
 import MouseCoordinateDisplay from "./MouseCoordinateDisplay";
 import ReportsLayer from "./ReportsLayer";
 import ReportZoomHandler from "./ReportZoomHandler";
+import BottomTimeline from "./BottomTimeline";
+import DualDateComparison from "./DualDateComparison";
 
 const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers }) => {
   const { 
@@ -201,7 +203,9 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
 const InteractiveMapClient: React.FC<MapContainerProps> = ({ 
   mapRef, 
   activeBasemap = 'osm', 
-  activeFeatureLayers 
+  activeFeatureLayers,
+  timelineMode = null,
+  onTimelineModeChange
 }) => {
   const { reports, fetchReports } = useSpatialStore();
   const searchParams = useSearchParams();
@@ -237,6 +241,12 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
     };
   }, [searchParams]);
 
+  const handleCloseTimeline = () => {
+    if (onTimelineModeChange) {
+      onTimelineModeChange(null);
+    }
+  };
+
   return (
     <>
       <style>{TOOLTIP_STYLES}</style>
@@ -255,6 +265,16 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
         <ReportZoomHandler reports={reports} searchParams={searchParams} />
         <MouseCoordinateDisplay />
       </MapContainer>
+
+      {/* Bottom Timeline Components */}
+      <BottomTimeline 
+        isVisible={timelineMode === 'timeline'} 
+        onClose={handleCloseTimeline} 
+      />
+      <DualDateComparison 
+        isVisible={timelineMode === 'comparison'} 
+        onClose={handleCloseTimeline} 
+      />
     </>
   );
 };

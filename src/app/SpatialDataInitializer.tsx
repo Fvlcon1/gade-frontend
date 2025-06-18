@@ -11,7 +11,7 @@ const SpatialDataInitializer = () => {
   useEffect(() => {
     if (isAuthenticated) {
       // Fetch initial data
-      fetchAllData();
+    fetchAllData();
       
       // Set up reports refresh
       setupReportsRefresh();
