@@ -101,7 +101,9 @@ const TwoFactorAuthForm: React.FC<TwoFactorAuthFormProps> = ({
       </div>
 
       {isLoading && (
-        <div className="text-center text-sm text-gray-400">Verifying code...</div>
+        <div className="flex justify-center">
+          <div className="animate-spin rounded-full h-6 w-6 border-2 border-gray-400 border-t-transparent"></div>
+        </div>
       )}
 
       <div className="text-center text-sm text-gray-400">
