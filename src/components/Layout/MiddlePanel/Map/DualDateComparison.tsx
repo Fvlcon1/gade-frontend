@@ -49,7 +49,7 @@ const DualDateComparison: React.FC<DualDateComparisonProps> = ({ isVisible, onCl
         </div>
         <button
           onClick={onClose}
-          className="text-gray-500 hover:text-gray-700 text-lg leading-none"
+          className="text-gray-500 hover:text-gray-700 text-lg cursor-pointer leading-none"
         >
           ×
         </button>
@@ -116,7 +116,7 @@ const DualDateComparison: React.FC<DualDateComparisonProps> = ({ isVisible, onCl
             <button
               onClick={handleCompare}
               disabled={!startDate || !endDate}
-              className={`flex items-center gap-2 px-4 py-2 text-white text-sm rounded-lg transition-all duration-200 ${
+              className={`flex items-center gap-2 px-4 py-2 text-white text-sm rounded-lg cursor-pointer transition-all duration-200 ${
                 !startDate || !endDate
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-[#635bff] hover:bg-[#5148d4]"

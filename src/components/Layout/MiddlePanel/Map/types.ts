@@ -10,6 +10,10 @@ export interface MapContainerProps {
   activeFeatureLayers: Layer[];
   timelineMode?: 'timeline' | 'comparison' | null;
   onTimelineModeChange?: (mode: 'timeline' | 'comparison' | null) => void;
+  sidebarExpanded?: boolean;
+  timelineRange?: [number, number];
+  onTimelineRangeChange?: (index: number, value: number) => void;
+  selectedYear?: number;
 }
 
 export interface LayerProps {

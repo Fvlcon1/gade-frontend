@@ -36,6 +36,8 @@ const Page = () => {
   const [activeBasemap, setActiveBasemap] = useState('osm');
   const [activeFeatureLayers, setActiveFeatureLayers] = useState<Layer[]>(initialLayers.filter(layer => layer.checked));
   const [timelineMode, setTimelineMode] = useState<'timeline' | 'comparison' | null>(null);
+  const [timelineRange, setTimelineRange] = useState<[number, number]>([0, 11]);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
     setupReportsRefresh();
@@ -59,6 +61,21 @@ const Page = () => {
 
   const handleTimelineModeChange = useCallback((mode: 'timeline' | 'comparison' | null) => {
     setTimelineMode(mode);
+  }, []);
+
+  const handleTimelineRangeChange = useCallback((index: number, value: number) => {
+    setTimelineRange(prev => {
+      const newRange = [...prev] as [number, number];
+      newRange[index] = value;
+      if (newRange[0] <= newRange[1]) {
+        return newRange;
+      }
+      return prev;
+    });
+  }, []);
+
+  const handleYearChange = useCallback((year: number) => {
+    setSelectedYear(year);
   }, []);
 
   const handleTabClick = (tabName: string) => {
@@ -96,6 +113,10 @@ const Page = () => {
           activeFeatureLayers={activeFeatureLayers}
           timelineMode={timelineMode}
           onTimelineModeChange={handleTimelineModeChange}
+          sidebarExpanded={sidebarExpanded}
+          timelineRange={timelineRange}
+          onTimelineRangeChange={handleTimelineRangeChange}
+          selectedYear={selectedYear}
         />
       )}
 
@@ -160,6 +181,10 @@ const Page = () => {
             setTimelineMode(null);
           }}
           onModeChange={handleTimelineModeChange}
+          range={timelineRange}
+          onRangeChange={handleTimelineRangeChange}
+          selectedYear={selectedYear}
+          onYearChange={handleYearChange}
         />
       )}
 
@@ -190,7 +215,7 @@ const Page = () => {
       </div>
 
       {/* Comparison Slider Overlay */}
-      <ComparisonSlider isVisible={showTimeline} sidebarExpanded={sidebarExpanded} />
+      <ComparisonSlider isVisible={showTimeline && timelineMode === 'comparison'} sidebarExpanded={sidebarExpanded} />
 
      
     </div>

@@ -16,7 +16,6 @@ import MouseCoordinateDisplay from "./MouseCoordinateDisplay";
 import ReportsLayer from "./ReportsLayer";
 import ReportZoomHandler from "./ReportZoomHandler";
 import BottomTimeline from "./BottomTimeline";
-import DualDateComparison from "./DualDateComparison";
 
 const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers }) => {
   const { 
@@ -205,7 +204,11 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
   activeBasemap = 'osm', 
   activeFeatureLayers,
   timelineMode = null,
-  onTimelineModeChange
+  onTimelineModeChange,
+  sidebarExpanded = false,
+  timelineRange = [0, 11],
+  onTimelineRangeChange,
+  selectedYear = new Date().getFullYear()
 }) => {
   const { reports, fetchReports } = useSpatialStore();
   const searchParams = useSearchParams();
@@ -269,11 +272,11 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
       {/* Bottom Timeline Components */}
       <BottomTimeline 
         isVisible={timelineMode === 'timeline'} 
-        onClose={handleCloseTimeline} 
-      />
-      <DualDateComparison 
-        isVisible={timelineMode === 'comparison'} 
-        onClose={handleCloseTimeline} 
+        onClose={handleCloseTimeline}
+        sidebarExpanded={sidebarExpanded}
+        range={timelineRange}
+        onRangeChange={onTimelineRangeChange}
+        selectedYear={selectedYear}
       />
     </>
   );

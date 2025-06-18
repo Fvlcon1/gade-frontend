@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { IoMdClose } from "react-icons/io";
-import { FaPlay, FaChevronDown, FaChevronRight, FaCalendar, FaClock } from "react-icons/fa";
+import { FaPlay, FaChevronDown, FaChevronRight, FaCalendar, FaClock, FaPause } from "react-icons/fa";
 import { AiOutlineReload } from "react-icons/ai";
 import { motion } from "framer-motion";
 import Text from "@styles/components/text";
@@ -17,35 +17,87 @@ const getLastSixMonths = () => {
   return months;
 };
 
-const TimelineController = ({ isOpen, onClose, sidebarExpanded = false, onModeChange }) => {
+const TimelineController = ({ 
+  isOpen, 
+  onClose, 
+  sidebarExpanded = false, 
+  onModeChange,
+  range: externalRange,
+  onRangeChange: externalOnRangeChange,
+  selectedYear: externalSelectedYear,
+  onYearChange: externalOnYearChange
+}) => {
   const months = getLastSixMonths();
   const [activeTab, setActiveTab] = useState('timeline'); // 'timeline' or 'comparison'
-  const [range, setRange] = useState([0, months.length - 1]);
+  const [range, setRange] = useState(externalRange || [0, months.length - 1]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [selectedYear, setSelectedYear] = useState(externalSelectedYear || new Date().getFullYear());
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Sync with external state
+  useEffect(() => {
+    if (externalRange) {
+      setRange(externalRange);
+    }
+  }, [externalRange]);
+
+  useEffect(() => {
+    if (externalSelectedYear) {
+      setSelectedYear(externalSelectedYear);
+    }
+  }, [externalSelectedYear]);
+
+  const getYears = () => {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let i = currentYear; i >= currentYear - 5; i--) {
+      years.push(i);
+    }
+    return years;
+  };
+
+  const years = getYears();
 
   const handleReset = () => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
-    setRange([0, months.length - 1]);
+    const newRange = [0, months.length - 1];
+    setRange(newRange);
+    if (externalOnRangeChange) {
+      externalOnRangeChange(0, 0);
+      externalOnRangeChange(1, months.length - 1);
+    }
     setIsPlaying(false);
   };
 
   const handlePlay = () => {
     if (!isPlaying) {
       setIsPlaying(true);
-      setRange(([_, to]) => [0, to]);
+      const newRange = [0, range[1]];
+      setRange(newRange);
+      if (externalOnRangeChange) {
+        externalOnRangeChange(0, 0);
+      }
+    } else {
+      setIsPlaying(false);
     }
   };
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     onModeChange(tab);
+  };
+
+  const handleYearChange = (year) => {
+    setSelectedYear(year);
+    if (externalOnYearChange) {
+      externalOnYearChange(year);
+    }
   };
 
   useEffect(() => {
@@ -76,7 +128,11 @@ const TimelineController = ({ isOpen, onClose, sidebarExpanded = false, onModeCh
     }
 
     timeoutRef.current = setTimeout(() => {
-      setRange(([from, to]) => [from + 1, to]);
+      const newRange = [range[0] + 1, range[1]];
+      setRange(newRange);
+      if (externalOnRangeChange) {
+        externalOnRangeChange(0, newRange[0]);
+      }
     }, 800);
 
     return () => {
@@ -85,13 +141,16 @@ const TimelineController = ({ isOpen, onClose, sidebarExpanded = false, onModeCh
         timeoutRef.current = null;
       }
     };
-  }, [range, isPlaying]);
+  }, [range, isPlaying, externalOnRangeChange]);
 
   const handleRangeChange = (index, value) => {
     const newRange = [...range];
     newRange[index] = value;
     if (newRange[0] <= newRange[1]) {
       setRange(newRange);
+      if (externalOnRangeChange) {
+        externalOnRangeChange(index, value);
+      }
     }
   };
 
@@ -102,7 +161,7 @@ const TimelineController = ({ isOpen, onClose, sidebarExpanded = false, onModeCh
     <motion.div
       animate={{ left: leftPosition }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
-      className="absolute top-[10px] z-[1001] w-[245px]"
+      className="absolute top-[10px] z-[1001] w-[280px]"
     >
       {/* Header */}
       <div className="w-[27] h-[26px] bg-white/80 shadow-md px-2 flex mb-2 items-center justify-between rounded-[7px]">
@@ -115,7 +174,7 @@ const TimelineController = ({ isOpen, onClose, sidebarExpanded = false, onModeCh
       <div className="flex bg-white/80 backdrop-blur-sm rounded-lg shadow-md mb-2 overflow-hidden">
         <button
           onClick={() => handleTabChange('timeline')}
-          className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 text-sm font-medium transition-colors ${
+          className={`flex-1 flex items-center justify-center gap-2 py-2 cursor-pointer px-3 text-sm font-medium transition-colors ${
             activeTab === 'timeline'
               ? 'bg-[#635bff] text-white'
               : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
@@ -142,7 +201,7 @@ const TimelineController = ({ isOpen, onClose, sidebarExpanded = false, onModeCh
         <motion.div
           animate={{ height: isCollapsed ? 35 : 145 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
-          className="w-[240px] h-[120px] overflow-hidden bg-white/65 backdrop-blur-xs shadow-md px-2 py-3 rounded-[10px]"
+          className="w-[280px] overflow-hidden bg-white/65 backdrop-blur-xs shadow-md px-2 py-3 rounded-[10px]"
         >
           <div className="flex items-center justify-between w-full h-[18px]">
             <Text size={theme.text.size.SM} bold={theme.text.bold.md} className="text-gray-700">
@@ -157,94 +216,50 @@ const TimelineController = ({ isOpen, onClose, sidebarExpanded = false, onModeCh
 
           {!isCollapsed && (
             <>
-              <Text size={theme.text.size.SM} bold={theme.text.bold.sm} className="text-gray-500">
+              <Text size={theme.text.size.SM} bold={theme.text.bold.sm} className="text-gray-500 mt-2">
                 Filter mining activity by date
               </Text>
 
-              {/* Slider + Labels Container */}
-              <div className="rounded-[10px] w-[190px] h-[50px] bg-[#EBEBEB]/140 px-3 ml-[3px] ">
-                {/* Slider */}
-                <div className="relative w-full h-[40px]">
-                  <div className="absolute top-[50%] left-0 right-0 h-[4px] bg-gray-300 rounded-full -translate-y-1/2" />
-                  <div
-                    className="absolute h-[4px] bg-[#635bff] rounded-full"
-                    style={{
-                      left: `${(range[0] / (months.length - 1)) * 100}%`,
-                      width: `${((range[1] - range[0]) / (months.length - 1)) * 100}%`,
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                    }}
-                  />
-
-                  <input
-                    type="range"
-                    min={0}
-                    max={months.length - 1}
-                    value={range[0]}
-                    onChange={(e) => handleRangeChange(0, parseInt(e.target.value))}
-                    className="absolute w-full h-full top-0 left-0 appearance-none bg-transparent z-20 pointer-events-auto"
-                  />
-                  <input
-                    type="range"
-                    min={0}
-                    max={months.length - 1}
-                    value={range[1]}
-                    onChange={(e) => handleRangeChange(1, parseInt(e.target.value))}
-                    className="absolute w-full h-full top-0 left-0 appearance-none bg-transparent z-30 pointer-events-auto"
-                  />
-                  <style jsx>{`
-                    input[type="range"]::-webkit-slider-thumb {
-                      -webkit-appearance: none;
-                      height: 18px;
-                      width: 18px;
-                      background: #635bff;
-                      border: 2px solid white;
-                      border-radius: 50%;
-                      box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
-                      cursor: pointer;
-                      margin-top: -2px;
-                      position: relative;
-                      z-index: 40;
-                    }
-                  `}</style>
-                </div>
-
-                {/* Labels */}
-                <div className="flex justify-between w-full -mt-3.5 text-xs font-[200] text-gray-500">
-                  {months.map((month, index) => (
-                    <span
-                      key={index}
-                      className={
-                        index === range[0] || index === range[1] ? "text-[#635bff] font-[500]" : ""
-                      }
-                    >
-                      {month}
-                    </span>
+              {/* Year Selection */}
+              <div className="flex items-center gap-2 mt-3 mb-3">
+                <FaCalendar size={12} className="text-gray-400" />
+                <select
+                  value={selectedYear}
+                  onChange={(e) => handleYearChange(parseInt(e.target.value))}
+                  className="text-xs border border-gray-300 rounded px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-[#635bff] flex-1"
+                >
+                  {years.map(year => (
+                    <option key={year} value={year}>{year}</option>
                   ))}
-                </div>
+                </select>
               </div>
 
               {/* Controls */}
-              <div className="flex justify-between items-center w-[50%] mt-2 ml-1">
+              <div className="flex items-center gap-2 mb-3">
                 <button
                   onClick={handlePlay}
                   disabled={isPlaying}
-                  className={`flex items-center justify-center gap-2 w-[63px] h-[24px] text-white text-sm leading-none rounded-[8px] transition-all duration-200 ${
+                  className={`flex items-center justify-center gap-1 px-3 py-1.5 text-white text-xs leading-none rounded transition-all duration-200 ${
                     isPlaying
                       ? "bg-gray-300 cursor-not-allowed"
                       : "bg-[#635bff] hover:bg-[#5148d4]"
                   }`}
                 >
-                  <FaPlay size={12} />
-                  {isPlaying ? "Play" : "Play"}
+                  {isPlaying ? <FaPause size={10} /> : <FaPlay size={10} />}
+                  {isPlaying ? "Pause" : "Play"}
                 </button>
 
                 <button
                   onClick={handleReset}
-                  className="flex items-center justify-center w-[24px] h-[24px] bg-white text-[#425466] border rounded-[7px] shadow-sm leading-none"
+                  className="flex items-center justify-center gap-1 px-2 py-1.5 bg-white text-gray-600 border border-gray-300 rounded text-xs hover:bg-gray-50 transition-colors"
                 >
-                  <AiOutlineReload width={13} height={10.6} />
+                  <AiOutlineReload size={10} />
+                  Reset
                 </button>
+
+                <div className="text-xs text-gray-500 ml-auto">
+                  {selectedYear}: {months[range[0]]} - {months[range[1]]}
+                </div>
               </div>
             </>
           )}
@@ -256,7 +271,7 @@ const TimelineController = ({ isOpen, onClose, sidebarExpanded = false, onModeCh
         <motion.div
           animate={{ height: isCollapsed ? 35 : 125 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
-          className="w-[213px] overflow-hidden bg-white/50 backdrop-blur-xs shadow-md px-2 py-[5px] rounded-[10px]"
+          className="w-[260px] overflow-hidden bg-white/50 backdrop-blur-xs shadow-md px-2 py-[5px] rounded-[10px]"
         >
           <div className="w-full h-[21px] flex items-center justify-between">
             <Text size={theme.text.size.SM} bold={theme.text.bold.md} className="!text-[var(--color-text-secondary)]">
@@ -322,7 +337,7 @@ const TimelineController = ({ isOpen, onClose, sidebarExpanded = false, onModeCh
               <div className="flex items-center gap-2 -mt-2">
                 <button
                   onClick={() => console.log("Compare", startDate, endDate)}
-                  className="flex items-center justify-center w-[81px] h-[24px] rounded-[7px] text-white bg-[var(--color-main-primary)] hover:bg-[#4e43c6] text-sm"
+                  className="flex items-center justify-center w-[81px] h-[24px] cursor-pointer rounded-[7px] text-white bg-[var(--color-main-primary)] hover:bg-[#4e43c6] text-sm"
                 >
                   Compare
                 </button>
