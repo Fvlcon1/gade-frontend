@@ -14,7 +14,7 @@ const basemaps = [
 // Feature layer definitions with colors matching LAYER_STYLES
 export const initialLayers = [
   // { id: 'mining', label: 'Mining concessions', checked: true }, // Commented out concessions
-  { id: 'reports', label: 'Reports', checked: true, color: '#FFD06C' },
+  { id: 'reports', label: 'Reports', checked: true, color: '#8F3C19' },
   { id: 'rivers', label: 'Rivers', checked: true, color: '#03A9F4' },
   { id: 'mining_sites', label: 'Detected mining activity', checked: true, color: '#FF4B4B' }, // Matches mining_sites color
   { id: 'forest', label: 'Forest reserves', checked: true, color: '#4CAF50' }, // Matches forest color
