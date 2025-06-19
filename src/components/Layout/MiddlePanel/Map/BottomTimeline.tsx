@@ -8,6 +8,8 @@ interface BottomTimelineProps {
   range: [number, number];
   onRangeChange: (index: number, value: number) => void;
   selectedYear: number;
+  playhead?: number | null;
+  isPlaying?: boolean;
 }
 
 const getMonths = () => [
@@ -21,7 +23,9 @@ const BottomTimeline: React.FC<BottomTimelineProps> = ({
   sidebarExpanded = false,
   range,
   onRangeChange,
-  selectedYear
+  selectedYear,
+  playhead = null,
+  isPlaying = false
 }) => {
   const months = getMonths();
 
@@ -56,6 +60,7 @@ const BottomTimeline: React.FC<BottomTimelineProps> = ({
               onChange={(e) => onRangeChange(0, parseInt(e.target.value))}
               className="absolute w-full h-full top-0 left-0 appearance-none bg-transparent z-20 pointer-events-auto cursor-pointer"
               style={{ WebkitAppearance: 'none', appearance: 'none' }}
+              disabled={isPlaying}
             />
             <input
               type="range"
@@ -65,6 +70,7 @@ const BottomTimeline: React.FC<BottomTimelineProps> = ({
               onChange={(e) => onRangeChange(1, parseInt(e.target.value))}
               className="absolute w-full h-full top-0 left-0 appearance-none bg-transparent z-30 pointer-events-auto cursor-pointer"
               style={{ WebkitAppearance: 'none', appearance: 'none' }}
+              disabled={isPlaying}
             />
 
             {/* Custom Thumb Styles */}
@@ -111,12 +117,18 @@ const BottomTimeline: React.FC<BottomTimelineProps> = ({
             <span
               key={index}
               className={`transition-colors ${
-                index === range[0] || index === range[1]
-                  ? "text-[#635bff] font-medium"
-                  : ""
+                (isPlaying && playhead === index)
+                  ? "text-[#635bff] font-bold underline underline-offset-2"
+                  : (index === range[0] || index === range[1])
+                    ? "text-[#635bff] font-medium"
+                    : ""
               }`}
             >
               {month}
+              {/* Playhead indicator */}
+              {isPlaying && playhead === index && (
+                <span className="block w-1 h-1 mx-auto mt-0.5 rounded-full bg-[#635bff]" />
+              )}
             </span>
           ))}
         </div>

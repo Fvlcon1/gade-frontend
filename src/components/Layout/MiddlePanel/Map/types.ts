@@ -14,6 +14,8 @@ export interface MapContainerProps {
   timelineRange?: [number, number];
   onTimelineRangeChange?: (index: number, value: number) => void;
   selectedYear?: number;
+  playhead?: number | null;
+  isPlaying?: boolean;
 }
 
 export interface LayerProps {

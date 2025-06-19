@@ -38,6 +38,8 @@ const Page = () => {
   const [timelineMode, setTimelineMode] = useState<'timeline' | 'comparison' | null>(null);
   const [timelineRange, setTimelineRange] = useState<[number, number]>([0, 11]);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [playhead, setPlayhead] = useState<number | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     setupReportsRefresh();
@@ -61,6 +63,10 @@ const Page = () => {
 
   const handleTimelineModeChange = useCallback((mode: 'timeline' | 'comparison' | null) => {
     setTimelineMode(mode);
+    if (mode !== 'timeline') {
+      setIsPlaying(false);
+      setPlayhead(null);
+    }
   }, []);
 
   const handleTimelineRangeChange = useCallback((index: number, value: number) => {
@@ -78,17 +84,49 @@ const Page = () => {
     setSelectedYear(year);
   }, []);
 
+  const handlePlay = useCallback(() => {
+    setIsPlaying(true);
+    setPlayhead(timelineRange[0]);
+  }, [timelineRange]);
+
+  // Reset playhead to new start month if range changes while playing
+  useEffect(() => {
+    if (isPlaying) {
+      setPlayhead(timelineRange[0]);
+    }
+  }, [timelineRange, isPlaying]);
+
+  // When playing, update the timeline's right handle to match playhead
+  useEffect(() => {
+    if (isPlaying && playhead != null) {
+      setTimelineRange(([from, _]) => [from, playhead]);
+    }
+  }, [isPlaying, playhead]);
+
+  const handlePause = useCallback(() => {
+    setIsPlaying(false);
+    setPlayhead(null);
+  }, []);
+
+  const handlePlayheadChange = useCallback((newPlayhead: number) => {
+    setPlayhead(newPlayhead);
+  }, []);
+
   const handleTabClick = (tabName: string) => {
     if (tabName === "layers") {
       setShowLayers(!showLayers);
       setShowMarkers(false);
       setShowTimeline(false);
       setActiveTab(activeTab === "layers" ? null : "layers");
+      setIsPlaying(false);
+      setPlayhead(null);
     } else if (tabName === "marker") {
       setShowMarkers(!showMarkers);
       setShowLayers(false);
       setShowTimeline(false);
       setActiveTab(activeTab === "marker" ? null : "marker");
+      setIsPlaying(false);
+      setPlayhead(null);
     } else if (tabName === "chart") {
       setShowTimeline(!showTimeline);
       setShowLayers(false);
@@ -99,6 +137,8 @@ const Page = () => {
       setShowMarkers(false);
       setShowTimeline(false);
       setActiveTab(null);
+      setIsPlaying(false);
+      setPlayhead(null);
     }
   };
 
@@ -117,6 +157,8 @@ const Page = () => {
           timelineRange={timelineRange}
           onTimelineRangeChange={handleTimelineRangeChange}
           selectedYear={selectedYear}
+          playhead={playhead}
+          isPlaying={isPlaying}
         />
       )}
 
@@ -185,6 +227,11 @@ const Page = () => {
           onRangeChange={handleTimelineRangeChange}
           selectedYear={selectedYear}
           onYearChange={handleYearChange}
+          playhead={playhead}
+          isPlaying={isPlaying}
+          onPlay={handlePlay}
+          onPause={handlePause}
+          onPlayheadChange={handlePlayheadChange}
         />
       )}
 

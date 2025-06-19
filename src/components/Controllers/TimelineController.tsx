@@ -25,12 +25,16 @@ const TimelineController = ({
   range: externalRange,
   onRangeChange: externalOnRangeChange,
   selectedYear: externalSelectedYear,
-  onYearChange: externalOnYearChange
+  onYearChange: externalOnYearChange,
+  playhead,
+  isPlaying,
+  onPlay,
+  onPause,
+  onPlayheadChange
 }) => {
   const months = getLastSixMonths();
   const [activeTab, setActiveTab] = useState('timeline'); // 'timeline' or 'comparison'
   const [range, setRange] = useState(externalRange || [0, months.length - 1]);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -72,25 +76,21 @@ const TimelineController = ({
       externalOnRangeChange(0, 0);
       externalOnRangeChange(1, months.length - 1);
     }
-    setIsPlaying(false);
+    if (onPause) onPause();
   };
 
-  const handlePlay = () => {
+  const handlePlayClick = () => {
     if (!isPlaying) {
-      setIsPlaying(true);
-      const newRange = [0, range[1]];
-      setRange(newRange);
-      if (externalOnRangeChange) {
-        externalOnRangeChange(0, 0);
-      }
+      if (onPlay) onPlay();
     } else {
-      setIsPlaying(false);
+      if (onPause) onPause();
     }
   };
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     onModeChange(tab);
+    if (onPause) onPause();
   };
 
   const handleYearChange = (year) => {
@@ -110,7 +110,7 @@ const TimelineController = ({
   }, []);
 
   useEffect(() => {
-    if (!isPlaying) {
+    if (!isPlaying || playhead == null) {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
@@ -118,7 +118,7 @@ const TimelineController = ({
       return;
     }
 
-    if (range[0] >= range[1]) {
+    if (playhead >= range[1]) {
       handleReset();
       return;
     }
@@ -128,10 +128,8 @@ const TimelineController = ({
     }
 
     timeoutRef.current = setTimeout(() => {
-      const newRange = [range[0] + 1, range[1]];
-      setRange(newRange);
-      if (externalOnRangeChange) {
-        externalOnRangeChange(0, newRange[0]);
+      if (onPlayheadChange) {
+        onPlayheadChange(playhead + 1);
       }
     }, 800);
 
@@ -141,7 +139,7 @@ const TimelineController = ({
         timeoutRef.current = null;
       }
     };
-  }, [range, isPlaying, externalOnRangeChange]);
+  }, [playhead, isPlaying, range, onPlayheadChange]);
 
   const handleRangeChange = (index, value) => {
     const newRange = [...range];
@@ -237,7 +235,7 @@ const TimelineController = ({
               {/* Controls */}
               <div className="flex items-center gap-2 mb-3">
                 <button
-                  onClick={handlePlay}
+                  onClick={handlePlayClick}
                   disabled={isPlaying}
                   className={`flex items-center justify-center gap-1 px-3 py-1.5 text-white text-xs leading-none rounded transition-all duration-200 ${
                     isPlaying

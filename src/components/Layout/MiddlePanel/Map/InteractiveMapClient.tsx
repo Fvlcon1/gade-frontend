@@ -208,9 +208,11 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
   sidebarExpanded = false,
   timelineRange = [0, 11],
   onTimelineRangeChange,
-  selectedYear = new Date().getFullYear()
+  selectedYear = new Date().getFullYear(),
+  playhead = null,
+  isPlaying = false
 }) => {
-  const { reports, fetchReports } = useSpatialStore();
+  const { reports, fetchReports, applyFilters } = useSpatialStore();
   const searchParams = useSearchParams();
 
   const [currentBasemap, setCurrentBasemap] = useState(activeBasemap);
@@ -225,6 +227,15 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
   useEffect(() => {
     fetchReports();
   }, [fetchReports]);
+
+  // Timeline play filtering
+  useEffect(() => {
+    if (timelineMode === 'timeline' && isPlaying && playhead != null) {
+      applyFilters({ year: selectedYear, playhead, range: timelineRange });
+    } else {
+      applyFilters();
+    }
+  }, [timelineMode, isPlaying, playhead, selectedYear, timelineRange, applyFilters]);
 
   const initialView = useMemo(() => {
     const lat = searchParams.get('lat');

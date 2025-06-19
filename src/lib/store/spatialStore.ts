@@ -64,7 +64,7 @@ interface SpatialState {
   setSelectedDistricts: (districts: string[]) => void;
   setHighlightedDistricts: (districts: string[]) => void;
   setDateRange: (range: { from: string | null; to: string | null }) => void;
-  applyFilters: () => void;
+  applyFilters: (options?: { year?: number; playhead?: number; range?: [number, number]; }) => void;
   fetchAllData: () => Promise<void>;
   fetchReports: () => Promise<void>;
 }
@@ -103,21 +103,40 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
   setHighlightedDistricts: (districts) => set({ highlightedDistricts: districts }),
   setDateRange: (range) => set({ dateRange: range }),
   
-  applyFilters: () => {
+  applyFilters: (options = {}) => {
     const { miningSites, districts, selectedDistricts, dateRange } = get();
     if (!miningSites || !districts) return;
 
-    // Filter mining sites based on selected districts and date range
+    // Timeline play filtering
+    const { year, playhead, range } = options;
+    let fromMonth = 0, toMonth = 11;
+    if (range) {
+      fromMonth = range[0];
+      toMonth = range[1];
+    }
+    let playheadMonth = playhead != null ? playhead : toMonth;
+
+    // Helper to get YYYY-MM for a month index
+    const getMonthString = (y, m) => `${y}-${String(m + 1).padStart(2, '0')}`;
+
     const filteredMiningSites = {
       ...miningSites,
       features: miningSites.features.filter(feature => {
         const matchesDistrict = selectedDistricts.length === 0 || 
           selectedDistricts.includes(feature.properties.district);
-        
-        const matchesDate = !dateRange?.from || !dateRange?.to || 
-          (feature.properties.detected_date >= dateRange.from && 
-           feature.properties.detected_date <= dateRange.to);
-        
+        let matchesDate = true;
+        if (year != null && playhead != null) {
+          // Only show sites detected up to the playhead month in the selected year
+          const detected = feature.properties.detected_date;
+          if (!detected) return false;
+          const detectedYear = Number(detected.slice(0, 4));
+          const detectedMonth = Number(detected.slice(5, 7)) - 1;
+          // Only show if detected in selected year and up to playhead month
+          matchesDate = detectedYear === year && detectedMonth <= playheadMonth && detectedMonth >= fromMonth;
+        } else if (dateRange?.from && dateRange?.to) {
+          matchesDate = feature.properties.detected_date >= dateRange.from && 
+                        feature.properties.detected_date <= dateRange.to;
+        }
         return matchesDistrict && matchesDate;
       })
     };
