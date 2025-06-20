@@ -18,7 +18,7 @@ import ReportZoomHandler from "./ReportZoomHandler";
 import BottomTimeline from "./BottomTimeline";
 import ComparisonSlider from "../../../../components/Controllers/ComparisonSlider";
 
-const MapLayers: React.FC<LayerProps & { playhead: number | null }> = ({ activeBasemap, activeFeatureLayers, playhead }) => {
+const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 'timeline' | 'comparison' | null }> = ({ activeBasemap, activeFeatureLayers, playhead, timelineMode }) => {
   const { 
     filteredMiningSites,
     filteredDistricts,
@@ -42,6 +42,9 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null }> = ({ activeB
   useEffect(() => {
     if (!filteredDistricts || !filteredDistricts.features) return;
 
+    // Skip auto-zoom if we're in timeline mode to allow free zooming
+    if (timelineMode === 'timeline') return;
+
     const districtsToZoom = highlightedDistricts.length > 0 ? highlightedDistricts : selectedDistricts;
     const bounds = new L.LatLngBounds([]);
 
@@ -61,7 +64,7 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null }> = ({ activeB
         duration: 0.5,
       });
     }
-  }, [map, filteredDistricts, highlightedDistricts, selectedDistricts]);
+  }, [map, filteredDistricts, highlightedDistricts, selectedDistricts, timelineMode]);
 
   const filteredLayerData = useMemo(() => {
     if (!filteredDistricts || !filteredMiningSites) return {};
@@ -222,8 +225,10 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
   const searchParams = useSearchParams();
 
   const [currentBasemap, setCurrentBasemap] = useState(activeBasemap);
-  const [playhead, setPlayhead] = useState(externalPlayhead);
-  const [isPlaying, setIsPlaying] = useState(externalIsPlaying);
+
+  useEffect(() => {
+    setCurrentBasemap(activeBasemap);
+  }, [activeBasemap]);
 
   // Comparison state
   const [comparisonSliderPosition, setComparisonSliderPosition] = useState(0.5); // 0 = left, 1 = right
@@ -245,13 +250,10 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
     };
   }, [miningSites, comparisonEndDate]);
 
-  useEffect(() => {
-    if (activeBasemap !== currentBasemap) {
-      setCurrentBasemap(activeBasemap);
-    }
-  }, [activeBasemap, currentBasemap]);
-
   // Sync external playhead and isPlaying
+  const [playhead, setPlayhead] = useState(externalPlayhead);
+  const [isPlaying, setIsPlaying] = useState(externalIsPlaying);
+
   useEffect(() => {
     setPlayhead(externalPlayhead);
     setIsPlaying(externalIsPlaying);
@@ -266,7 +268,7 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
   useEffect(() => {
     if (timelineMode === 'timeline') {
       if (isPlaying && playhead != null) {
-        applyFilters({ year: selectedYear, playhead, range: timelineRange });
+      applyFilters({ year: selectedYear, playhead, range: timelineRange });
       } else {
         // Reset to show all data within range when not playing
         applyFilters({ year: selectedYear, range: timelineRange });
@@ -317,6 +319,14 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
     setPlayhead(newPlayhead);
   };
 
+  // Dynamically update planet basemap URL with year and month for timeline
+  const getPlanetUrl = () => {
+    const year = selectedYear;
+    const month = playhead != null ? playhead : timelineRange[0];
+    const monthStr = String(month + 1).padStart(2, '0');
+    return `https://tiles.planet.com/basemaps/v1/planet-tiles/global_monthly_${year}_${monthStr}_mosaic/gmap/{z}/{x}/{y}.png?api_key=${process.env.NEXT_PUBLIC_PL_KEY}`;
+  };
+
   return (
     <>
       <style>{TOOLTIP_STYLES}</style>
@@ -328,28 +338,48 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
         className="w-full h-full"
       >
         <TileLayer
-          url={BASEMAP_URLS[currentBasemap]}
+          url={currentBasemap === 'planet' ? getPlanetUrl() : BASEMAP_URLS[currentBasemap]}
           attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         {/* Render mining sites for comparison if active */}
-        {comparisonActive && miningSitesLeft && (
-          <GeoJSON
-            key={`comparison-left-${comparisonStartDate}`}
-            data={miningSitesLeft}
-            style={{ ...LAYER_STYLES.mining_sites, opacity: 1, fillOpacity: 0.7 }}
-          />
-        )}
-        {comparisonActive && miningSitesRight && (
-          <GeoJSON
-            key={`comparison-right-${comparisonEndDate}`}
-            data={miningSitesRight}
-            style={{ ...LAYER_STYLES.mining_sites, opacity: 1, fillOpacity: 0.7 }}
-            // TODO: Add mask/clip/opacity based on comparisonSliderPosition
-          />
+        {comparisonActive && (
+          <>
+            {miningSitesLeft && (
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                pointerEvents: 'none',
+                zIndex: 401,
+              }}>
+                <GeoJSON
+                  key={`comparison-left-${comparisonStartDate}`}
+                  data={miningSitesLeft}
+                  style={{ ...LAYER_STYLES.mining_sites, opacity: 1, fillOpacity: 0.7 }}
+                />
+              </div>
+            )}
+            {miningSitesRight && (
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                pointerEvents: 'none',
+                zIndex: 402,
+                clipPath: `inset(0 0 0 ${Math.round((1 - comparisonSliderPosition) * 100)}%)`,
+                WebkitClipPath: `inset(0 0 0 ${Math.round((1 - comparisonSliderPosition) * 100)}%)`,
+                transition: 'clip-path 0.2s, -webkit-clip-path 0.2s',
+              }}>
+                <GeoJSON
+                  key={`comparison-right-${comparisonEndDate}`}
+                  data={miningSitesRight}
+                  style={{ ...LAYER_STYLES.mining_sites, opacity: 1, fillOpacity: 0.7 }}
+                />
+              </div>
+            )}
+          </>
         )}
         {/* Normal layers if not in comparison mode */}
         {!comparisonActive && (
-          <MapLayers activeBasemap={currentBasemap} activeFeatureLayers={activeFeatureLayers} playhead={playhead} />
+          <MapLayers activeBasemap={currentBasemap} activeFeatureLayers={activeFeatureLayers} playhead={playhead} timelineMode={timelineMode} />
         )}
         <ReportZoomHandler reports={reports} searchParams={searchParams} />
         <MouseCoordinateDisplay />
@@ -362,7 +392,7 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
           sidebarExpanded={sidebarExpanded}
           position={comparisonSliderPosition}
           setPosition={setComparisonSliderPosition}
-          onExit={onExitComparison}
+        
         />
       )}
       {/* TODO: Wire up DualDateComparison UI and pass handleCompare to it */}

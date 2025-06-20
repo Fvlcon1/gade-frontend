@@ -34,10 +34,13 @@ const Page = () => {
   const [activeTab, setActiveTab] = useState(null);
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [activeBasemap, setActiveBasemap] = useState('osm');
+  const [previousBasemap, setPreviousBasemap] = useState('osm');
   const [activeFeatureLayers, setActiveFeatureLayers] = useState<Layer[]>(initialLayers.filter(layer => layer.checked));
   const [timelineMode, setTimelineMode] = useState<'timeline' | 'comparison' | null>(null);
-  const [timelineRange, setTimelineRange] = useState<[number, number]>([0, 11]);
-  const [lastUserRange, setLastUserRange] = useState<[number, number]>([0, 11]);
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const [timelineRange, setTimelineRange] = useState<[number, number]>([0, currentMonth]);
+  const [lastUserRange, setLastUserRange] = useState<[number, number]>([0, currentMonth]);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [playhead, setPlayhead] = useState<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -126,6 +129,7 @@ const Page = () => {
       setActiveTab(activeTab === "layers" ? null : "layers");
       setIsPlaying(false);
       setPlayhead(null);
+      setTimelineMode(null);
     } else if (tabName === "marker") {
       setShowMarkers(!showMarkers);
       setShowLayers(false);
@@ -133,6 +137,7 @@ const Page = () => {
       setActiveTab(activeTab === "marker" ? null : "marker");
       setIsPlaying(false);
       setPlayhead(null);
+      setTimelineMode(null);
     } else if (tabName === "chart") {
       setShowTimeline(!showTimeline);
       setShowLayers(false);
@@ -145,12 +150,13 @@ const Page = () => {
       setActiveTab(null);
       setIsPlaying(false);
       setPlayhead(null);
+      setTimelineMode(null);
     }
   };
 
   const handleResetTimeline = useCallback(() => {
-    setTimelineRange([0, 11]);
-    setLastUserRange([0, 11]);
+    setTimelineRange([0, currentMonth]);
+    setLastUserRange([0, currentMonth]);
     setIsPlaying(false);
     setPlayhead(null);
   }, []);
@@ -163,6 +169,21 @@ const Page = () => {
   };
 
   const floatingNavLeft = sidebarExpanded ? "232px" : "72px";
+
+  // Correct basemap switching logic
+  useEffect(() => {
+    if (timelineMode === 'timeline' || timelineMode === 'comparison') {
+      if (activeBasemap !== 'planet') {
+        setPreviousBasemap(activeBasemap);
+        setActiveBasemap('planet');
+      }
+    } else {
+      if (activeBasemap === 'planet') {
+        setActiveBasemap(previousBasemap);
+      }
+    }
+    // eslint-disable-next-line
+  }, [timelineMode]);
 
   return (
     <div className="relative w-screen h-screen overflow-hidden">

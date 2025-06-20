@@ -167,7 +167,7 @@ const TimelineController: React.FC<TimelineControllerProps> = ({
       } else {
         handleReset();
       }
-    }, 800);
+    }, 2200);
 
     // Cleanup function
     return () => {
@@ -194,6 +194,13 @@ const TimelineController: React.FC<TimelineControllerProps> = ({
       }
     }
   };
+
+  // Set initial mode when component mounts
+  useEffect(() => {
+    if (isOpen && onModeChange) {
+      onModeChange(activeTab as 'timeline' | 'comparison');
+    }
+  }, [isOpen, onModeChange, activeTab]);
 
   if (!isOpen) return null;
   const leftPosition = sidebarExpanded ? "296px" : "136px";
@@ -242,7 +249,7 @@ const TimelineController: React.FC<TimelineControllerProps> = ({
         <motion.div
           animate={{ height: isCollapsed ? 35 : 145 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
-          className="w-[280px] overflow-hidden bg-white/65 backdrop-blur-xs shadow-md px-2 py-3 rounded-[10px]"
+          className="w-[280px] overflow-hidden bg-white/85 backdrop-blur-xs shadow-md px-2 py-3 rounded-[10px]"
         >
           <div className="flex items-center justify-between w-full h-[18px]">
             <Text size={theme.text.size.SM} bold={theme.text.bold.md} className="text-gray-700">
@@ -309,9 +316,9 @@ const TimelineController: React.FC<TimelineControllerProps> = ({
       {/* Comparison Tab Content */}
       {activeTab === 'comparison' && (
         <motion.div
-          animate={{ height: isCollapsed ? 35 : 125 }}
+          animate={{ height: isCollapsed ? 35 : 150 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
-          className="w-[260px] overflow-hidden bg-white/50 backdrop-blur-xs shadow-md px-2 py-[5px] rounded-[10px]"
+          className="w-[280px] overflow-hidden bg-white/85 backdrop-blur-xs shadow-md px-3 py-3 rounded-[10px]"
         >
           <div className="w-full h-[21px] flex items-center justify-between">
             <Text size={theme.text.size.SM} bold={theme.text.bold.md} className="!text-[var(--color-text-secondary)]">
@@ -325,48 +332,48 @@ const TimelineController: React.FC<TimelineControllerProps> = ({
           </div>
 
           {!isCollapsed && (
-            <div className="mt-3 flex flex-col gap-3 px-1">
+            <div className="mt-3 flex flex-col gap-3">
               {/* Date Inputs */}
-              <div className="flex justify-between">
+              <div className="flex justify-between items-end">
                 {/* START */}
-                <div className="flex flex-col w-[82px]">
-                  <Text size={theme.text.size.SM} bold={theme.text.bold.sm} className="!text-[var(--color-text-tetiary)]">Start</Text>
+                <div className="flex flex-col w-[110px]">
+                  <Text size={theme.text.size.SM} bold={theme.text.bold.sm} className="!text-[var(--color-text-tetiary)] mb-1">Start</Text>
                   <div
-                    className="flex items-center w-[81px] h-[28px] border-[var(--border-tetiary)] rounded-[10px] justify-around px-[4px] border-[1px] bg-white/50 cursor-pointer"
+                    className="flex items-center w-full h-[28px] border-[var(--border-tetiary)] rounded-[6px] justify-center px-1 border-[1px] bg-white/50 cursor-pointer hover:bg-white/70 transition-colors"
                     onClick={() => (document.getElementById("start-date-input") as HTMLInputElement)?.showPicker()}
                   >
-                    <FaCalendar size={12} className="text-[var(--color-text-tetiary)]" />
+                    <FaCalendar size={10} className="text-[var(--color-text-tetiary)] mr-1" />
                     <input
                       id="start-date-input"
                       type="date"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
                       max={endDate || undefined}
-                      className="w-full text-[10px] text-center text-[var(--color-text-tetiary)] bg-transparent outline-none placeholder:text-gray-400"
+                      className="flex-1 text-[11px] text-center text-[var(--color-text-tetiary)] bg-transparent outline-none placeholder:text-gray-400"
                       style={{ WebkitAppearance: "none", appearance: "none" }}
                     />
                   </div>
                 </div>
 
-                <div className="flex items-end pb-2">
+                <div className="flex items-end pb-2 px-1">
                   <Text size={theme.text.size.SM} bold={theme.text.bold.md} className="!text-[var(--color-text-tetiary)]">...</Text>
                 </div>
 
                 {/* END */}
-                <div className="flex flex-col w-[82px]">
-                  <Text size={theme.text.size.SM} bold={theme.text.bold.sm} className="!text-[var(--color-text-tetiary)]">End</Text>
+                <div className="flex flex-col w-[110px]">
+                  <Text size={theme.text.size.SM} bold={theme.text.bold.sm} className="!text-[var(--color-text-tetiary)] mb-1">End</Text>
                   <div
-                    className="flex items-center w-[81px] h-[28px] border-[var(--border-tetiary)] rounded-[10px] justify-around px-[4px] border-[1px] bg-white/50 cursor-pointer"
+                    className="flex items-center w-full h-[28px] border-[var(--border-tetiary)] rounded-[6px] justify-center px-1 border-[1px] bg-white/50 cursor-pointer hover:bg-white/70 transition-colors"
                     onClick={() => (document.getElementById("end-date-input") as HTMLInputElement)?.showPicker()}
                   >
-                    <FaCalendar size={12} className="text-[var(--color-text-tetiary)]" />
+                    <FaCalendar size={10} className="text-[var(--color-text-tetiary)] mr-1" />
                     <input
                       id="end-date-input"
                       type="date"
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
                       min={startDate || undefined}
-                      className="w-full text-[10px] text-center text-[var(--color-text-tetiary)] bg-transparent outline-none placeholder:text-gray-400"
+                      className="flex-1 text-[11px] text-center text-[var(--color-text-tetiary)] bg-transparent outline-none placeholder:text-gray-400"
                       style={{ WebkitAppearance: "none", appearance: "none" }}
                     />
                   </div>
@@ -374,12 +381,12 @@ const TimelineController: React.FC<TimelineControllerProps> = ({
               </div>
 
               {/* Compare & Reset */}
-              <div className="flex items-center gap-2 -mt-2">
+              <div className="flex items-center gap-2 mt-1">
                 <button
                   onClick={() => { 
                   if (onCompare && startDate && endDate) onCompare(startDate, endDate);
                    }}
-                  className="flex items-center justify-center w-[81px] h-[24px] cursor-pointer rounded-[7px] text-white bg-[var(--color-main-primary)] hover:bg-[#4e43c6] text-sm"
+                  className="flex items-center justify-center flex-1 h-[28px] cursor-pointer rounded-[6px] text-white bg-[var(--color-main-primary)] hover:bg-[#4e43c6] text-sm font-medium transition-colors"
                 >
                   Compare
                 </button>
@@ -388,9 +395,9 @@ const TimelineController: React.FC<TimelineControllerProps> = ({
                     setStartDate("");
                     setEndDate("");
                   }}
-                  className="flex items-center justify-center w-[24px] h-[24px] bg-white border rounded-[5px] shadow-sm text-[#425466]"
+                  className="flex items-center justify-center w-[28px] h-[28px] bg-white border border-gray-300 rounded-[6px] shadow-sm text-[#425466] hover:bg-gray-50 transition-colors"
                 >
-                  <AiOutlineReload width={12.25} height={10.5} />
+                  <AiOutlineReload size={12} />
                 </button>
               </div>
             </div>

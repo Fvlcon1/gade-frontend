@@ -8,10 +8,9 @@ interface ComparisonSliderProps {
   sidebarExpanded: boolean;
   position: number;
   setPosition: (pos: number) => void;
-  onExit: () => void;
 }
 
-const ComparisonSlider: React.FC<ComparisonSliderProps> = ({ isVisible, sidebarExpanded, position, setPosition, onExit }) => {
+const ComparisonSlider: React.FC<ComparisonSliderProps> = ({ isVisible, sidebarExpanded, position, setPosition }) => {
   const [dragging, setDragging] = useState(false);
 
   const handleMouseMove = (e: MouseEvent) => {
@@ -71,13 +70,7 @@ const ComparisonSlider: React.FC<ComparisonSliderProps> = ({ isVisible, sidebarE
         <FaArrowsAltH className="text-[#6060D0]" />
       </div>
       {/* Close button */}
-      <button
-        onClick={onExit}
-        className="absolute top-2 right-2 bg-white border border-gray-300 rounded-full w-7 h-7 flex items-center justify-center shadow hover:bg-gray-100 z-10"
-        title="Exit comparison"
-      >
-        <span className="text-lg text-gray-500">×</span>
-      </button>
+     
     </motion.div>
   );
 };

@@ -1,9 +1,15 @@
 import { MapLayerStyle } from './types';
 
+const now = new Date();
+const currentYear = now.getFullYear();
+const currentMonth = now.getMonth();
+const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+
+
 export const BASEMAP_URLS = {
   osm: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
   satellite: "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
-  planet: `https://tiles.planet.com/basemaps/v1/planet-tiles/global_monthly_2023_01_mosaic/gmap/{z}/{x}/{y}.png?api_key=${process.env.NEXT_PUBLIC_PL_KEY}`,
+  planet: `https://tiles.planet.com/basemaps/v1/planet-tiles/global_monthly_${currentYear}_${String(prevMonth + 1).padStart(2, '0')}_mosaic/gmap/{z}/{x}/{y}.png?api_key=${process.env.NEXT_PUBLIC_PL_KEY}`,
 };
 
 export const LAYER_STYLES: Record<string, MapLayerStyle> = {
@@ -49,9 +55,9 @@ export const HIGHLIGHT_STYLE: Record<string, MapLayerStyle> = {
   },
   admin: {
     color: "#FFFF00",
-    weight: 2,
-    opacity: 0.6,
-    fillOpacity: 0.1,
+    weight: 2.5,
+    opacity: 0.9,
+    fillOpacity: 0.0,
   },
   rivers: {
     color: "#29B6F6",

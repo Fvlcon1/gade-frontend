@@ -80,7 +80,7 @@ const BottomTimeline: React.FC<BottomTimelineProps> = ({
 
   return (
     <div
-      className="absolute bottom-10 z-[1002] bg-white/50 backdrop-blur-sm shadow-lg rounded-4xl border border-gray-200 w-full max-w-[600px] sm:max-w-[60vw]"
+      className="absolute bottom-10 z-[1002] bg-white/80 backdrop-blur-sm shadow-lg rounded-4xl border border-gray-200 w-full max-w-[600px] sm:max-w-[60vw]"
       style={{ left: "50%", transform: "translateX(-50%)" }}
     >
       <div className="h-full flex flex-col justify-center items-center px-4 sm:px-6 py-3 gap-1.5">

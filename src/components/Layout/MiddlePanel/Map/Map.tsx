@@ -57,6 +57,12 @@ const Map = () => {
             { id: 'forest', label: 'Forest Reserves', checked: true },
             { id: 'admin', label: 'Districts', checked: true },        
           ]}
+          timelineMode={null}
+          onTimelineModeChange={() => {}}
+          sidebarExpanded={false}
+          timelineRange={[0, 11]}
+          onTimelineRangeChange={() => {}}
+          selectedYear={new Date().getFullYear()}
         />
       </div>
     </div>
