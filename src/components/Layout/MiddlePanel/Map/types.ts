@@ -8,14 +8,18 @@ export interface MapContainerProps {
   mapRef: React.RefObject<any>;
   activeBasemap: string;
   activeFeatureLayers: Layer[];
-  timelineMode?: 'timeline' | 'comparison' | null;
-  onTimelineModeChange?: (mode: 'timeline' | 'comparison' | null) => void;
-  sidebarExpanded?: boolean;
-  timelineRange?: [number, number];
-  onTimelineRangeChange?: (index: number, value: number) => void;
-  selectedYear?: number;
+  timelineMode: 'timeline' | 'comparison' | null;
+  onTimelineModeChange: (mode: 'timeline' | 'comparison' | null) => void;
+  sidebarExpanded: boolean;
+  timelineRange: [number, number];
+  onTimelineRangeChange: (index: number, value: number) => void;
+  selectedYear: number;
   playhead?: number | null;
   isPlaying?: boolean;
+  comparisonActive?: boolean;
+  comparisonStartDate?: string | null;
+  comparisonEndDate?: string | null;
+  onExitComparison?: () => void;
 }
 
 export interface LayerProps {

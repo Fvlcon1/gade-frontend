@@ -41,6 +41,9 @@ const Page = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [playhead, setPlayhead] = useState<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [comparisonActive, setComparisonActive] = useState(false);
+  const [comparisonStartDate, setComparisonStartDate] = useState<string | null>(null);
+  const [comparisonEndDate, setComparisonEndDate] = useState<string | null>(null);
 
   useEffect(() => {
     setupReportsRefresh();
@@ -152,6 +155,13 @@ const Page = () => {
     setPlayhead(null);
   }, []);
 
+  const handleCompare = (start: string, end: string) => {
+    setComparisonStartDate(start);
+    setComparisonEndDate(end);
+    setComparisonActive(true);
+    setTimelineMode('comparison');
+  };
+
   const floatingNavLeft = sidebarExpanded ? "232px" : "72px";
 
   return (
@@ -169,6 +179,9 @@ const Page = () => {
           selectedYear={selectedYear}
           playhead={playhead}
           isPlaying={isPlaying}
+          comparisonActive={comparisonActive}
+          comparisonStartDate={comparisonStartDate}
+          comparisonEndDate={comparisonEndDate}
         />
       )}
 
@@ -243,6 +256,7 @@ const Page = () => {
           onPause={handlePause}
           onPlayheadChange={handlePlayheadChange}
           onReset={handleResetTimeline}
+          onCompare={handleCompare}
         />
       )}
 
@@ -272,10 +286,6 @@ const Page = () => {
         </div>
       </div>
 
-      {/* Comparison Slider Overlay */}
-      <ComparisonSlider isVisible={showTimeline && timelineMode === 'comparison'} sidebarExpanded={sidebarExpanded} />
-
-     
     </div>
   );
 };

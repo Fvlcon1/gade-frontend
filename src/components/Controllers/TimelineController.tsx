@@ -7,6 +7,24 @@ import { motion } from "framer-motion";
 import Text from "@styles/components/text";
 import theme from "@styles/theme";
 
+interface TimelineControllerProps {
+  isOpen: boolean;
+  onClose: () => void;
+  sidebarExpanded?: boolean;
+  onModeChange: (mode: 'timeline' | 'comparison') => void;
+  range: [number, number];
+  onRangeChange: (index: number, value: number) => void;
+  selectedYear: number;
+  onYearChange: (year: number) => void;
+  playhead?: number | null;
+  isPlaying?: boolean;
+  onPlay?: () => void;
+  onPause?: () => void;
+  onPlayheadChange?: (playhead: number) => void;
+  onReset?: () => void;
+  onCompare?: (startDate: string, endDate: string) => void;
+}
+
 const getLastSixMonths = () => {
   const now = new Date();
   const months = [];
@@ -17,7 +35,7 @@ const getLastSixMonths = () => {
   return months;
 };
 
-const TimelineController = ({ 
+const TimelineController: React.FC<TimelineControllerProps> = ({ 
   isOpen, 
   onClose, 
   sidebarExpanded = false, 
@@ -30,7 +48,9 @@ const TimelineController = ({
   isPlaying,
   onPlay,
   onPause,
-  onPlayheadChange
+  onPlayheadChange,
+  onReset,
+  onCompare
 }) => {
   const months = getLastSixMonths();
   const [activeTab, setActiveTab] = useState('timeline');
@@ -81,6 +101,9 @@ const TimelineController = ({
     }
     if (onPause) {
       onPause();
+    }
+    if (onReset) {
+      onReset();
     }
   };
 
@@ -353,7 +376,9 @@ const TimelineController = ({
               {/* Compare & Reset */}
               <div className="flex items-center gap-2 -mt-2">
                 <button
-                  onClick={() => console.log("Compare", startDate, endDate)}
+                  onClick={() => { 
+                  if (onCompare && startDate && endDate) onCompare(startDate, endDate);
+                   }}
                   className="flex items-center justify-center w-[81px] h-[24px] cursor-pointer rounded-[7px] text-white bg-[var(--color-main-primary)] hover:bg-[#4e43c6] text-sm"
                 >
                   Compare

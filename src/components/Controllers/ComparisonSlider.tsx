@@ -1,70 +1,83 @@
 "use client";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FaArrowsAltH } from "react-icons/fa";
 
-const ComparisonSlider = ({ isVisible, sidebarExpanded }) => {
-  const [position, setPosition] = useState("50%");
+interface ComparisonSliderProps {
+  isVisible: boolean;
+  sidebarExpanded: boolean;
+  position: number;
+  setPosition: (pos: number) => void;
+  onExit: () => void;
+}
+
+const ComparisonSlider: React.FC<ComparisonSliderProps> = ({ isVisible, sidebarExpanded, position, setPosition, onExit }) => {
   const [dragging, setDragging] = useState(false);
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e: MouseEvent) => {
     if (!dragging) return;
     const screenWidth = window.innerWidth;
     const sidebarWidth = sidebarExpanded ? 232 : 72;
-    let newPosition = (e.clientX / screenWidth) * 100;
-
-    if (e.clientX < sidebarWidth + 40) newPosition = ((sidebarWidth + -10) / screenWidth) * 100;
-    if (e.clientX > screenWidth - 40) newPosition = ((screenWidth - -10) / screenWidth) * 100;
-
-    setPosition(`${newPosition}%`);
+    let newPosition = (e.clientX / screenWidth);
+    // Clamp between 0 and 1
+    newPosition = Math.max(0, Math.min(1, newPosition));
+    setPosition(newPosition);
   };
 
   const handleMouseUp = () => {
     setDragging(false);
-    setPosition("50%"); 
   };
 
-  const handleMouseDown = (e) => {
-    e.preventDefault(); 
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
     setDragging(true);
   };
 
   useEffect(() => {
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
+    if (dragging) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    } else {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    }
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [dragging, sidebarExpanded]);
+  }, [dragging]);
 
   useEffect(() => {
-    if (!isVisible) setPosition("50%");
-  }, [isVisible]);
+    if (!isVisible) setPosition(0.5);
+  }, [isVisible, setPosition]);
 
   if (!isVisible) return null;
 
   return (
     <motion.div
       className="absolute top-0 h-full z-[1000] select-none"
-      animate={{ left: position }}
+      animate={{ left: `${position * 100}%` }}
       transition={{ duration: 0.1 }}
     >
-      
-
-      
+      {/* Overlay for right side */}
       <div className="absolute top-0 left-full h-full w-screen bg-black/10 pointer-events-none" />
-
-      
+      {/* Vertical slider line */}
       <div className="w-[2px] h-full bg-white/60 translate-x-[-1px]" />
-
-      
+      {/* Drag handle */}
       <div
         onMouseDown={handleMouseDown}
         className="absolute top-[50%] left-[-20px] w-[40px] h-[40px] rounded-full bg-white border border-gray-300 shadow-md flex items-center justify-center cursor-col-resize -translate-y-1/2"
       >
         <FaArrowsAltH className="text-[#6060D0]" />
       </div>
+      {/* Close button */}
+      <button
+        onClick={onExit}
+        className="absolute top-2 right-2 bg-white border border-gray-300 rounded-full w-7 h-7 flex items-center justify-center shadow hover:bg-gray-100 z-10"
+        title="Exit comparison"
+      >
+        <span className="text-lg text-gray-500">×</span>
+      </button>
     </motion.div>
   );
 };
