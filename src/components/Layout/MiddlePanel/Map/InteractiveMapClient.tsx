@@ -203,19 +203,22 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
   mapRef, 
   activeBasemap = 'osm', 
   activeFeatureLayers,
-  timelineMode = null,
+  timelineMode = 'timeline',
   onTimelineModeChange,
   sidebarExpanded = false,
   timelineRange = [0, 11],
   onTimelineRangeChange,
   selectedYear = new Date().getFullYear(),
-  playhead = null,
-  isPlaying = false
+  playhead: externalPlayhead = null,
+  isPlaying: externalIsPlaying = false
 }) => {
   const { reports, fetchReports, applyFilters } = useSpatialStore();
+
   const searchParams = useSearchParams();
 
   const [currentBasemap, setCurrentBasemap] = useState(activeBasemap);
+  const [playhead, setPlayhead] = useState(externalPlayhead);
+  const [isPlaying, setIsPlaying] = useState(externalIsPlaying);
 
   useEffect(() => {
     if (activeBasemap !== currentBasemap) {
@@ -223,21 +226,33 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
     }
   }, [activeBasemap, currentBasemap]);
 
-  // Fetch reports on mount to ensure data is available
+  // Sync external playhead and isPlaying
+  useEffect(() => {
+    setPlayhead(externalPlayhead);
+    setIsPlaying(externalIsPlaying);
+  }, [externalPlayhead, externalIsPlaying]);
+
+  // Fetch reports on mount
   useEffect(() => {
     fetchReports();
   }, [fetchReports]);
 
   // Timeline play filtering
   useEffect(() => {
-    if (timelineMode === 'timeline' && isPlaying && playhead != null) {
-      applyFilters({ year: selectedYear, playhead, range: timelineRange });
+    if (timelineMode === 'timeline') {
+      if (isPlaying && playhead != null) {
+        applyFilters({ year: selectedYear, playhead, range: timelineRange });
+      } else {
+        // Reset to show all data within range when not playing
+        applyFilters({ year: selectedYear, range: timelineRange });
+      }
     } else {
-      applyFilters();
+      applyFilters(); // Apply district/date range filters when not in timeline mode
     }
   }, [timelineMode, isPlaying, playhead, selectedYear, timelineRange, applyFilters]);
 
   const initialView = useMemo(() => {
+    const searchParams = new URLSearchParams(window.location.search);
     const lat = searchParams.get('lat');
     const lon = searchParams.get('lon');
     const zoom = searchParams.get('zoom');
@@ -253,12 +268,28 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
       center: [5.6570, -2.1478] as [number, number],
       zoom: 9.2,
     };
-  }, [searchParams]);
+  }, []);
 
   const handleCloseTimeline = () => {
     if (onTimelineModeChange) {
       onTimelineModeChange(null);
     }
+    setIsPlaying(false);
+  };
+
+  const handlePlay = () => {
+    setIsPlaying(true);
+    if (playhead == null || playhead >= timelineRange[1]) {
+      setPlayhead(timelineRange[0]);
+    }
+  };
+
+  const handlePause = () => {
+    setIsPlaying(false);
+  };
+
+  const handlePlayheadChange = (newPlayhead: number) => {
+    setPlayhead(newPlayhead);
   };
 
   return (
@@ -280,7 +311,6 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
         <MouseCoordinateDisplay />
       </MapContainer>
 
-      {/* Bottom Timeline Components */}
       <BottomTimeline 
         isVisible={timelineMode === 'timeline'} 
         onClose={handleCloseTimeline}
@@ -288,6 +318,8 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
         range={timelineRange}
         onRangeChange={onTimelineRangeChange}
         selectedYear={selectedYear}
+        playhead={playhead}
+        isPlaying={isPlaying}
       />
     </>
   );

@@ -96,13 +96,6 @@ const Page = () => {
     }
   }, [timelineRange, isPlaying]);
 
-  // When playing, update the timeline's right handle to match playhead
-  useEffect(() => {
-    if (isPlaying && playhead != null) {
-      setTimelineRange(([from, _]) => [from, playhead]);
-    }
-  }, [isPlaying, playhead]);
-
   const handlePause = useCallback(() => {
     setIsPlaying(false);
     setPlayhead(null);

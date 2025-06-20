@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 
 interface BottomTimelineProps {
   isVisible: boolean;
@@ -28,8 +28,55 @@ const BottomTimeline: React.FC<BottomTimelineProps> = ({
   isPlaying = false
 }) => {
   const months = getMonths();
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [dragging, setDragging] = useState<null | 0 | 1>(null);
+
+  const getPositionValue = (e: MouseEvent | React.MouseEvent) => {
+    const track = trackRef.current;
+    if (!track) return 0;
+    const rect = track.getBoundingClientRect();
+    const x = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
+    const ratio = x / rect.width;
+    return Math.round(ratio * (months.length - 1));
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (dragging === null || isPlaying) return;
+    const value = getPositionValue(e);
+    onRangeChange(dragging, value);
+  };
+
+  const handleMouseUp = () => {
+    setDragging(null);
+  };
+
+  const handleTrackClick = (e: React.MouseEvent) => {
+    if (isPlaying) return;
+    const clickedValue = getPositionValue(e);
+    const distanceToStart = Math.abs(clickedValue - range[0]);
+    const distanceToEnd = Math.abs(clickedValue - range[1]);
+    const closestIndex = distanceToStart <= distanceToEnd ? 0 : 1;
+    onRangeChange(closestIndex, clickedValue);
+  };
+
+  useEffect(() => {
+    if (dragging !== null) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    } else {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    }
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [dragging]);
 
   if (!isVisible) return null;
+
+  const leftPercent = (range[0] / (months.length - 1)) * 100;
+  const rightPercent = (range[1] / (months.length - 1)) * 100;
 
   return (
     <div
@@ -39,80 +86,53 @@ const BottomTimeline: React.FC<BottomTimelineProps> = ({
       <div className="h-full flex flex-col justify-center items-center px-4 sm:px-6 py-3 gap-1.5">
         {/* Timeline Slider */}
         <div className="w-full">
-          <div className="relative h-2 bg-gray-100 rounded-lg flex items-center w-full">
+          <div
+            className="relative h-2 bg-gray-100 rounded-lg w-full cursor-pointer"
+            ref={trackRef}
+            onClick={handleTrackClick}
+          >
             {/* Active Range */}
             <div
               className="absolute h-2 bg-[#635bff] rounded-full"
               style={{
-                left: `${(range[0] / (months.length - 1)) * 100}%`,
-                width: `${((range[1] - range[0]) / (months.length - 1)) * 100}%`,
-                top: "50%",
-                transform: "translateY(-50%)",
+                left: `${leftPercent}%`,
+                width: `${rightPercent - leftPercent}%`,
+                top: "0",
               }}
             />
 
-            {/* Range Inputs */}
-            <input
-              type="range"
-              min={0}
-              max={months.length - 1}
-              value={range[0]}
-              onChange={(e) => onRangeChange(0, parseInt(e.target.value))}
-              className="absolute w-full h-full top-0 left-0 appearance-none bg-transparent z-20 pointer-events-auto cursor-pointer"
-              style={{ WebkitAppearance: 'none', appearance: 'none' }}
-              disabled={isPlaying}
-            />
-            <input
-              type="range"
-              min={0}
-              max={months.length - 1}
-              value={range[1]}
-              onChange={(e) => onRangeChange(1, parseInt(e.target.value))}
-              className="absolute w-full h-full top-0 left-0 appearance-none bg-transparent z-30 pointer-events-auto cursor-pointer"
-              style={{ WebkitAppearance: 'none', appearance: 'none' }}
-              disabled={isPlaying}
+            {/* Thumb Start */}
+            <div
+              onMouseDown={() => !isPlaying && setDragging(0)}
+              className="absolute top-1/2 w-4 h-4 bg-[#635bff] border-2 border-white rounded-full shadow-md -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10"
+              style={{
+                left: `${leftPercent}%`,
+              }}
             />
 
-            {/* Custom Thumb Styles */}
-            <style jsx>{`
-              input[type="range"]::-webkit-slider-thumb {
-                -webkit-appearance: none;
-                height: 18px;
-                width: 18px;
-                background: #635bff;
-                border: 3px solid white;
-                border-radius: 50%;
-                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-                cursor: pointer;
-                transition: all 0.2s ease;
-              }
+            {/* Thumb End */}
+            <div
+              onMouseDown={() => !isPlaying && setDragging(1)}
+              className="absolute top-1/2 w-4 h-4 bg-[#635bff] border-2 border-white rounded-full shadow-md -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10"
+              style={{
+                left: `${rightPercent}%`,
+              }}
+            />
 
-              input[type="range"]::-webkit-slider-thumb:hover {
-                transform: scale(1.1);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-              }
-
-              input[type="range"]::-moz-range-thumb {
-                height: 18px;
-                width: 18px;
-                background: #635bff;
-                border: 3px solid white;
-                border-radius: 50%;
-                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-                cursor: pointer;
-                transition: all 0.2s ease;
-              }
-
-              input[type="range"]::-moz-range-thumb:hover {
-                transform: scale(1.1);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-              }
-            `}</style>
+            {/* Playhead */}
+            {playhead != null && (
+              <div
+                className="absolute top-1/2 bg-[#ff5733] w-0.5 h-full -translate-y-1/2"
+                style={{
+                  left: `${(playhead / (months.length - 1)) * 100}%`,
+                }}
+              />
+            )}
           </div>
         </div>
 
         {/* Month Labels */}
-        <div className="w-full flex justify-between text-xs text-gray-500 px-1">
+        <div className="w-full flex justify-between text-xs text-gray-500 px-1 mt-1">
           {months.map((month, index) => (
             <span
               key={index}
@@ -125,7 +145,6 @@ const BottomTimeline: React.FC<BottomTimelineProps> = ({
               }`}
             >
               {month}
-              {/* Playhead indicator */}
               {isPlaying && playhead === index && (
                 <span className="block w-1 h-1 mx-auto mt-0.5 rounded-full bg-[#635bff]" />
               )}

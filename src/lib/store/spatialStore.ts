@@ -106,8 +106,7 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
   applyFilters: (options = {}) => {
     const { miningSites, districts, selectedDistricts, dateRange } = get();
     if (!miningSites || !districts) return;
-
-    // Timeline play filtering
+  
     const { year, playhead, range } = options;
     let fromMonth = 0, toMonth = 11;
     if (range) {
@@ -115,33 +114,34 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
       toMonth = range[1];
     }
     let playheadMonth = playhead != null ? playhead : toMonth;
-
-    // Helper to get YYYY-MM for a month index
-    const getMonthString = (y, m) => `${y}-${String(m + 1).padStart(2, '0')}`;
-
+  
     const filteredMiningSites = {
       ...miningSites,
       features: miningSites.features.filter(feature => {
         const matchesDistrict = selectedDistricts.length === 0 || 
           selectedDistricts.includes(feature.properties.district);
+        
         let matchesDate = true;
         if (year != null && playhead != null) {
-          // Only show sites detected up to the playhead month in the selected year
           const detected = feature.properties.detected_date;
           if (!detected) return false;
+          
           const detectedYear = Number(detected.slice(0, 4));
           const detectedMonth = Number(detected.slice(5, 7)) - 1;
-          // Only show if detected in selected year and up to playhead month
-          matchesDate = detectedYear === year && detectedMonth <= playheadMonth && detectedMonth >= fromMonth;
+          
+          matchesDate = detectedYear === year && 
+                       detectedMonth <= playheadMonth && 
+                       detectedMonth >= fromMonth &&
+                       detectedMonth <= toMonth;
         } else if (dateRange?.from && dateRange?.to) {
           matchesDate = feature.properties.detected_date >= dateRange.from && 
-                        feature.properties.detected_date <= dateRange.to;
+                       feature.properties.detected_date <= dateRange.to;
         }
+        
         return matchesDistrict && matchesDate;
       })
     };
-
-    // Filter districts based on selection
+  
     const filteredDistricts = {
       ...districts,
       features: districts.features.filter(feature => 
@@ -149,10 +149,10 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
         selectedDistricts.includes(feature.properties.district)
       )
     };
-
+  
+    console.log('Filtered Mining Sites:', filteredMiningSites.features.length);
     set({ filteredMiningSites, filteredDistricts });
   },
-
   fetchReports: async () => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL;
     if (!baseUrl) {

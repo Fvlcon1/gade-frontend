@@ -51,6 +51,8 @@ const ComparisonSlider = ({ isVisible, sidebarExpanded }) => {
       transition={{ duration: 0.1 }}
     >
       
+
+      
       <div className="absolute top-0 left-full h-full w-screen bg-black/10 pointer-events-none" />
 
       

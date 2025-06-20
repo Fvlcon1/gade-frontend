@@ -10,7 +10,7 @@ import theme from "@styles/theme";
 const getLastSixMonths = () => {
   const now = new Date();
   const months = [];
-  for (let i = 5; i >= 0; i--) {
+  for (let i = 11; i >= 0; i--) {
     const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
     months.push(date.toLocaleString("default", { month: "short" }));
   }
@@ -33,7 +33,7 @@ const TimelineController = ({
   onPlayheadChange
 }) => {
   const months = getLastSixMonths();
-  const [activeTab, setActiveTab] = useState('timeline'); // 'timeline' or 'comparison'
+  const [activeTab, setActiveTab] = useState('timeline');
   const [range, setRange] = useState(externalRange || [0, months.length - 1]);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [startDate, setStartDate] = useState("");
@@ -76,7 +76,12 @@ const TimelineController = ({
       externalOnRangeChange(0, 0);
       externalOnRangeChange(1, months.length - 1);
     }
-    if (onPause) onPause();
+    if (onPlayheadChange) {
+      onPlayheadChange(0);
+    }
+    if (onPause) {
+      onPause();
+    }
   };
 
   const handlePlayClick = () => {
@@ -118,21 +123,30 @@ const TimelineController = ({
       return;
     }
 
+    // If we've reached the end of the range
     if (playhead >= range[1]) {
       handleReset();
       return;
     }
 
+    // Clear any existing timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
 
+    // Schedule next update
     timeoutRef.current = setTimeout(() => {
-      if (onPlayheadChange) {
-        onPlayheadChange(playhead + 1);
+      const nextPlayhead = playhead + 1;
+      if (nextPlayhead <= range[1]) {
+        if (onPlayheadChange) {
+          onPlayheadChange(nextPlayhead);
+        }
+      } else {
+        handleReset();
       }
     }, 800);
 
+    // Cleanup function
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
@@ -148,6 +162,12 @@ const TimelineController = ({
       setRange(newRange);
       if (externalOnRangeChange) {
         externalOnRangeChange(index, value);
+      }
+      // Ensure playhead stays within new range
+      if (playhead != null && (playhead < newRange[0] || playhead > newRange[1])) {
+        if (onPlayheadChange) {
+          onPlayheadChange(newRange[0]);
+        }
       }
     }
   };
@@ -174,7 +194,7 @@ const TimelineController = ({
           onClick={() => handleTabChange('timeline')}
           className={`flex-1 flex items-center justify-center gap-2 py-2 cursor-pointer px-3 text-sm font-medium transition-colors ${
             activeTab === 'timeline'
-              ? 'bg-[#635bff] text-white'
+              ? 'bg-[var(--color-main-primary)] text-white'
               : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
           }`}
         >
@@ -185,7 +205,7 @@ const TimelineController = ({
           onClick={() => handleTabChange('comparison')}
           className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 text-sm font-medium transition-colors ${
             activeTab === 'comparison'
-              ? 'bg-[#635bff] text-white'
+              ? 'bg-[var(--color-main-primary)] text-white'
               : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
           }`}
         >
@@ -236,11 +256,10 @@ const TimelineController = ({
               <div className="flex items-center gap-2 mb-3">
                 <button
                   onClick={handlePlayClick}
-                  disabled={isPlaying}
                   className={`flex items-center justify-center gap-1 px-3 py-1.5 text-white text-xs leading-none rounded transition-all duration-200 ${
                     isPlaying
-                      ? "bg-gray-300 cursor-not-allowed"
-                      : "bg-[#635bff] hover:bg-[#5148d4]"
+                      ? "bg-[var(--color-main-primary)] hover:bg-[#5148d4]"
+                      : "bg-[var(--color-main-primary)] hover:bg-[#5148d4]"
                   }`}
                 >
                   {isPlaying ? <FaPause size={10} /> : <FaPlay size={10} />}
