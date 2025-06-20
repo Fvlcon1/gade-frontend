@@ -37,6 +37,7 @@ const Page = () => {
   const [activeFeatureLayers, setActiveFeatureLayers] = useState<Layer[]>(initialLayers.filter(layer => layer.checked));
   const [timelineMode, setTimelineMode] = useState<'timeline' | 'comparison' | null>(null);
   const [timelineRange, setTimelineRange] = useState<[number, number]>([0, 11]);
+  const [lastUserRange, setLastUserRange] = useState<[number, number]>([0, 11]);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [playhead, setPlayhead] = useState<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -74,11 +75,12 @@ const Page = () => {
       const newRange = [...prev] as [number, number];
       newRange[index] = value;
       if (newRange[0] <= newRange[1]) {
+        if (!isPlaying) setLastUserRange(newRange);
         return newRange;
       }
       return prev;
     });
-  }, []);
+  }, [isPlaying]);
 
   const handleYearChange = useCallback((year: number) => {
     setSelectedYear(year);
@@ -95,6 +97,14 @@ const Page = () => {
       setPlayhead(timelineRange[0]);
     }
   }, [timelineRange, isPlaying]);
+
+  // Restore last user-set range after play ends
+  useEffect(() => {
+    if (!isPlaying && playhead === null) {
+      setTimelineRange(lastUserRange);
+    }
+    // eslint-disable-next-line
+  }, [isPlaying, playhead, lastUserRange]);
 
   const handlePause = useCallback(() => {
     setIsPlaying(false);
@@ -134,6 +144,13 @@ const Page = () => {
       setPlayhead(null);
     }
   };
+
+  const handleResetTimeline = useCallback(() => {
+    setTimelineRange([0, 11]);
+    setLastUserRange([0, 11]);
+    setIsPlaying(false);
+    setPlayhead(null);
+  }, []);
 
   const floatingNavLeft = sidebarExpanded ? "232px" : "72px";
 
@@ -225,6 +242,7 @@ const Page = () => {
           onPlay={handlePlay}
           onPause={handlePause}
           onPlayheadChange={handlePlayheadChange}
+          onReset={handleResetTimeline}
         />
       )}
 

@@ -17,7 +17,7 @@ import ReportsLayer from "./ReportsLayer";
 import ReportZoomHandler from "./ReportZoomHandler";
 import BottomTimeline from "./BottomTimeline";
 
-const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers }) => {
+const MapLayers: React.FC<LayerProps & { playhead: number | null }> = ({ activeBasemap, activeFeatureLayers, playhead }) => {
   const { 
     filteredMiningSites,
     filteredDistricts,
@@ -152,7 +152,7 @@ const MapLayers: React.FC<LayerProps> = ({ activeBasemap, activeFeatureLayers })
             if (layer.id === 'mining_sites') {
               return (
                 <GeoJSON
-                  key={`${layer.id}-${selectedDistricts.join(',')}-${dateRange?.from || ''}-${dateRange?.to || ''}`}
+                  key={`${layer.id}-${selectedDistricts.join(',')}-${dateRange?.from || ''}-${dateRange?.to || ''}-${data.features.length}-${playhead ?? ''}`}
                   data={data}
                   style={LAYER_STYLES[layer.id]}
                   onEachFeature={(feature, leafletLayer) => {
@@ -306,7 +306,7 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
           url={BASEMAP_URLS[currentBasemap]}
           attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        <MapLayers activeBasemap={currentBasemap} activeFeatureLayers={activeFeatureLayers} />
+        <MapLayers activeBasemap={currentBasemap} activeFeatureLayers={activeFeatureLayers} playhead={playhead} />
         <ReportZoomHandler reports={reports} searchParams={searchParams} />
         <MouseCoordinateDisplay />
       </MapContainer>
