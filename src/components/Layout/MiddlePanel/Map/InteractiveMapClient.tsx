@@ -1,6 +1,6 @@
 "use client";
-import React, { useMemo, useState, useEffect } from "react";
-import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
+import React, { useMemo, useState, useEffect, useRef } from "react";
+import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
@@ -203,6 +203,26 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
   );
 };
 
+// Component to sync map events between comparison maps
+const MapSynchronizer: React.FC<{ targetMap: any }> = ({ targetMap }) => {
+  const map = useMap();
+  
+  useMapEvents({
+    zoom: () => {
+      if (targetMap && targetMap.current) {
+        targetMap.current.setZoom(map.getZoom());
+      }
+    },
+    move: () => {
+      if (targetMap && targetMap.current) {
+        targetMap.current.setView(map.getCenter(), map.getZoom());
+      }
+    }
+  });
+  
+  return null;
+};
+
 const InteractiveMapClient: React.FC<MapContainerProps> = ({ 
   mapRef, 
   activeBasemap = 'osm', 
@@ -327,85 +347,126 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
     return `https://tiles.planet.com/basemaps/v1/planet-tiles/global_monthly_${year}_${monthStr}_mosaic/gmap/{z}/{x}/{y}.png?api_key=${process.env.NEXT_PUBLIC_PL_KEY}`;
   };
 
+  // Helper function for planet URLs in comparison
+  const getPlanetUrlForMonth = (dateString: string) => {
+    if (!dateString) return BASEMAP_URLS.planet;
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const monthStr = String(month + 1).padStart(2, '0');
+    return `https://tiles.planet.com/basemaps/v1/planet-tiles/global_monthly_${year}_${monthStr}_mosaic/gmap/{z}/{x}/{y}.png?api_key=${process.env.NEXT_PUBLIC_PL_KEY}`;
+  };
+
+  const topMapRef = useRef(null);
+
   return (
     <>
       <style>{TOOLTIP_STYLES}</style>
-      <MapContainer
-        ref={mapRef}
-        center={initialView.center}
-        zoom={initialView.zoom}
-        zoomControl={false}
-        className="w-full h-full"
-      >
-        <TileLayer
-          url={currentBasemap === 'planet' ? getPlanetUrl() : BASEMAP_URLS[currentBasemap]}
-          attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
-        {/* Render mining sites for comparison if active */}
-        {comparisonActive && (
-          <>
-            {miningSitesLeft && (
-              <div style={{
-                position: 'absolute',
-                inset: 0,
-                pointerEvents: 'none',
-                zIndex: 401,
-              }}>
+      {/* Comparison mode - Split screen with two maps */}
+      {comparisonActive && timelineMode === 'comparison' && (
+        <>
+          {/* Bottom Map - Start Month */}
+          <div className="absolute inset-0 z-10">
+            <MapContainer
+              ref={mapRef}
+              center={initialView.center}
+              zoom={initialView.zoom}
+              zoomControl={false}
+              className="w-full h-full"
+            >
+              <TileLayer
+                url={getPlanetUrlForMonth(comparisonStartDate)}
+                attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              />
+              {/* Start month mining sites */}
+              {miningSitesLeft && (
                 <GeoJSON
-                  key={`comparison-left-${comparisonStartDate}`}
+                  key={`comparison-start-${comparisonStartDate}`}
                   data={miningSitesLeft}
                   style={{ ...LAYER_STYLES.mining_sites, opacity: 1, fillOpacity: 0.7 }}
                 />
-              </div>
-            )}
-            {miningSitesRight && (
-              <div style={{
-                position: 'absolute',
-                inset: 0,
-                pointerEvents: 'none',
-                zIndex: 402,
-                clipPath: `inset(0 0 0 ${Math.round((1 - comparisonSliderPosition) * 100)}%)`,
-                WebkitClipPath: `inset(0 0 0 ${Math.round((1 - comparisonSliderPosition) * 100)}%)`,
-                transition: 'clip-path 0.2s, -webkit-clip-path 0.2s',
-              }}>
+              )}
+              <ReportZoomHandler reports={reports} searchParams={searchParams} />
+              <MouseCoordinateDisplay />
+              <MapSynchronizer targetMap={topMapRef} />
+            </MapContainer>
+          </div>
+
+          {/* Top Map - End Month (masked by slider) */}
+          <div 
+            className="absolute inset-0 z-20 pointer-events-none"
+            style={{
+              clipPath: `inset(0 0 0 ${Math.round(comparisonSliderPosition * 100)}%)`,
+              WebkitClipPath: `inset(0 0 0 ${Math.round(comparisonSliderPosition * 100)}%)`,
+              transition: 'clip-path 0.2s, -webkit-clip-path 0.2s',
+            }}
+          >
+            <MapContainer
+              ref={topMapRef}
+              center={initialView.center}
+              zoom={initialView.zoom}
+              zoomControl={false}
+              className="w-full h-full"
+            >
+              <TileLayer
+                url={getPlanetUrlForMonth(comparisonEndDate)}
+                attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              />
+              {/* End month mining sites */}
+              {miningSitesRight && (
                 <GeoJSON
-                  key={`comparison-right-${comparisonEndDate}`}
+                  key={`comparison-end-${comparisonEndDate}`}
                   data={miningSitesRight}
                   style={{ ...LAYER_STYLES.mining_sites, opacity: 1, fillOpacity: 0.7 }}
                 />
-              </div>
-            )}
-          </>
-        )}
-        {/* Normal layers if not in comparison mode */}
-        {!comparisonActive && (
+              )}
+            </MapContainer>
+          </div>
+        </>
+      )}
+
+      {/* Normal single map mode */}
+      {!(comparisonActive && timelineMode === 'comparison') && (
+        <MapContainer
+          ref={mapRef}
+          center={initialView.center}
+          zoom={initialView.zoom}
+          zoomControl={false}
+          className="w-full h-full"
+        >
+          <TileLayer
+            url={currentBasemap === 'planet' ? getPlanetUrl() : BASEMAP_URLS[currentBasemap]}
+            attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          />
           <MapLayers activeBasemap={currentBasemap} activeFeatureLayers={activeFeatureLayers} playhead={playhead} timelineMode={timelineMode} />
-        )}
-        <ReportZoomHandler reports={reports} searchParams={searchParams} />
-        <MouseCoordinateDisplay />
-      </MapContainer>
+          <ReportZoomHandler reports={reports} searchParams={searchParams} />
+          <MouseCoordinateDisplay />
+        </MapContainer>
+      )}
 
       {/* Comparison slider overlay */}
-      {comparisonActive && (
+      {comparisonActive && timelineMode === 'comparison' && (
         <ComparisonSlider
           isVisible={comparisonActive}
           sidebarExpanded={sidebarExpanded}
           position={comparisonSliderPosition}
           setPosition={setComparisonSliderPosition}
-        
         />
       )}
-      {/* TODO: Wire up DualDateComparison UI and pass handleCompare to it */}
-      <BottomTimeline 
-        isVisible={timelineMode === 'timeline'} 
-        onClose={handleCloseTimeline}
-        sidebarExpanded={sidebarExpanded}
-        range={timelineRange}
-        onRangeChange={onTimelineRangeChange}
-        selectedYear={selectedYear}
-        playhead={playhead}
-        isPlaying={isPlaying}
-      />
+
+      {/* Bottom timeline - only show in timeline mode */}
+      {timelineMode === 'timeline' && (
+        <BottomTimeline 
+          isVisible={timelineMode === 'timeline'} 
+          onClose={handleCloseTimeline}
+          sidebarExpanded={sidebarExpanded}
+          range={timelineRange}
+          onRangeChange={onTimelineRangeChange}
+          selectedYear={selectedYear}
+          playhead={playhead}
+          isPlaying={isPlaying}
+        />
+      )}
     </>
   );
 };
