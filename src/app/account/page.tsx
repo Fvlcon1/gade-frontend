@@ -330,14 +330,6 @@ const AccountManagement = () => {
     setShowInviteModal(true);
   };
 
-  const handleDeleteClick = (user: User) => {
-    handleRemoveUser(user.id);
-  };
-
-  const handleEditClick = (user: User) => {
-    // TODO: Implement edit functionality
-    console.log('Edit user:', user);
-  };
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.user_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -385,7 +377,7 @@ const AccountManagement = () => {
     <div 
       className="flex flex-col flex-1 p-6 bg-gray-50 overflow-y-auto" 
       style={{ 
-        height: "calc(100vh - 64px)",
+        height: "100vh",
         scrollbarWidth: "thin",
         scrollbarColor: "#d1d5db #f3f4f6"
       }}

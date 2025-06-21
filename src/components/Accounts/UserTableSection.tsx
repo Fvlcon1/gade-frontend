@@ -496,9 +496,9 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
   ];
 
   return (
-    <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6 min-h-[calc(100vh-24rem)]">
-      <Tabs defaultValue="overview" className="h-full flex flex-col">
-        <TabsContent value="overview" className="flex-1 p-4 overflow-y-auto custom-scrollbar">
+    <div className="flex-1 bg-white rounded-xl shadow-sm border custom-scrollbar border-gray-200 overflow-hidden">
+      {/* <Tabs defaultValue="overview" className="h-full flex flex-col"> */}
+        {/* <TabsContent value="overview" className="flex-1 p-4 overflow-y-auto custom-scrollbar"> */}
           <UserTable 
             data={filteredUsers}
             columns={columns}
@@ -508,11 +508,7 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
             onRemoveUser={onRemoveUser}
             onInviteUser={onInviteUser}
           />
-        </TabsContent>
-        <TabsContent value="logs" className="flex-1 p-4 overflow-y-auto">
-          <div className="text-gray-500">Activity logs will be displayed here.</div>
-        </TabsContent>
-      </Tabs>
+ 
 
       {/* Loading Spinner */}
       {isMutating && (
