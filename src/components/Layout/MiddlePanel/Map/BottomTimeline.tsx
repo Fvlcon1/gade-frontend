@@ -122,9 +122,12 @@ const BottomTimeline: React.FC<BottomTimelineProps> = ({
             {/* Playhead */}
             {playhead != null && (
               <div
-                className="absolute top-1/2 bg-[#ff5733] w-0.5 h-full -translate-y-1/2"
+                className="absolute top-1/2 bg-[#ff5733] rounded-full"
                 style={{
                   left: `${(playhead / (months.length - 1)) * 100}%`,
+                  width: isPlaying ? "6px" : "2px",
+                  height: "100%",
+                  transform: "translateY(-50%)",
                 }}
               />
             )}
