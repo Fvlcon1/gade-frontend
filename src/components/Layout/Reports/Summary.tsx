@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { AiFillAlert } from "react-icons/ai";
-import { useSpatialStore } from '@/lib/store/spatialStore';
+import { useSpatialStore } from '@/lib/store/spatial-store';
 import Text, { Head1 } from '@/app/styles/components/text';
 import { TypographySize, TypographyBold } from '@/app/styles/style.types';
 import { IconReport, IconAlertCircle, IconClock, IconCheck } from "@tabler/icons-react";

@@ -6,7 +6,7 @@ import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
-import { useSpatialStore } from '@/lib/store/spatialStore';
+import { useSpatialStore } from '@/lib/store/spatial-store';
 import L from 'leaflet';
 import 'leaflet.markercluster';
 import { useSearchParams } from "next/navigation";
@@ -119,7 +119,7 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
 
       {error && (
         <div className="absolute top-4 right-[120px] bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-sm z-[1002] flex items-center gap-2">
-          <span className="text-sm text-red-500 font-medium">Error loading layers</span>
+          <span className="text-sm text-red-500 font-medium">Could not load layers</span>
         </div>
       )}
 
@@ -237,8 +237,7 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
   isPlaying: externalIsPlaying = false,
   comparisonActive,
   comparisonStartDate,
-  comparisonEndDate,
-  onExitComparison
+  comparisonEndDate
 }) => {
   const { reports, fetchReports, applyFilters, miningSites } = useSpatialStore();
 
@@ -324,21 +323,7 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
     setIsPlaying(false);
   };
 
-  const handlePlay = () => {
-    setIsPlaying(true);
-    if (playhead == null || playhead >= timelineRange[1]) {
-      setPlayhead(timelineRange[0]);
-    }
-  };
-
-  const handlePause = () => {
-    setIsPlaying(false);
-  };
-
-  const handlePlayheadChange = (newPlayhead: number) => {
-    setPlayhead(newPlayhead);
-  };
-
+ 
   // Dynamically update planet basemap URL with year and month for timeline
   const getPlanetUrl = () => {
     const year = selectedYear;

@@ -8,8 +8,7 @@ import type {
   SetupAccountRequest,
   SetupAccountResponse,
   User,
-  AccountRegistrationRequest,
-  PaginatedResponse,
+  AccountRegistrationRequest
 } from '@/types/auth';
 
 class ApiError extends Error {
@@ -33,7 +32,7 @@ class ApiClient {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+    this.baseUrl = API_BASE_URL;
   }
 
   private async request<T>(
@@ -128,6 +127,26 @@ class ApiClient {
         method: 'PATCH',
         body: JSON.stringify({ status }),
       }),
+  };
+
+  spatial = {
+    miningSites: () =>
+      this.request<any>('/data/mining-sites'),
+    districts: () =>
+      this.request<any>('/data/districts'),
+    forestReserves: () =>
+      this.request<any>('/data/forest-reserves'),
+    rivers: () =>
+      this.request<any>('/data/rivers'),
+    districtSearch: (searchTerm: string) =>
+      this.request<any>(`/data/districts/search?name=${encodeURIComponent(searchTerm)}`),
+  };
+
+  reports = {
+    list: (page: number = 1, pageSize: number = 10) =>
+      this.request<any>(`/admin/report?page_id=${page}&page_size=${pageSize}`),
+    all: () =>
+      this.request<any>(`/admin/report?page_id=1&page_size=1000`),
   };
 }
 

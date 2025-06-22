@@ -1,8 +1,8 @@
 import { create } from 'zustand';
-import { fetchSpatialData } from '@/hooks/spatial-data';
+import { apiClient } from '@/lib/api-client';
 import { useAuthStore } from '@/lib/store/auth-store';
 
-// Define SpatialData type
+// SpatialData type
 interface SpatialData {
   type: 'FeatureCollection';
   features: Array<{
@@ -39,7 +39,6 @@ interface ReportLocation {
   updated_at: string;
 }
 
-
 interface SpatialState {
   // Spatial data
   districts: SpatialData | null;
@@ -68,19 +67,6 @@ interface SpatialState {
   fetchAllData: () => Promise<void>;
   fetchReports: () => Promise<void>;
 }
-
-// Helper function to fetch reports
-const fetchReportsData = async (baseUrl: string): Promise<Report[]> => {
-  if (!baseUrl) {
-    throw new Error('API base URL is not configured');
-  }
-  const response = await fetch(`${baseUrl}/admin/report?page_id=1&page_size=1000`, {credentials: 'include'});
-  if (!response.ok) {
-    throw new Error('Failed to fetch reports');
-  }
-  const data = await response.json();
-  return data;
-};
 
 export const useSpatialStore = create<SpatialState>((set, get) => ({
   // Initial state
@@ -154,14 +140,8 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
     set({ filteredMiningSites, filteredDistricts });
   },
   fetchReports: async () => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-    if (!baseUrl) {
-      set({ error: 'API base URL is not configured' });
-      return;
-    }
-
     try {
-      const reports = await fetchReportsData(baseUrl);
+      const reports = await apiClient.reports.all();
       set({ 
         reports,
         reportsLastUpdated: Date.now(),
@@ -178,18 +158,13 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
   fetchAllData: async () => {
     set({ isLoading: true, error: null });
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-      if (!baseUrl) {
-        throw new Error('API base URL is not configured');
-      }
-
       // Fetch all data in parallel
       const [districts, forestReserves, rivers, miningSites, reports] = await Promise.all([
-        fetchSpatialData('/data/districts'),
-        fetchSpatialData('/data/forest-reserves'),
-        fetchSpatialData('/data/rivers'),
-        fetchSpatialData('/data/mining-sites'),
-        fetchReportsData(baseUrl)
+        apiClient.spatial.districts(),
+        apiClient.spatial.forestReserves(),
+        apiClient.spatial.rivers(),
+        apiClient.spatial.miningSites(),
+        apiClient.reports.all()
       ]);
 
       set({

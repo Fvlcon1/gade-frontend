@@ -4,13 +4,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactNode } from 'react';
 
 // Cache duration constants
-const FOUR_WEEKS_MS = 1000 * 60 * 60 * 24 * 28; // 4 weeks in milliseconds
+const MAX_SAFE_TIMEOUT = 2_147_483_647; // Maximum safe timeout for Node.js timers (~24.8 days)
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: FOUR_WEEKS_MS, // Data will be considered fresh for 4 weeks
-      gcTime: FOUR_WEEKS_MS, // Keep unused data in cache for 4 weeks
+      staleTime: MAX_SAFE_TIMEOUT, // Data will be considered fresh for max safe duration
+      gcTime: MAX_SAFE_TIMEOUT, // Keep unused data in cache for max safe duration
       refetchOnWindowFocus: false,
       refetchOnMount: false, // Don't refetch when component mounts if data exists
       refetchOnReconnect: false, // Don't refetch when reconnecting

@@ -9,7 +9,7 @@ import theme from "@styles/theme";
 import { useDistrictSearch } from '@/hooks/spatial-data';
 import { useDebounce } from 'react-use';
 import { Loader2 } from 'lucide-react';
-import { useSpatialStore } from '@/lib/store/spatialStore';
+import { useSpatialStore } from '@/lib/store/spatial-store';
 
 const DateRanges = ["Last month", "Last 2 months"];
 

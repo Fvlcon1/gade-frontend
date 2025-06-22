@@ -9,7 +9,7 @@ import Summary from '../../components/Layout/Reports/Summary';
 import FilterBar from '@components/Layout/Reports/FilterBar';
 import ReportList from '@components/Layout/Reports/ReportList';
 import ReportItem from '../../components/Layout/Reports/ReportItem';
-import { useSpatialStore, setupReportsRefresh, cleanupReportsRefresh } from '@/lib/store/spatialStore';
+import { useSpatialStore, setupReportsRefresh, cleanupReportsRefresh } from '@/lib/store/spatial-store';
 import { exportToCSV } from '@/utils/export';
 import { exportToPDF } from '@/utils/export';
 import { formatReportId } from '@/utils/format';

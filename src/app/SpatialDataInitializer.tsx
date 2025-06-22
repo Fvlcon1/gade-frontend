@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useSpatialStore, setupReportsRefresh, cleanupReportsRefresh } from '@/lib/store/spatialStore';
+import { useSpatialStore, setupReportsRefresh, cleanupReportsRefresh } from '@/lib/store/spatial-store';
 import { useAuthStore } from '@/lib/store/auth-store';
 
 const SpatialDataInitializer = () => {
