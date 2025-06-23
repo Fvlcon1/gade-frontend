@@ -42,7 +42,7 @@ const Page = () => {
   const [timelineRange, setTimelineRange] = useState<[number, number]>([0, currentMonth]);
   const [lastUserRange, setLastUserRange] = useState<[number, number]>([0, currentMonth]);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [playhead, setPlayhead] = useState<number | null>(null);
+  const [playhead, setPlayhead] = useState<number | null>(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [comparisonActive, setComparisonActive] = useState(false);
   const [comparisonStartDate, setComparisonStartDate] = useState<string | null>(null);
@@ -72,7 +72,7 @@ const Page = () => {
     setTimelineMode(mode);
     if (mode !== 'timeline') {
       setIsPlaying(false);
-      setPlayhead(null);
+      setPlayhead(0);
     }
   }, []);
 
@@ -114,7 +114,7 @@ const Page = () => {
 
   const handlePause = useCallback(() => {
     setIsPlaying(false);
-    setPlayhead(null);
+    setPlayhead(0);
   }, []);
 
   const handlePlayheadChange = useCallback((newPlayhead: number) => {
@@ -128,7 +128,7 @@ const Page = () => {
       setShowTimeline(false);
       setActiveTab(activeTab === "layers" ? null : "layers");
       setIsPlaying(false);
-      setPlayhead(null);
+      setPlayhead(0);
       setTimelineMode(null);
     } else if (tabName === "marker") {
       setShowMarkers(!showMarkers);
@@ -136,7 +136,7 @@ const Page = () => {
       setShowTimeline(false);
       setActiveTab(activeTab === "marker" ? null : "marker");
       setIsPlaying(false);
-      setPlayhead(null);
+      setPlayhead(0);
       setTimelineMode(null);
     } else if (tabName === "chart") {
       setShowTimeline(!showTimeline);
@@ -149,7 +149,7 @@ const Page = () => {
       setShowTimeline(false);
       setActiveTab(null);
       setIsPlaying(false);
-      setPlayhead(null);
+      setPlayhead(0);
       setTimelineMode(null);
     }
   };
@@ -158,7 +158,7 @@ const Page = () => {
     setTimelineRange([0, currentMonth]);
     setLastUserRange([0, currentMonth]);
     setIsPlaying(false);
-    setPlayhead(null);
+    setPlayhead(0);
   }, []);
 
   const handleCompare = (start: string, end: string) => {
@@ -207,7 +207,7 @@ const Page = () => {
       )}
 
       {/* Left Panel */}
-      <div className="absolute top-0 left-1.5 z-[1001] h-full">
+      <div className="absolute top-0 left-1.5 z-[1001] h-full py-2">
         <LeftPanel onExpandChange={setSidebarExpanded} />
       </div>
 

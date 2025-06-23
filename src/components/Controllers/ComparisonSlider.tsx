@@ -2,15 +2,20 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FaArrowsAltH } from "react-icons/fa";
+import Text from "@styles/components/text";
+import theme from "@styles/theme";
+import getDate from "@/utils/getDate";
 
 interface ComparisonSliderProps {
   isVisible: boolean;
   sidebarExpanded: boolean;
   position: number;
+  comparisonStartDate: string;
+  comparisonEndDate: string;
   setPosition: (pos: number) => void;
 }
 
-const ComparisonSlider: React.FC<ComparisonSliderProps> = ({ isVisible, sidebarExpanded, position, setPosition }) => {
+const ComparisonSlider: React.FC<ComparisonSliderProps> = ({ isVisible, sidebarExpanded, position, comparisonStartDate, comparisonEndDate, setPosition }) => {
   const [dragging, setDragging] = useState(false);
 
   const handleMouseMove = (e: MouseEvent) => {
@@ -58,10 +63,35 @@ const ComparisonSlider: React.FC<ComparisonSliderProps> = ({ isVisible, sidebarE
       animate={{ left: `${position * 100}%` }}
       transition={{ duration: 0.1 }}
     >
-      {/* Overlay for right side */}
-      <div className="absolute top-0 left-full h-full w-screen bg-black/10 pointer-events-none" />
+      {/* Start Date */}
+      <div className="absolute top-[30px] right-[50px] flex justify-end w-[300px]">
+        <div className="bg-bg-quantinary/30 shadow-xl border-[1px] border-border-secondary/40 backdrop-blur-sm backdrop-filter h-fit flex justify-end px-3 py-1 rounded-full">
+          <Text
+            textColor={theme.colors.bg.primary}
+            size={theme.text.size.body2}
+            bold={theme.text.bold.md2}
+          >
+            {getDate(new Date(comparisonStartDate))}
+          </Text>
+        </div>
+      </div>
+
+      {/* End Date */}
+      <div className="absolute top-[30px] left-[50px] flex justify-start w-[300px]">
+        <div className="bg-bg-quantinary/30 shadow-xl border-[1px] border-border-secondary/40 backdrop-blur-sm backdrop-filter h-fit flex justify-start px-3 py-1 rounded-full">
+          <Text
+            textColor={theme.colors.bg.primary}
+            size={theme.text.size.body2}
+            bold={theme.text.bold.md2}
+          >
+            {getDate(new Date(comparisonEndDate))}
+          </Text>
+        </div>
+      </div>
+
       {/* Vertical slider line */}
-      <div className="w-[2px] h-full bg-white/60 translate-x-[-1px]" />
+      <div className="w-[2px] h-full bg-white/60 translate-x-[1px]" />
+
       {/* Drag handle */}
       <div
         onMouseDown={handleMouseDown}
@@ -69,6 +99,7 @@ const ComparisonSlider: React.FC<ComparisonSliderProps> = ({ isVisible, sidebarE
       >
         <FaArrowsAltH className="text-[#6060D0]" />
       </div>
+
       {/* Close button */}
      
     </motion.div>

@@ -14,9 +14,11 @@
   --bg-quantinary : #D0D0D0;
   --bg-primary-lighter : #FBFBFB;
 
-  --border-primary : #E4E4E4;
-  --border-secondary : #F7F7F7;
-  --border-tetiary : #DDDDDD;
+  /* Border colors */
+  --border-primary: #E4E4E4;
+  --border-secondary: #F2F2F2;
+  --border-tetiary: #DDDDDD;
+  --border-quantinary: #C6C6D0;
 
   --main-primary : #6060D0;
   --main-primary-20: rgba(96, 96, 208, 0.2);

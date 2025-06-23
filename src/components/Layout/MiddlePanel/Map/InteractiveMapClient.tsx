@@ -237,7 +237,7 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
   isPlaying: externalIsPlaying = false,
   comparisonActive,
   comparisonStartDate,
-  comparisonEndDate
+  comparisonEndDate,
 }) => {
   const { reports, fetchReports, applyFilters, miningSites } = useSpatialStore();
 
@@ -434,6 +434,8 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
         <ComparisonSlider
           isVisible={comparisonActive}
           sidebarExpanded={sidebarExpanded}
+          comparisonStartDate={comparisonStartDate}
+          comparisonEndDate={comparisonEndDate}
           position={comparisonSliderPosition}
           setPosition={setComparisonSliderPosition}
         />
@@ -450,6 +452,7 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
           selectedYear={selectedYear}
           playhead={playhead}
           isPlaying={isPlaying}
+          setPlayhead={setPlayhead}
         />
       )}
     </>
