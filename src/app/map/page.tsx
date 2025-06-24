@@ -9,7 +9,7 @@ import { setupReportsRefresh, cleanupReportsRefresh } from '@/lib/store/spatial-
 
 import LeftPanel from "@components/Layout/LeftPanel/LeftPanel";
 import LayersControl from "../../components/Controllers/LayersControl";
-import MarkersControl from "../../components/Controllers/MarkersControl";
+import MarkersControl from "../../components/Controllers/MarkersControl/MarkersControl";
 import TimelineController from "../../components/Controllers/TimelineController";
 import ComparisonSlider from "../../components/Controllers/ComparisonSlider";
 import { initialLayers } from "../../components/Controllers/LayersControl";
@@ -215,7 +215,7 @@ const Page = () => {
       <motion.div
         animate={{ left: floatingNavLeft }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
-        className="absolute top-[10px] z-[1001] w-[54px] h-[127px] bg-white/90 backdrop-blur-md rounded-xl shadow-md flex flex-col items-center justify-around p-2"
+        className="absolute top-[10px] z-[1001] bg-white/90 backdrop-blur-sm rounded-xl gap-0.5 shadow-xl flex flex-col items-center justify-around p-2"
       >
         <ToolButton
           icon={<FaLayerGroup size={16} />}
@@ -316,9 +316,9 @@ const ToolButton = ({ icon, isActive, onClick }) => (
   <motion.button
     whileTap={{ scale: 0.9 }}
     transition={{ duration: 0.3, ease: "easeOut" }}
-    className={`flex items-center justify-center rounded-md cursor-pointer ${isActive
-      ? "text-[var(--color-main-primary)] bg-[rgba(96,96,208,0.2)] w-[36px] h-[36px]"
-      : "text-[var(--color-text-tetiary)] w-[24px] h-[24px] hover:bg-gray-100"
+    className={`flex items-center justify-center rounded-md cursor-pointer w-[36px] h-[36px] ${isActive
+      ? "text-[var(--color-main-primary)] bg-[rgba(96,96,208,0.2)]"
+      : "text-[var(--color-text-tetiary)] hover:bg-gray-200"
       }`}
     onClick={onClick}
   >

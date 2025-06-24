@@ -8,6 +8,8 @@ const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
 
 export const BASEMAP_URLS = {
   osm: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  cartocdnLight: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+  cartocdnDark: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
   satellite: "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
   planet: `https://tiles.planet.com/basemaps/v1/planet-tiles/global_monthly_${currentYear}_${String(prevMonth + 1).padStart(2, '0')}_mosaic/gmap/{z}/{x}/{y}.png?api_key=${process.env.NEXT_PUBLIC_PL_KEY}`,
 };
@@ -26,9 +28,9 @@ export const LAYER_STYLES: Record<string, MapLayerStyle> = {
     fillOpacity: 0.2,
   },
   admin: {
-    color: "#757575",
+    color: "#261b1b",
     weight: 2,
-    opacity: 1,
+    opacity: 0.7,
     fillOpacity: 0,
     dashArray: 'none',
   },
@@ -54,16 +56,26 @@ export const HIGHLIGHT_STYLE: Record<string, MapLayerStyle> = {
     fillOpacity: 0.4,
   },
   admin: {
-    color: "#FFFF00",
-    weight: 2.5,
-    opacity: 0.9,
-    fillOpacity: 0.0,
+    color: "#261b1b",
+    weight: 2,
+    opacity: 1,
+    fillOpacity: 0.3,
   },
   rivers: {
     color: "#29B6F6",
     weight: 3,
     opacity: 1,
     fillOpacity: 0.5,
+  },
+};
+
+export const HOVER_STYLE: Record<string, MapLayerStyle> = {
+  admin: {
+    color: "#261b1b",
+    weight: 2,
+    opacity: 1,
+    fillOpacity: 0.3,
+    dashArray: 'none',
   },
 };
 

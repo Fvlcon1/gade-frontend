@@ -16,8 +16,8 @@ export interface baseProps {
     background?: string
     colorTheme? : string
     border?: string
-    PreIcon?: ElementType
-    PostIcon?: ElementType
+    PreIcon?: ReactNode
+    PostIcon?: ReactNode
     id?: string
     radius?: number
     padding?:string
@@ -52,8 +52,9 @@ export interface DropdownItem {
     key: string;
     label?: ReactNode | string;
     disabled?: boolean;
-    type?: "divider" | "title" | "link"
+    type?: "divider" | "title" | "link" | "loading"
     href? : string
     icon?: ReactNode;
     onClick? : ()=>void
+    isSelected? : boolean
 }

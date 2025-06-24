@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useState, useEffect, useRef } from "react";
+import React, { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility";
@@ -10,7 +10,7 @@ import { useSpatialStore } from '@/lib/store/spatial-store';
 import L from 'leaflet';
 import 'leaflet.markercluster';
 import { useSearchParams } from "next/navigation";
-import { BASEMAP_URLS, LAYER_STYLES, HIGHLIGHT_STYLE, TOOLTIP_STYLES } from "./constants";
+import { BASEMAP_URLS, LAYER_STYLES, HIGHLIGHT_STYLE, TOOLTIP_STYLES, HOVER_STYLE } from "./constants";
 import { MapContainerProps, LayerProps } from "./types";
 import MouseCoordinateDisplay from "./MouseCoordinateDisplay";
 import ReportsLayer from "./ReportsLayer";
@@ -77,30 +77,48 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
     };
   }, [filteredDistricts, filteredMiningSites, forestReserves, rivers]);
 
-  const getDistrictStyle = (feature: any) => {
+  const getDistrictStyle = useCallback((feature: any, hover?: boolean) => {
     const district = feature.properties.district;
     const isHighlighted = highlightedDistricts.includes(district);
     const isSelected = selectedDistricts.includes(district);
 
     if (selectedDistricts.length === 0 && highlightedDistricts.length === 0) {
+      if(hover === true) return HIGHLIGHT_STYLE.admin;
       return LAYER_STYLES.admin;
     }
 
     if (isHighlighted) {
-      return HIGHLIGHT_STYLE.admin;
+      if(hover === true) return HIGHLIGHT_STYLE.admin;
+      return LAYER_STYLES.admin;
     }
 
-    if (isSelected) {
-      return {
-        color: 'var(--color-main-primary)',
-        weight: 1.5,
-        opacity: 0.6,
-        fillOpacity: 0.1,
-        dashArray: 'none',
-      };
-    }
+    // if (isSelected) {
+    //   if(hover) return HOVER_STYLE.admin;
+    //   return {
+    //     color: 'var(--color-main-primary)',
+    //     weight: 1.5,
+    //     opacity: 0.6,
+    //     fillOpacity: 0.1,
+    //     dashArray: 'none',
+    //   };
+    // }
 
     return { opacity: 0, fillOpacity: 0 };
+  }, [selectedDistricts, highlightedDistricts]);
+
+  const handleMouseOver = (e: any) => {
+    const layer = e.target;
+    layer.setStyle(getDistrictStyle(layer.feature, true));
+
+    // Add a tooltip
+    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+      layer.bringToFront();
+    }
+  };
+
+  const handleMouseOut = (e: any) => {
+    const layer = e.target;
+    layer.setStyle(getDistrictStyle(layer.feature));
   };
 
   const adminLayerKey = useMemo(() => {
@@ -135,19 +153,24 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
                 <GeoJSON
                   key={adminLayerKey}
                   data={data}
-                  style={(feature) => getDistrictStyle(feature)}
-                  onEachFeature={(feature, leafletLayer) => {
+                  style={getDistrictStyle}
+                  interactive={true}
+                  onEachFeature={(feature, layer) => {
+                    layer.on({
+                      mouseover: (e) => handleMouseOver(e),
+                      mouseout: (e) => handleMouseOut(e),
+                    });
                     const district = feature.properties.district;
                     const tooltipContent = `<div class="font-medium">${district}</div>`;
-                    leafletLayer.bindTooltip(tooltipContent, {
+                    layer.bindTooltip(tooltipContent, {
                       permanent: false,
                       direction: 'top',
                       offset: [0, -8],
                       className: 'district-tooltip',
                     });
-                    leafletLayer.off('click');
-                    leafletLayer.off('mouseover');
-                    leafletLayer.off('mouseout');
+                    // layer.off('click');
+                    // layer.off('mouseover');
+                    // layer.off('mouseout');
                   }}
                 />
               );

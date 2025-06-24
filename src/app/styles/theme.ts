@@ -35,6 +35,7 @@ export const theme = {
         },
         bold: { 
             sm : TypographyBold.sm,
+            sm2 : TypographyBold.sm2,
             md : TypographyBold.md,
             lg : TypographyBold.lg,
             md2 : TypographyBold.md2,
