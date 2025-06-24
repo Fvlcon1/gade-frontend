@@ -8,11 +8,13 @@ import { featureCollection, distance, centroid } from '@turf/turf';
 export function filterByDistance(
   collectionA: FeatureCollection<Geometry>,
   collectionB: FeatureCollection<Geometry>,
-  maxDistanceMeters: number
+  maxDistanceMeters: number,
+  minDistanceMeters?: number
 ): FeatureCollection<Geometry> {
   const results = [];
 
   const maxDistanceKm = maxDistanceMeters / 1000;
+  const minDistanceKm = minDistanceMeters ? minDistanceMeters / 1000 : 0;
 
   collectionB.features.forEach((featureB) => {
     const centroidB = centroid(featureB);
@@ -20,7 +22,7 @@ export function filterByDistance(
     const isClose = collectionA.features.some((featureA) => {
       const centroidA = centroid(featureA);
       const dist = distance(centroidA, centroidB, { units: 'kilometers' });
-      return dist <= maxDistanceKm;
+      return dist <= maxDistanceKm && dist >= minDistanceKm;
     });
 
     if (isClose) {
