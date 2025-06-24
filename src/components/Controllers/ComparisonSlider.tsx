@@ -60,9 +60,8 @@ const ComparisonSlider: React.FC<ComparisonSliderProps> = ({ isVisible, sidebarE
   return (
     <motion.div
       className="absolute top-0 h-full z-[1000] select-none"
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
+      animate={{ left: `${position * 100}%` }}
+      transition={{ duration: 0.1 }}
     >
       {/* Start Date */}
       <div className="absolute top-[30px] right-[50px] flex justify-end w-[300px]">

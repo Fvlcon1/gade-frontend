@@ -133,7 +133,7 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
       filteredMiningSites = filterByDistance(
         districts,
         filteredMiningSites,
-        1000 // 1 km
+        1000000 // 1 km
       ) as any;
     }
   
