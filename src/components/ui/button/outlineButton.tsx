@@ -4,12 +4,10 @@ import { ButtonProps } from "@/utils/@types"
 
 const OutlineButton = (props: ButtonProps) => {
     return <Button 
-        className="!bg-transparent hover:!bg-bg-secondary border-[1px] border-main-primary"
-        color={theme.colors.main.primary}
         {...props}
-    >
-        {props.children}
-    </Button>
+        className={`!bg-transparent hover:!bg-bg-secondary border-[1px] border-main-primary ${props.className}`}
+        color={theme.colors.main.primary}
+    />
 }
 
 export default OutlineButton

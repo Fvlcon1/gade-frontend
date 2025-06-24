@@ -1,12 +1,19 @@
 'use client';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, Fragment } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IoClose, IoLayersOutline, IoMapOutline } from 'react-icons/io5';
 import Text from '@styles/components/text';
+import theme from '@styles/theme';
+import ClickableTab from '@components/ui/clickable/clickabletab';
+import BlurContainer from '@components/ui/blur-container';
+import OutlineButton from '@components/ui/button/outlineButton';
+import Button from '@components/ui/button/button';
 
 // Basemap definitions
 const basemaps = [
-  { id: 'osm', label: 'OpenStreetMap', checked: true },
+  { id: 'osm', label: 'Open Street Map', checked: true },
+  { id: 'cartocdnLight', label: 'CartoDB Light', checked: false },
+  { id: 'cartocdnDark', label: 'CartoDB Dark', checked: false },
   { id: 'satellite', label: 'Google Satellite', checked: false },
   { id: 'planet', label: 'Planet', checked: false },
 ];
@@ -36,16 +43,16 @@ interface LayersControlProps {
   onLayerChange?: (layers: Layer[]) => void;
 }
 
-const LayersControl: React.FC<LayersControlProps> = ({ 
-  isOpen, 
-  onClose, 
-  sidebarExpanded = false, 
-  onBasemapChange = () => {}, 
-  onLayerChange = () => {} 
+const LayersControl: React.FC<LayersControlProps> = ({
+  isOpen,
+  onClose,
+  sidebarExpanded = false,
+  onBasemapChange = () => { },
+  onLayerChange = () => { }
 }) => {
   const [basemapLayers, setBasemapLayers] = useState(basemaps);
   const [featureLayers, setFeatureLayers] = useState(initialLayers);
-  
+
   const toggleBasemap = useCallback((id: string) => {
     setBasemapLayers(prev => {
       const newLayers = prev.map(layer => ({
@@ -57,7 +64,7 @@ const LayersControl: React.FC<LayersControlProps> = ({
       return newLayers;
     });
   }, [onBasemapChange]);
-  
+
   const toggleFeatureLayer = useCallback((id: string) => {
     setFeatureLayers(prev => {
       const newLayers = prev.map(layer =>
@@ -68,7 +75,7 @@ const LayersControl: React.FC<LayersControlProps> = ({
       return newLayers;
     });
   }, [onLayerChange]);
-  
+
   const selectAllFeatures = useCallback(() => {
     setFeatureLayers(prev => {
       const newLayers = prev.map(layer => ({ ...layer, checked: true }));
@@ -77,103 +84,137 @@ const LayersControl: React.FC<LayersControlProps> = ({
       return newLayers;
     });
   }, [onLayerChange]);
-  
+
+  const deselectAllFeatures = useCallback(() => {
+    setFeatureLayers(prev => {
+      const newLayers = prev.map(layer => ({ ...layer, checked: false }));
+      // Call onLayerChange after state update
+      setTimeout(() => onLayerChange(newLayers), 0);
+      return newLayers;
+    });
+  }, [onLayerChange]);
+
   const selectedFeatureCount = featureLayers.filter(l => l.checked).length;
   const leftPosition = sidebarExpanded ? '295px' : '135px';
-  
+
+  const Divider = ({ className }: { className?: string }) => {
+    return (
+      <div className={`w-full pl-8 ${className}`}>
+        <div className="w-full h-0.25 bg-border-primary/80" />
+      </div>
+    )
+  }
+
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="absolute top-[10px] w-[240px] rounded-xl bg-white/90 backdrop-blur-xs shadow-md px-4 py-3 z-[1002] border border-gray-200"
-          initial={{ opacity: 0, y: -10, left: leftPosition }}
-          animate={{ opacity: 1, y: 0, left: leftPosition }}
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.5, ease: 'easeInOut' }}
+          style={{ left: leftPosition }}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
+          className="absolute top-[10px] z-[1001] w-[240px] gap-2 flex flex-col"
         >
           {/* Header */}
-          <div className="flex items-center justify-between text-sm font-bold text-gray-700 mb-2">
-            <Text>Map Layers</Text>
-            <div className="flex items-center gap-2 text-xs font-normal text-gray-500">
-              {selectedFeatureCount} Selected
-              <IoClose className="cursor-pointer hover:text-gray-700" onClick={onClose} />
-            </div>
+          <div className="w-full h-[33px] bg-white/80 backdrop-blur-sm shadow-xl px-3 pr-1 flex items-center justify-between rounded-[10px]">
+            <Text bold={theme.text.bold.md}>
+              Map Layers
+            </Text>
+            <ClickableTab onClick={onClose}>
+              <IoClose
+                size={17}
+                color={theme.colors.text.secondary}
+              />
+            </ClickableTab>
           </div>
 
           {/* Content Container */}
           <div className="space-y-4">
             {/* Basemaps Section */}
-            <div>
-              <div className="flex items-center gap-2 text-xs font-semibold text-gray-600 mb-2">
-                <IoMapOutline size={14} />
-                <span>Basemaps</span>
+            <BlurContainer>
+              <div className="py-3 gap-1 flex flex-col">
+                <Text
+                  bold={theme.text.bold.md}
+                  className="pl-4"
+                >
+                  Basemaps
+                </Text>
+                <div className="flex flex-col gap-1">
+                  {basemapLayers.map((layer, index) => (
+                    <Fragment key={layer.id}>
+                      <label className="flex items-center gap-2 px-4 py-1 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="basemap"
+                          checked={layer.checked}
+                          onChange={() => toggleBasemap(layer.id)}
+                          className="w-3 h-3 accent-[#4F46E5]"
+                        />
+                        <Text
+                          textColor={layer.checked ? theme.colors.main.primary : theme.colors.text.secondary}
+                          bold={layer.checked ? theme.text.bold.md : theme.text.bold.sm2}
+                        >
+                          {layer.label}
+                        </Text>
+                      </label>
+
+                      {index < basemapLayers.length - 1 && <Divider />}
+                    </Fragment>
+                  ))}
+                </div>
               </div>
-              <div className="flex flex-col gap-1">
-                {basemapLayers.map((layer) => (
-                  <div key={layer.id}>
-                    <label className="flex items-center gap-3 py-[6px] cursor-pointer">
-                      <input
-                        type="radio"
-                        name="basemap"
-                        checked={layer.checked}
-                        onChange={() => toggleBasemap(layer.id)}
-                        className="w-4 h-4 accent-[#4F46E5]"
-                      />
-                      <span
-                        className={`text-left text-sm font-medium ${
-                          layer.checked ? 'text-[#4F46E5]' : 'text-gray-500'
-                        }`}
-                      >
-                        {layer.label}
-                      </span>
-                    </label>
-                    <div className="h-px bg-gray-200 w-[calc(100%+1rem)] -mr-4" />
-                  </div>
-                ))}
-              </div>
-            </div>
+            </BlurContainer>
 
             {/* Feature Layers Section */}
-            <div>
-              <div className="flex items-center gap-2 text-xs font-semibold text-gray-600 mb-2">
-                <IoLayersOutline size={14} />
-                <span>Layers</span>
+            <BlurContainer>
+              <div className="py-3 gap-1 flex flex-col">
+                <Text
+                  bold={theme.text.bold.md}
+                  className="pl-4"
+                >
+                  Layers
+                </Text>
+                <div className="flex flex-col gap-1">
+                  {featureLayers.map((layer, index) => (
+                    <Fragment key={layer.id}>
+                      <div className="flex items-center gap-2 px-4 py-1 cursor-pointer" onClick={() => toggleFeatureLayer(layer.id)}>
+                        <ToggleSwitch
+                          checked={layer.checked}
+                          onChange={() => { }}
+                          color={layer.color}
+                        />
+                        <Text
+                          bold={layer.checked ? theme.text.bold.md : theme.text.bold.sm2}
+                          textColor={layer.checked ? theme.colors.main.primary : theme.colors.text.secondary}
+                        >
+                          {layer.label}
+                        </Text>
+                      </div>
+                      {index < featureLayers.length - 1 && <Divider className="pl-12" />}
+                    </Fragment>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-2 w-full px-3 mt-2">
+                  <Button
+                    text="Select All"
+                    className="flex-1"
+                    onClick={selectAllFeatures}
+                  />
+                  <OutlineButton
+                    text="Deselect All"
+                    className="flex-1"
+                    onClick={deselectAllFeatures}
+                  />
+                </div>
               </div>
-              <div className="flex flex-col gap-1">
-                {featureLayers.map((layer) => (
-                  <div key={layer.id}>
-                    <div className="flex items-center gap-3 py-[6px] cursor-pointer" onClick={() => toggleFeatureLayer(layer.id)}>
-                      <ToggleSwitch 
-                        checked={layer.checked} 
-                        onChange={() => {}}
-                        color={layer.color}
-                      />
-                      <span className="text-left text-sm font-medium text-gray-700">
-                        {layer.label}
-                      </span>
-                    </div>
-                    <div className="h-px bg-gray-200 w-[calc(100%+1rem)] -mr-4" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          
-          {/* Footer */}
-          <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-200">
-            <button
-              onClick={selectAllFeatures}
-              className="bg-[#4F46E5] text-white text-xs font-semibold px-3 py-[3px] rounded-md shadow hover:bg-[#4338CA] cursor-pointer"
-            >
-              Select all layers
-            </button>
-            <button className="w-6 h-6 border border-gray-400 rounded-full flex items-center justify-center text-sm text-gray-600 hover:bg-gray-100 cursor-pointer">
-              ⟳
-            </button>
+            </BlurContainer>
           </div>
         </motion.div>
-      )}
-    </AnimatePresence>
+      )
+      }
+    </AnimatePresence >
   );
 };
 

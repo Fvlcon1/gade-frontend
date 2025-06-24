@@ -18,7 +18,7 @@ export interface AppTypographyProps {
   size?: TypographySize;
   textColor?: string;
   colorTheme? : string;
-  wrap?: string;
+  wrap?: boolean;
   underline?: boolean
   clickable?: boolean
   clickableLink?: boolean

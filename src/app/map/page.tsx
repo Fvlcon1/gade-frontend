@@ -9,7 +9,7 @@ import { setupReportsRefresh, cleanupReportsRefresh } from '@/lib/store/spatial-
 
 import LeftPanel from "@components/Layout/LeftPanel/LeftPanel";
 import LayersControl from "../../components/Controllers/LayersControl";
-import MarkersControl from "../../components/Controllers/MarkersControl";
+import MarkersControl from "../../components/Controllers/MarkersControl/MarkersControl";
 import TimelineController from "../../components/Controllers/TimelineController";
 import ComparisonSlider from "../../components/Controllers/ComparisonSlider";
 import { initialLayers } from "../../components/Controllers/LayersControl";
@@ -42,7 +42,7 @@ const Page = () => {
   const [timelineRange, setTimelineRange] = useState<[number, number]>([0, currentMonth]);
   const [lastUserRange, setLastUserRange] = useState<[number, number]>([0, currentMonth]);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [playhead, setPlayhead] = useState<number | null>(null);
+  const [playhead, setPlayhead] = useState<number | null>(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [comparisonActive, setComparisonActive] = useState(false);
   const [comparisonStartDate, setComparisonStartDate] = useState<string | null>(null);
@@ -72,7 +72,7 @@ const Page = () => {
     setTimelineMode(mode);
     if (mode !== 'timeline') {
       setIsPlaying(false);
-      setPlayhead(null);
+      setPlayhead(0);
     }
   }, []);
 
@@ -114,7 +114,7 @@ const Page = () => {
 
   const handlePause = useCallback(() => {
     setIsPlaying(false);
-    setPlayhead(null);
+    setPlayhead(0);
   }, []);
 
   const handlePlayheadChange = useCallback((newPlayhead: number) => {
@@ -128,7 +128,7 @@ const Page = () => {
       setShowTimeline(false);
       setActiveTab(activeTab === "layers" ? null : "layers");
       setIsPlaying(false);
-      setPlayhead(null);
+      setPlayhead(0);
       setTimelineMode(null);
     } else if (tabName === "marker") {
       setShowMarkers(!showMarkers);
@@ -136,7 +136,7 @@ const Page = () => {
       setShowTimeline(false);
       setActiveTab(activeTab === "marker" ? null : "marker");
       setIsPlaying(false);
-      setPlayhead(null);
+      setPlayhead(0);
       setTimelineMode(null);
     } else if (tabName === "chart") {
       setShowTimeline(!showTimeline);
@@ -149,7 +149,7 @@ const Page = () => {
       setShowTimeline(false);
       setActiveTab(null);
       setIsPlaying(false);
-      setPlayhead(null);
+      setPlayhead(0);
       setTimelineMode(null);
     }
   };
@@ -158,7 +158,7 @@ const Page = () => {
     setTimelineRange([0, currentMonth]);
     setLastUserRange([0, currentMonth]);
     setIsPlaying(false);
-    setPlayhead(null);
+    setPlayhead(0);
   }, []);
 
   const handleCompare = (start: string, end: string) => {
@@ -207,7 +207,7 @@ const Page = () => {
       )}
 
       {/* Left Panel */}
-      <div className="absolute top-0 left-1.5 z-[1001] h-full">
+      <div className="absolute top-0 left-1.5 z-[1001] h-full py-2">
         <LeftPanel onExpandChange={setSidebarExpanded} />
       </div>
 
@@ -215,7 +215,7 @@ const Page = () => {
       <motion.div
         animate={{ left: floatingNavLeft }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
-        className="absolute top-[10px] z-[1001] w-[54px] h-[127px] bg-white/90 backdrop-blur-md rounded-xl shadow-md flex flex-col items-center justify-around p-2"
+        className="absolute top-[10px] z-[1001] bg-white/90 backdrop-blur-sm rounded-xl gap-0.5 shadow-xl flex flex-col items-center justify-around p-2"
       >
         <ToolButton
           icon={<FaLayerGroup size={16} />}
@@ -316,9 +316,9 @@ const ToolButton = ({ icon, isActive, onClick }) => (
   <motion.button
     whileTap={{ scale: 0.9 }}
     transition={{ duration: 0.3, ease: "easeOut" }}
-    className={`flex items-center justify-center rounded-md cursor-pointer ${isActive
-      ? "text-[var(--color-main-primary)] bg-[rgba(96,96,208,0.2)] w-[36px] h-[36px]"
-      : "text-[var(--color-text-tetiary)] w-[24px] h-[24px] hover:bg-gray-100"
+    className={`flex items-center justify-center rounded-md cursor-pointer w-[36px] h-[36px] ${isActive
+      ? "text-[var(--color-main-primary)] bg-[rgba(96,96,208,0.2)]"
+      : "text-[var(--color-text-tetiary)] hover:bg-gray-200"
       }`}
     onClick={onClick}
   >

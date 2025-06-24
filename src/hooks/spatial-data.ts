@@ -26,7 +26,7 @@ interface SpatialData {
 }
 
 // New interface for the district search response
-interface DistrictSearchResponse {
+export interface DistrictSearchResponse {
   result: string[];
 }
   
@@ -80,7 +80,7 @@ export const useDistrictSearch = (searchTerm: string) => {
   return useQuery<DistrictSearchResponse, Error>({
     queryKey: spatialDataKeys.districtSearch(searchTerm),
     queryFn: () => apiClient.spatial.districtSearch(searchTerm),
-    enabled: isAuthenticated && !!searchTerm, // Only run if authenticated and searchTerm exists
+    enabled: isAuthenticated,
     staleTime: 1000 * 60 * 60 * 24 * 28, // 4 weeks
     gcTime: 1000 * 60 * 60 * 24 * 28, // 4 weeks
   });

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { apiClient } from '@/lib/api-client';
 import { useAuthStore } from '@/lib/store/auth-store';
+import { filterByDistance } from '../filter-by-distance';
 
 // SpatialData type
 interface SpatialData {
@@ -101,7 +102,7 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
     }
     let playheadMonth = playhead != null ? playhead : toMonth;
   
-    const filteredMiningSites = {
+    let filteredMiningSites = {
       ...miningSites,
       features: miningSites.features.filter(feature => {
         const matchesDistrict = selectedDistricts.length === 0 || 
@@ -127,6 +128,14 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
         return matchesDistrict && matchesDate;
       })
     };
+
+    if (selectedDistricts.length > 0) {
+      filteredMiningSites = filterByDistance(
+        districts,
+        filteredMiningSites,
+        1000 // 1 km
+      ) as any;
+    }
   
     const filteredDistricts = {
       ...districts,
@@ -159,23 +168,26 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       // Fetch all data in parallel
-      const [districts, forestReserves, rivers, miningSites, reports] = await Promise.all([
+      const [districts, forestReserves, rivers, miningSites] = await Promise.allSettled([
         apiClient.spatial.districts(),
         apiClient.spatial.forestReserves(),
         apiClient.spatial.rivers(),
         apiClient.spatial.miningSites(),
-        apiClient.reports.all()
       ]);
 
+      // const districts = await apiClient.spatial.districts();
+      // const forestReserves = await apiClient.spatial.forestReserves();
+      // const rivers = await apiClient.spatial.rivers();
+      // const miningSites = await apiClient.spatial.miningSites();
+
       set({
-        districts,
-        forestReserves,
-        rivers,
-        miningSites,
-        reports,
+        districts : districts.status === "fulfilled" ? districts.value : null,
+        forestReserves : forestReserves.status === "fulfilled" ? forestReserves.value : null,
+        rivers : rivers.status === "fulfilled" ? rivers.value : null,
+        miningSites : miningSites.status === "fulfilled" ? miningSites.value : null,
         reportsLastUpdated: Date.now(),
-        filteredMiningSites: miningSites,
-        filteredDistricts: districts,
+        filteredMiningSites : miningSites.status === "fulfilled" ? miningSites.value : null,
+        filteredDistricts : districts.status === "fulfilled" ? districts.value : null,
         isLoading: false,
         error: null
       });

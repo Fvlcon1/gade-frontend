@@ -14,8 +14,9 @@ export const colors = {
     },
     border : {
         primary : "#E4E4E4",
-        secondary : '#F7F7F7',
+        secondary : '#F2F2F2',
         tetiary : '#DDDDDD',
+        quantinary : '#C6C6D0',
     },
     main : {
         primary : '#6060D0'
@@ -28,10 +29,17 @@ export const theme = {
         size: { 
             SM: TypographySize.SM,
             body: TypographySize.body,
+            body2 : TypographySize.body2,
             HL: TypographySize.HL,
             HM: TypographySize.HM,
         },
-        bold: { sm: TypographyBold.sm, md: TypographyBold.md, lg: TypographyBold.lg },
+        bold: { 
+            sm : TypographyBold.sm,
+            sm2 : TypographyBold.sm2,
+            md : TypographyBold.md,
+            lg : TypographyBold.lg,
+            md2 : TypographyBold.md2,
+         },
       },
 }
 
