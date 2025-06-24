@@ -52,9 +52,11 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
 
   type InviteUserFormData = z.infer<typeof inviteUserSchema>;
 
-  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<InviteUserFormData>({
+  const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<InviteUserFormData>({
     resolver: zodResolver(inviteUserSchema),
   });
+
+  const watchEmail = watch('email');
 
   // Define the schema for edit user form validation
   const editUserSchema = z.object({
@@ -535,7 +537,7 @@ const UserTableSection: React.FC<UserTableSectionProps> = ({
               <div className="mb-4">
                 <Label htmlFor="inviteEmail" className="block text-sm font-medium text-gray-700 mb-1">Email address</Label>
                 <CustomInput 
-                  id="inviteEmail"
+                  value={watchEmail}
                   placeholder="Email address" 
                   {...register("email")}
                   className="mb-1"
