@@ -14,6 +14,7 @@ interface BottomTimelineProps {
 	playhead?: number | null;
 	isPlaying?: boolean;
 	setPlayhead?: (playhead: number | null) => void;
+	months: Array<{ monthIndex: number; year: number }>;
 }
 
 const getMonths = () => [
@@ -30,9 +31,9 @@ const BottomTimeline: React.FC<BottomTimelineProps> = ({
 	selectedYear,
 	playhead = null,
 	isPlaying = false,
-	setPlayhead
+	setPlayhead,
+	months
 }) => {
-	const months = getMonths();
 	const trackRef = useRef<HTMLDivElement>(null);
 	const [dragging, setDragging] = useState<null | 0 | 1>(null);
 
@@ -61,6 +62,7 @@ const BottomTimeline: React.FC<BottomTimelineProps> = ({
 		const distanceToStart = Math.abs(clickedValue - range[0]);
 		const distanceToEnd = Math.abs(clickedValue - range[1]);
 		const closestIndex = distanceToStart <= distanceToEnd ? 0 : 1;
+		console.log({closestIndex, clickedValue})
 		onRangeChange(closestIndex, clickedValue);
 	};
 
@@ -85,7 +87,7 @@ const BottomTimeline: React.FC<BottomTimelineProps> = ({
 
 	return (
 		<div
-			className="absolute bottom-5 h-[150px] flex items-end z-[1000] pl-[70px] w-full bg-gradient-to-t from-[#ffffff] to-[#ffffff00]"
+			className="absolute bottom-0 pb-8 h-[150px] flex items-end z-[1000] pl-[70px] w-full bg-gradient-to-t from-[#ffffff] to-[#ffffff00]"
 		>
 			<div className="flex flex-col justify-center w-full items-center px-4 sm:px-6 py-3 gap-1">
 				{/* Timeline Slider */}
@@ -146,7 +148,7 @@ const BottomTimeline: React.FC<BottomTimelineProps> = ({
 										textColor={theme.colors.bg.primary}
 										bold={theme.text.bold.md}
 									>
-										{month}
+										{new Date(month.year, month.monthIndex).toLocaleDateString('default', { month: 'short', year: '2-digit' })}
 									</Text>
 								</div>
 							</div>
@@ -159,7 +161,7 @@ const BottomTimeline: React.FC<BottomTimelineProps> = ({
 								<Text
 									bold={theme.text.bold.md}
 								>
-									{month}
+									{new Date(month.year, month.monthIndex).toLocaleDateString('default', { month: 'short', year: '2-digit' })}
 								</Text>
 							</div>
 						)

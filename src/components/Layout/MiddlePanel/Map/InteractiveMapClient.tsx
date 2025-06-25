@@ -17,6 +17,8 @@ import ReportsLayer from "./ReportsLayer";
 import ReportZoomHandler from "./ReportZoomHandler";
 import BottomTimeline from "./BottomTimeline";
 import ComparisonSlider from "../../../../components/Controllers/ComparisonSlider";
+import TimelineTiles from "@components/Controllers/timeline-controller/components/timeline-tiles";
+import { getLastTwelveMonths } from "@/utils/date-utils";
 
 const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 'timeline' | 'comparison' | null }> = ({ activeBasemap, activeFeatureLayers, playhead, timelineMode }) => {
   const { 
@@ -64,7 +66,7 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
         duration: 0.5,
       });
     }
-  }, [map, filteredDistricts, highlightedDistricts, selectedDistricts, timelineMode]);
+  }, [map, selectedDistricts, timelineMode]);
 
   const filteredLayerData = useMemo(() => {
     if (!filteredDistricts || !filteredMiningSites) return {};
@@ -346,6 +348,7 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
     setIsPlaying(false);
   };
 
+  const [months, setMonths] = useState(getLastTwelveMonths());
  
   // Dynamically update planet basemap URL with year and month for timeline
   const getPlanetUrl = () => {
@@ -446,6 +449,7 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
             url={currentBasemap === 'planet' ? getPlanetUrl() : BASEMAP_URLS[currentBasemap]}
             attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
+          {timelineMode === 'timeline' && <TimelineTiles playhead={playhead} months={months} />}
           <MapLayers activeBasemap={currentBasemap} activeFeatureLayers={activeFeatureLayers} playhead={playhead} timelineMode={timelineMode} />
           <ReportZoomHandler reports={reports} searchParams={searchParams} />
           <MouseCoordinateDisplay />
@@ -474,6 +478,7 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
           onRangeChange={onTimelineRangeChange}
           selectedYear={selectedYear}
           playhead={playhead}
+          months={months}
           isPlaying={isPlaying}
           setPlayhead={setPlayhead}
         />

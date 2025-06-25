@@ -3,7 +3,7 @@ import { colors } from "../../../../app/styles/theme";
 import Text from "@styles/components/text";
 import theme from "@styles/theme";
 import Input from "@components/ui/input/input";
-import { useState } from "react";
+import { useSpatialStore } from "@/lib/store/spatial-store";
 
 const metersUnit = (
     <Text 
@@ -15,25 +15,26 @@ const metersUnit = (
 )
 
 const ForestReserveFilter = () => {
-    const [min, setMin] = useState(0);
-    const [max, setMax] = useState(200);
+    const { setProximityFilters, minProximityToForestReserve, maxProximityToForestReserve, applyFilters } = useSpatialStore();
 
     const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = parseInt(e.target.value);
-        if (value >= 0 && value <= max) {
-            setMin(value);
+        if (value >= 0 && value <= maxProximityToForestReserve) {
+            setProximityFilters({ minProximityToForestReserve: value });
+            applyFilters();
         }
     };
 
     const handleMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = parseInt(e.target.value);
-        if (value >= min && value <= 500) {
-            setMax(value);
+        if (value >= minProximityToForestReserve && value <= 5000) {
+            setProximityFilters({ maxProximityToForestReserve: value });
+            applyFilters();
         }
     };
     const handleSliderChange = (values: number[]) => {
-        setMin(values[0]);
-        setMax(values[1]);
+        setProximityFilters({ minProximityToForestReserve: values[0], maxProximityToForestReserve: values[1] });
+        applyFilters();
     };
     return (
         <div className="flex flex-col gap-0 px-3">
@@ -48,8 +49,9 @@ const ForestReserveFilter = () => {
                 <Slider
                     range
                     min={0}
-                    max={500}
-                    defaultValue={[min, max]}
+                    max={5000}
+                    defaultValue={[minProximityToForestReserve, maxProximityToForestReserve]}
+                    value={[minProximityToForestReserve, maxProximityToForestReserve]}
                     styles={{
                         handle: {
                             backgroundColor: colors.main.primary,
@@ -68,7 +70,7 @@ const ForestReserveFilter = () => {
                 <Input 
                     placeholder="Min"
                     type="number"
-                    value={min}
+                    value={minProximityToForestReserve}
                     onChange={handleMinChange}
                     PostIcon={metersUnit}
                     className="!h-[35px]"
@@ -76,7 +78,7 @@ const ForestReserveFilter = () => {
                 <Input 
                     placeholder="Max"
                     type="number"
-                    value={max}
+                    value={maxProximityToForestReserve}
                     onChange={handleMaxChange}
                     PostIcon={metersUnit}
                     className="!h-[35px]"

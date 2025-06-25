@@ -30,7 +30,7 @@ const ReportsLayer: React.FC<ReportsLayerProps> = ({ reports, activeFeatureLayer
       } else {
         map.removeLayer(reportsLayer);
       }
-    } else if (shouldShowReports && reports.length > 0) {
+    } else if (shouldShowReports && reports?.length > 0) {
       const markersLayer = L.markerClusterGroup({
         iconCreateFunction: (cluster: L.MarkerCluster) => {
           const count = cluster.getChildCount();

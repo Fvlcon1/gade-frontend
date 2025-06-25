@@ -4,6 +4,7 @@ import Text from "@styles/components/text";
 import theme from "@styles/theme";
 import Input from "@components/ui/input/input";
 import { useState } from "react";
+import { useSpatialStore } from "@/lib/store/spatial-store";
 
 const metersUnit = (
     <Text 
@@ -15,25 +16,26 @@ const metersUnit = (
 )
 
 const RiverFilter = () => {
-    const [min, setMin] = useState(0);
-    const [max, setMax] = useState(200);
+    const { setProximityFilters, minProximityToRiver, maxProximityToRiver, applyFilters } = useSpatialStore();
 
     const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = parseInt(e.target.value);
-        if (value >= 0 && value <= max) {
-            setMin(value);
+        if (value >= 0 && value <= maxProximityToRiver) {
+            setProximityFilters({ minProximityToRiver: value });
+            applyFilters();
         }
     };
 
     const handleMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = parseInt(e.target.value);
-        if (value >= min && value <= 500) {
-            setMax(value);
+        if (value >= minProximityToRiver && value <= 5000) {
+            setProximityFilters({ maxProximityToRiver: value });
+            applyFilters();
         }
     };
     const handleSliderChange = (values: number[]) => {
-        setMin(values[0]);
-        setMax(values[1]);
+        setProximityFilters({ minProximityToRiver: values[0], maxProximityToRiver: values[1] });
+        applyFilters();
     };
     return (
         <div className="flex flex-col gap-0 px-3">
@@ -48,8 +50,9 @@ const RiverFilter = () => {
                 <Slider
                     range
                     min={0}
-                    max={500}
-                    defaultValue={[min, max]}
+                    max={5000}
+                    defaultValue={[minProximityToRiver, maxProximityToRiver]}
+                    value={[minProximityToRiver, maxProximityToRiver]}
                     styles={{
                         handle: {
                             backgroundColor: colors.main.primary,
@@ -68,7 +71,7 @@ const RiverFilter = () => {
                 <Input 
                     placeholder="Min"
                     type="number"
-                    value={min}
+                    value={minProximityToRiver}
                     onChange={handleMinChange}
                     PostIcon={metersUnit}
                     className="!h-[35px]"
@@ -76,7 +79,7 @@ const RiverFilter = () => {
                 <Input 
                     placeholder="Max"
                     type="number"
-                    value={max}
+                    value={maxProximityToRiver}
                     onChange={handleMaxChange}
                     PostIcon={metersUnit}
                     className="!h-[35px]"

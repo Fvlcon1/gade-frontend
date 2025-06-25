@@ -130,7 +130,7 @@ const LayersControl: React.FC<LayersControlProps> = ({
           </div>
 
           {/* Content Container */}
-          <div className="space-y-4">
+          <div className="space-y-2">
             {/* Basemaps Section */}
             <BlurContainer>
               <div className="py-3 gap-1 flex flex-col">

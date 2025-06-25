@@ -17,27 +17,27 @@ export const BASEMAP_URLS = {
 export const LAYER_STYLES: Record<string, MapLayerStyle> = {
   mining_sites: {
     color: "#FF4B4B",
-    weight: 2,
+    weight: 1,
     opacity: 0.8,
     fillOpacity: 0.1,
   },
   forest: {
     color: "#4CAF50",
-    weight: 2,
-    opacity: 0.8,
-    fillOpacity: 0.2,
+    weight: 1,
+    opacity: 0.6,
+    fillOpacity: 0.1,
   },
   admin: {
     color: "#261b1b",
     weight: 2,
-    opacity: 0.7,
+    opacity: 0.5,
     fillOpacity: 0,
     dashArray: 'none',
   },
   rivers: {
     color: "#03A9F4",
-    weight: 2,
-    opacity: 1,
+    weight: 1,
+    opacity: 0.7,
     fillOpacity: 0.9,
   },
 };
@@ -45,13 +45,13 @@ export const LAYER_STYLES: Record<string, MapLayerStyle> = {
 export const HIGHLIGHT_STYLE: Record<string, MapLayerStyle> = {
   mining_sites: {
     color: "#FF6B6B",
-    weight: 3,
+    weight: 2,
     opacity: 1,
     fillOpacity: 0.4,
   },
   forest: {
     color: "#66BB6A",
-    weight: 3,
+    weight: 2,
     opacity: 1,
     fillOpacity: 0.4,
   },
