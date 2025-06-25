@@ -10,8 +10,7 @@ import { setupReportsRefresh, cleanupReportsRefresh } from '@/lib/store/spatial-
 import LeftPanel from "@components/Layout/LeftPanel/LeftPanel";
 import LayersControl from "../../components/Controllers/LayersControl";
 import MarkersControl from "../../components/Controllers/MarkersControl/MarkersControl";
-import TimelineController from "../../components/Controllers/TimelineController";
-import ComparisonSlider from "../../components/Controllers/ComparisonSlider";
+import TimelineController from "../../components/Controllers/timeline-controller/TimelineController";
 import { initialLayers } from "../../components/Controllers/LayersControl";
 
 const InteractiveMapClient = dynamic(() => import("../../components/Layout/MiddlePanel/Map/InteractiveMapClient"), {

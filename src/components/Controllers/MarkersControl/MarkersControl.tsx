@@ -51,7 +51,8 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
     setDateRange,
     dateRange: storeDateRange,
     selectedDistricts: storeSelectedDistricts,
-    applyFilters
+    applyFilters,
+    setProximityFilters,
   } = useSpatialStore();
 
   const months = useMemo(() => getLastSixMonths(), []);
@@ -157,6 +158,7 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
     setActiveRange("");
     setDateRange({ from: null, to: null });
     applyFilters();
+    setProximityFilters({ minProximityToRiver: 0, maxProximityToRiver: 0, minProximityToForestReserve: 0, maxProximityToForestReserve: 0 });
   }, [setSelectedDistricts, setHighlightedDistricts, setDateRange, applyFilters, months.length]);
 
   const handleApplyDistricts = () => {

@@ -4,6 +4,9 @@ import { apiClient } from '@/lib/api-client';
 import { useAuthStore } from '@/lib/store/auth-store';
 import { toast } from '@/components/ui/toast';
 import type { LoginCredentials, SetupAccountRequest } from '@/types/auth';
+import Cookies from "universal-cookie"
+
+const cookies = new Cookies();
 
 export const useAuth = () => {
   const router = useRouter();
@@ -81,6 +84,9 @@ export const useAuth = () => {
   const verifyOTPMutation = useMutation({
     mutationFn: apiClient.auth.verifyOTP,
     onSuccess: async (data, variables) => {
+      cookies.set('access_token', data.access_token);
+      cookies.set("refresh_token", data.refresh_token)
+      
       // Set user and clear pending login
       setUser(data.user);
       setPendingLogin(null);

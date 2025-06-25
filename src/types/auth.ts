@@ -53,7 +53,8 @@ export interface OTPVerificationRequest {
 
 export interface OTPVerificationResponse {
   user: User;
-  token: string;
+  access_token: string;
+  refresh_token: string;
 }
 
 export interface AccountRegistrationRequest {

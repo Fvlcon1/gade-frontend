@@ -1,3 +1,7 @@
+import Cookies from "universal-cookie"
+
+const cookies = new Cookies();
+
 import type {
   LoginCredentials,
   LoginResponse,
@@ -44,6 +48,7 @@ class ApiClient {
       ...options,
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${cookies.get('access_token')}`,
         ...options.headers,
       },
       credentials: 'include',
@@ -54,7 +59,7 @@ class ApiClient {
       throw new Error(error.message || 'An error occurred');
     }
 
-    return response.json();
+    return await response.json();
   }
 
   auth = {
