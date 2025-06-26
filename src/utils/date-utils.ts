@@ -20,3 +20,28 @@ export function getLastTwelveMonths(): Array<{ monthIndex: number; year: number 
         return a.year - b.year;
     });
 }
+
+export function getMonthsBetweenDates(startDate: Date, endDate: Date): Array<{ monthIndex: number; year: number }> {
+    const months: Array<{ monthIndex: number; year: number }> = [];
+    
+    // Ensure startDate is before endDate
+    if (startDate > endDate) {
+        [startDate, endDate] = [endDate, startDate];
+    }
+
+    // Start from the first day of the start month
+    const current = new Date(startDate);
+    current.setDate(1);
+    
+    while (current <= endDate) {
+        months.push({
+            monthIndex: current.getMonth(),
+            year: current.getFullYear()
+        });
+        
+        // Move to next month
+        current.setMonth(current.getMonth() + 1);
+    }
+    
+    return months;
+}

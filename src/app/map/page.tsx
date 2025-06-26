@@ -5,13 +5,13 @@ import { motion } from "framer-motion";
 import { FaLayerGroup, FaLocationArrow } from "react-icons/fa";
 import { FaSliders } from "react-icons/fa6";
 import { BsFillClockFill } from "react-icons/bs";
-import { setupReportsRefresh, cleanupReportsRefresh } from '@/lib/store/spatial-store';
 
 import LeftPanel from "@components/Layout/LeftPanel/LeftPanel";
 import LayersControl from "../../components/Controllers/LayersControl";
 import MarkersControl from "../../components/Controllers/MarkersControl/MarkersControl";
 import TimelineController from "../../components/Controllers/timeline-controller/TimelineController";
 import { initialLayers } from "../../components/Controllers/LayersControl";
+import { useSpatialStore } from "@/lib/store/spatial-store";
 
 const InteractiveMapClient = dynamic(() => import("../../components/Layout/MiddlePanel/Map/InteractiveMapClient"), {
   ssr: false,
@@ -25,21 +25,22 @@ interface Layer {
 
 const Page = () => {
   const mapRef = useRef(null);
+  const { months } = useSpatialStore();
 
   const [mapReady, setMapReady] = useState(false);
-  const [showLayers, setShowLayers] = useState(false);
+  const [showLayers, setShowLayers] = useState(true);
   const [showMarkers, setShowMarkers] = useState(false);
   const [showTimeline, setShowTimeline] = useState(false);
-  const [activeTab, setActiveTab] = useState(null);
+  const [activeTab, setActiveTab] = useState("layers");
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
-  const [activeBasemap, setActiveBasemap] = useState('osm');
-  const [previousBasemap, setPreviousBasemap] = useState('osm');
+  const [activeBasemap, setActiveBasemap] = useState('cartocdnLight');
+  const [previousBasemap, setPreviousBasemap] = useState('cartocdnLight');
   const [activeFeatureLayers, setActiveFeatureLayers] = useState<Layer[]>(initialLayers.filter(layer => layer.checked));
   const [timelineMode, setTimelineMode] = useState<'timeline' | 'comparison' | null>(null);
   const now = new Date();
   const currentMonth = now.getMonth();
-  const [timelineRange, setTimelineRange] = useState<[number, number]>([0, currentMonth]);
-  const [lastUserRange, setLastUserRange] = useState<[number, number]>([0, currentMonth]);
+  const [timelineRange, setTimelineRange] = useState<[number, number]>([0, months.length - 1]);
+  const [lastUserRange, setLastUserRange] = useState<[number, number]>([0, months.length - 1]);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [playhead, setPlayhead] = useState<number | null>(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -48,14 +49,14 @@ const Page = () => {
   const [comparisonEndDate, setComparisonEndDate] = useState<string | null>(null);
 
   useEffect(() => {
-    setupReportsRefresh();
-    return () => cleanupReportsRefresh();
-  }, []);
-
-  useEffect(() => {
     const timer = setTimeout(() => setMapReady(true), 300);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    setTimelineRange([0, months.length - 1]);
+    setLastUserRange([0, months.length - 1]);
+  }, [months]);
 
   const handleBasemapChange = useCallback((basemapId: string) => {
     setActiveBasemap(basemapId);
@@ -212,7 +213,9 @@ const Page = () => {
 
       {/* Floating Navigation */}
       <motion.div
-        animate={{ left: floatingNavLeft }}
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        style={{ left: floatingNavLeft }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
         className="absolute top-[10px] z-[1001] bg-white/90 backdrop-blur-sm rounded-xl gap-0.5 shadow-xl flex flex-col items-center justify-around p-2"
       >
@@ -277,6 +280,8 @@ const Page = () => {
           onPlayheadChange={handlePlayheadChange}
           onReset={handleResetTimeline}
           onCompare={handleCompare}
+          comparisonStartDate={comparisonStartDate}
+          comparisonEndDate={comparisonEndDate}
         />
       )}
 

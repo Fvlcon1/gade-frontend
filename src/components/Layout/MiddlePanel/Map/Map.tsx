@@ -49,7 +49,7 @@ const Map = () => {
       <div className="w-full h-[380px] rounded-[9px] relative">
         <InteractiveMapClient 
           mapRef={mapRef}
-          activeBasemap="osm"
+          activeBasemap="cartocdnLight"
           activeFeatureLayers={[
             { id: 'reports', label: 'Reports', checked: true },
             { id: 'rivers', label: 'Rivers', checked: true },

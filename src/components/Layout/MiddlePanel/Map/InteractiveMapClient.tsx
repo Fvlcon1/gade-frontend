@@ -250,7 +250,7 @@ const MapSynchronizer: React.FC<{ targetMap: any }> = ({ targetMap }) => {
 
 const InteractiveMapClient: React.FC<MapContainerProps> = ({ 
   mapRef, 
-  activeBasemap = 'osm', 
+  activeBasemap = 'cartocdnLight', 
   activeFeatureLayers,
   timelineMode = 'timeline',
   onTimelineModeChange,
@@ -478,7 +478,6 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
           onRangeChange={onTimelineRangeChange}
           selectedYear={selectedYear}
           playhead={playhead}
-          months={months}
           isPlaying={isPlaying}
           setPlayhead={setPlayhead}
         />

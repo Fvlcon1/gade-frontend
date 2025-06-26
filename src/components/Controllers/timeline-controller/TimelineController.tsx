@@ -17,6 +17,7 @@ import { MdOutlineRefresh } from "react-icons/md";
 import Timeline from "./components/timeline";
 import Compare from "./components/compare";
 import TabToggle from "./components/tab-toggle";
+import { useSpatialStore } from "@/lib/store/spatial-store";
 
 const { RangePicker } = DatePicker;
 interface TimelineControllerProps {
@@ -35,6 +36,8 @@ interface TimelineControllerProps {
   onPlayheadChange?: (playhead: number) => void;
   onReset?: () => void;
   onCompare?: (startDate: string, endDate: string) => void;
+  comparisonStartDate?: string;
+  comparisonEndDate?: string;
 }
 
 const getLastSixMonths = () => {
@@ -62,9 +65,11 @@ const TimelineController: React.FC<TimelineControllerProps> = ({
   onPause,
   onPlayheadChange,
   onReset,
-  onCompare
+  onCompare,
+  comparisonStartDate,
+  comparisonEndDate
 }) => {
-  const months = getLastSixMonths();
+  const { months } = useSpatialStore();
   const [activeTab, setActiveTab] = useState('timeline');
   const [range, setRange] = useState(externalRange || [0, months.length - 1]);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -121,7 +126,6 @@ const TimelineController: React.FC<TimelineControllerProps> = ({
     if (onPause) {
       onPause();
     }
-    resetDate();
   };
 
   const handlePlayClick = () => {
@@ -160,12 +164,6 @@ const TimelineController: React.FC<TimelineControllerProps> = ({
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
-      return;
-    }
-
-    // If we've reached the end of the range
-    if (playhead >= range[1]) {
-      handleReset();
       return;
     }
 
@@ -247,10 +245,6 @@ const TimelineController: React.FC<TimelineControllerProps> = ({
               activeTab === 'timeline' && (
                 <Timeline
                   resetDate={resetDate}
-                  startDate={startDate}
-                  endDate={endDate}
-                  setStartDate={setStartDate}
-                  setEndDate={setEndDate}
                   isPlaying={isPlaying}
                   handlePlayClick={handlePlayClick}
                   handleReset={handleReset}
@@ -262,11 +256,9 @@ const TimelineController: React.FC<TimelineControllerProps> = ({
               activeTab === 'comparison' && (
                 <Compare
                   resetDate={resetDate}
-                  startDate={startDate}
-                  endDate={endDate}
-                  setStartDate={setStartDate}
-                  setEndDate={setEndDate}
                   onCompare={onCompare}
+                  comparisonStartDate={comparisonStartDate}
+                  comparisonEndDate={comparisonEndDate}
                 />
               )
             }

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { apiClient } from '@/lib/api-client';
 import { useAuthStore } from '@/lib/store/auth-store';
 import { filterByDistance } from '../filter-by-distance';
+import { getLastTwelveMonths } from '@/utils/date-utils';
 
 // SpatialData type
 interface SpatialData {
@@ -60,6 +61,9 @@ interface SpatialState {
   filteredMiningSites: SpatialData | null;
   filteredDistricts: SpatialData | null;
 
+  //Filter
+  months: Array<{ monthIndex: number; year: number }>;
+
   //Proximity
   minProximityToRiver: number;
   maxProximityToRiver: number;
@@ -86,6 +90,7 @@ interface SpatialState {
   setProximityFilters: (options: { minProximityToRiver?: number; maxProximityToRiver?: number; minProximityToForestReserve?: number; maxProximityToForestReserve?: number; }) => void;
   fetchAllData: () => Promise<void>;
   fetchReports: () => Promise<void>;
+  setMonths: (months : Array<{ monthIndex: number; year: number }>) => void;
 }
 
 export const useSpatialStore = create<SpatialState>((set, get) => ({
@@ -96,6 +101,7 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
   miningSites: null,
   filteredMiningSites: null,
   filteredDistricts: null,
+  months: getLastTwelveMonths(),
   reports: null,
   reportsLastUpdated: null,
   isLoading: false,
@@ -114,6 +120,7 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
   setSelectedDistricts: (districts) => set({ selectedDistricts: districts }),
   setHighlightedDistricts: (districts) => set({ highlightedDistricts: districts }),
   setDateRange: (range) => set({ dateRange: range }),
+  setMonths: (months : Array<{ monthIndex: number; year: number }>) => set({ months: months }),
   setProximityFilters: (options) => set({ 
     minProximityToRiver: options.minProximityToRiver ?? get().minProximityToRiver,
     maxProximityToRiver: options.maxProximityToRiver ?? get().maxProximityToRiver,
@@ -271,34 +278,34 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
   }
 }));
 
-// Set up automatic reports refresh
-let refreshInterval: NodeJS.Timeout | null = null;
+// // Set up automatic reports refresh
+// let refreshInterval: NodeJS.Timeout | null = null;
 
-export const setupReportsRefresh = () => {
-  const { isAuthenticated } = useAuthStore.getState();
+// export const setupReportsRefresh = () => {
+//   const { isAuthenticated } = useAuthStore.getState();
 
-  if (!isAuthenticated) return;
+//   if (!isAuthenticated) return;
 
-  if (refreshInterval) {
-    clearInterval(refreshInterval);
-  }
+//   if (refreshInterval) {
+//     clearInterval(refreshInterval);
+//   }
 
-  // Initial fetch
-  useSpatialStore.getState().fetchReports();
+//   // Initial fetch
+//   useSpatialStore.getState().fetchReports();
 
-  refreshInterval = setInterval(() => {
-    const { isAuthenticated } = useAuthStore.getState();
-    if (isAuthenticated) {
-      useSpatialStore.getState().fetchReports();
-    } else {
-      cleanupReportsRefresh();
-    }
-  }, 10000); // Refresh every 10 seconds
-};
+//   refreshInterval = setInterval(() => {
+//     const { isAuthenticated } = useAuthStore.getState();
+//     if (isAuthenticated) {
+//       useSpatialStore.getState().fetchReports();
+//     } else {
+//       cleanupReportsRefresh();
+//     }
+//   }, 10000); // Refresh every 10 seconds
+// };
 
-export const cleanupReportsRefresh = () => {
-  if (refreshInterval) {
-    clearInterval(refreshInterval);
-    refreshInterval = null;
-  }
-};
+// export const cleanupReportsRefresh = () => {
+//   if (refreshInterval) {
+//     clearInterval(refreshInterval);
+//     refreshInterval = null;
+//   }
+// };

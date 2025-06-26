@@ -11,8 +11,8 @@ import Button from '@components/ui/button/button';
 
 // Basemap definitions
 const basemaps = [
-  { id: 'osm', label: 'Open Street Map', checked: true },
-  { id: 'cartocdnLight', label: 'CartoDB Light', checked: false },
+  { id: 'cartocdnLight', label: 'CartoDB Light', checked: true },
+  { id: 'osm', label: 'Open Street Map', checked: false },
   { id: 'cartocdnDark', label: 'CartoDB Dark', checked: false },
   { id: 'satellite', label: 'Google Satellite', checked: false },
   { id: 'planet', label: 'Planet', checked: false },

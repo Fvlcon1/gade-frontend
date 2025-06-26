@@ -1,4 +1,5 @@
 "use client";
+import { useSpatialStore } from "@/lib/store/spatial-store";
 import Text from "@styles/components/text";
 import theme from "@styles/theme";
 import React, { useRef, useState, useEffect } from "react";
@@ -14,7 +15,6 @@ interface BottomTimelineProps {
 	playhead?: number | null;
 	isPlaying?: boolean;
 	setPlayhead?: (playhead: number | null) => void;
-	months: Array<{ monthIndex: number; year: number }>;
 }
 
 const getMonths = () => [
@@ -32,10 +32,10 @@ const BottomTimeline: React.FC<BottomTimelineProps> = ({
 	playhead = null,
 	isPlaying = false,
 	setPlayhead,
-	months
 }) => {
 	const trackRef = useRef<HTMLDivElement>(null);
 	const [dragging, setDragging] = useState<null | 0 | 1>(null);
+	const {months} = useSpatialStore();
 
 	const getPositionValue = (e: MouseEvent | React.MouseEvent) => {
 		const track = trackRef.current;
@@ -62,7 +62,6 @@ const BottomTimeline: React.FC<BottomTimelineProps> = ({
 		const distanceToStart = Math.abs(clickedValue - range[0]);
 		const distanceToEnd = Math.abs(clickedValue - range[1]);
 		const closestIndex = distanceToStart <= distanceToEnd ? 0 : 1;
-		console.log({closestIndex, clickedValue})
 		onRangeChange(closestIndex, clickedValue);
 	};
 
