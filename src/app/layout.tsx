@@ -6,6 +6,7 @@ import { Providers } from "./providers";
 import SpatialDataInitializer from './SpatialDataInitializer';
 import { QueryProvider } from '@/providers/query-provider';
 import { Toaster } from '@/components/ui/sonner';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 const montserrat = Montserrat({
 	variable: "--font-montserrat",
@@ -17,6 +18,16 @@ export const metadata: Metadata = {
 	description: "GADE",
 };
 
+// // Initialize theme
+// const savedTheme = localStorage.getItem('theme');
+// if (savedTheme === 'dark') {
+//   document.documentElement.classList.add('dark');
+// } else {
+//   // Default to light theme
+//   localStorage.setItem('theme', 'light');
+//   document.documentElement.classList.remove('dark');
+// }
+
 export default function RootLayout({
 	children,
 }: Readonly<{
@@ -25,14 +36,16 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body
-				className={`${montserrat.variable} antialiased`}
+				className={`${montserrat.variable} antialiased dark duration-500`}
 			>
 				<QueryProvider>
-				<Providers>
-					<SpatialDataInitializer />
-				{children}
-						<Toaster />
-				</Providers>
+					<ThemeProvider>
+						<Providers>
+							<SpatialDataInitializer />
+							{children}
+							<Toaster />
+						</Providers>
+					</ThemeProvider>
 				</QueryProvider>
 			</body>
 		</html>

@@ -9,11 +9,10 @@ import Summary from '../../components/Layout/Reports/Summary';
 import FilterBar from '@components/Layout/Reports/FilterBar';
 import ReportList from '@components/Layout/Reports/ReportList';
 import ReportItem from '../../components/Layout/Reports/ReportItem';
-import { useSpatialStore, setupReportsRefresh, cleanupReportsRefresh } from '@/lib/store/spatial-store';
+import { useSpatialStore } from '@/lib/store/spatial-store';
 import { exportToCSV } from '@/utils/export';
 import { exportToPDF } from '@/utils/export';
 import { formatReportId } from '@/utils/format';
-import { Button } from '@/components/ui/button';
 
 
 export default function ReportsPage() {
@@ -37,12 +36,6 @@ export default function ReportsPage() {
 
   // Get reports from spatial store
   const { reports, isLoading, error, fetchReports } = useSpatialStore();
-
-  // Set up and clean up reports refresh
-  useEffect(() => {
-    setupReportsRefresh();
-    return () => cleanupReportsRefresh();
-  }, []);
 
   // Handle manual refresh
   const handleRefresh = useCallback(async () => {

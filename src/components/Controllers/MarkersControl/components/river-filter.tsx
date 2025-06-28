@@ -1,5 +1,4 @@
 import { Slider } from "antd";
-import { colors } from "../../../../app/styles/theme";
 import Text from "@styles/components/text";
 import theme from "@styles/theme";
 import Input from "@components/ui/input/input";
@@ -55,13 +54,13 @@ const RiverFilter = () => {
                     value={[minProximityToRiver, maxProximityToRiver]}
                     styles={{
                         handle: {
-                            backgroundColor: colors.main.primary,
+                            backgroundColor: theme.colors.main.primary,
                         },
                         track: {
-                            backgroundColor: colors.main.primary,
+                            backgroundColor: theme.colors.main.primary,
                         },
                         rail: {
-                            backgroundColor: colors.bg.quantinary,
+                            backgroundColor: theme.colors.bg.quantinary,
                         },
                     }}
                     onChange={handleSliderChange}

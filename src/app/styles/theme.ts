@@ -1,6 +1,6 @@
 import { TypographyBold, TypographySize } from "./style.types"
 
-export const colors = {
+export const lightColors = {
     text : {
         primary : '#0A2540',
         secondary : '#425466',
@@ -23,8 +23,39 @@ export const colors = {
     }
 }
 
+export const darkColors = {
+    text : {
+        primary : '#F1FCFD',
+        secondary : '#CDD6D7',
+        tetiary : '#798586',
+    },
+    bg : {
+        primary : '#0B0A0A',
+        secondary : '#141515',
+        tetiary : '#1B1E1E',
+        quantinary : "#323737"
+    },
+    border : {
+        primary : "#1D1D1D",
+        secondary : '#2F2F2F',
+        tetiary : '#4D4D4D',
+        quantinary : '#909090',
+    },
+    main : {
+        primary : '#6060D0'
+    }
+}
+
+export const getColors = (): typeof lightColors => {
+    if (typeof window !== "undefined") {
+      const savedTheme = localStorage.getItem('theme');
+      return savedTheme === 'dark' ? darkColors : lightColors;
+    }
+    return lightColors; // default fallback
+  };
+
 export const theme = {
-    colors,
+    colors : getColors(),
     text: {
         size: { 
             SM: TypographySize.SM,
