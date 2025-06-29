@@ -41,7 +41,7 @@ const ForestReserveFilter = () => {
                 bold={theme.text.bold.md}
                 className="pl-1"
             >
-                Filter by distance to forest reserve
+                Distance to forest reserve
             </Text>
 
             <div className="w-full px-1">

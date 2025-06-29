@@ -207,7 +207,7 @@ const Page = () => {
       )}
 
       {/* Left Panel */}
-      <div className="absolute top-0 left-1.5 z-[1001] h-full py-2">
+      <div className="absolute top-0 left-1.5 z-[1001] h-full py-2 shadow-xl">
         <LeftPanel onExpandChange={setSidebarExpanded} />
       </div>
 
@@ -321,7 +321,7 @@ const ToolButton = ({ icon, isActive, onClick }) => (
     whileTap={{ scale: 0.9 }}
     transition={{ duration: 0.3, ease: "easeOut" }}
     className={`flex items-center justify-center rounded-md cursor-pointer w-[36px] h-[36px] ${isActive
-      ? "text-[var(--color-main-primary)] bg-[rgba(96,96,208,0.2)]"
+      ? "text-[var(--color-main-primary)] bg-main-primary/20"
       : "text-[var(--color-text-tetiary)] hover:bg-gray-200"
       }`}
     onClick={onClick}

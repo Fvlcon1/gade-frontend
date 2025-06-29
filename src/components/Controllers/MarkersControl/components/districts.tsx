@@ -91,7 +91,7 @@ const Districts = ({
                     bold={theme.text.bold.md}
                     className="pl-1"
                 >
-                    Filter by districts
+                    District
                 </Text>
             </div>
 

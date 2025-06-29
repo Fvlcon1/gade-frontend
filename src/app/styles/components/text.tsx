@@ -57,6 +57,7 @@ const Text = ({
                 flexWrap : wrap ? 'wrap' : 'nowrap',
                 textDecoration : underline || (onHover && clickableLink) ? 'underline' : 'none',
                 opacity : onHover && (clickable || clickableLink) ? 0.7 : 1,
+                lineHeight : lineHeight,
                 fontStyle : italic ? 'italic' : 'normal',
                 textAlign,
                 display: display ?? maxLines ? '-webkit-box' : 'inline-block',
@@ -64,7 +65,7 @@ const Text = ({
                 WebkitBoxOrient : 'vertical',
                 textOverflow : ellipsis ? 'ellipsis' : 'none',
                 cursor : (clickableLink || clickable) ? 'pointer' : '',
-                whiteSpace : maxLines ? 'none' : ellipsis ? 'nowrap' : 'none',
+                whiteSpace : whiteSpace ?? (maxLines ? 'none' : ellipsis ? 'nowrap' : 'none'),
                 overflow : ellipsis ? 'hidden' : 'inherit'
             }}
             onMouseOver={()=>setOnHover(true)}

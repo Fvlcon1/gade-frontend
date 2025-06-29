@@ -34,9 +34,9 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en">
+		<html lang="en" className="h-full">
 			<body
-				className={`${montserrat.variable} antialiased dark duration-500`}
+				className={`${montserrat.variable} antialiased dark duration-500 h-full min-h-full`}
 			>
 				<QueryProvider>
 					<ThemeProvider>
