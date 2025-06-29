@@ -1,5 +1,5 @@
 'use client'
-import theme, { colors } from "@styles/theme";
+import theme from "@styles/theme";
 import { ButtonProps } from "@/utils/@types";
 import Text from "@styles/components/text";
 import { useState } from "react";
