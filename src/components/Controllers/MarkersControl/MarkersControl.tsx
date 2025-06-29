@@ -12,8 +12,6 @@ import Districts from "./components/districts";
 import DateRange from "./components/date-range";
 import BlurContainer from "@components/ui/blur-container";
 import Actions from "./components/actions";
-import { Slider } from "antd";
-import { colors } from '../../../app/styles/theme';
 import RiverFilter from "./components/river-filter";
 import ForestReserveFilter from "./components/forest-reserve-filter";
 
