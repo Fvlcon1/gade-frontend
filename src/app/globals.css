@@ -27,12 +27,12 @@
   --bg-primary-lighter: #FBFBFB;
 
   /* Border colors */
-  --border-primary: #E4E4E4;
-  --border-secondary: #F2F2F2;
-  --border-tetiary: #DDDDDD;
-  --border-quantinary: #C6C6D0;
+  --border-primary: #EDEDED;
+  --border-secondary: #D1D1D1;
+  --border-tetiary: #B3B3B3;
+  --border-quantinary: #6E6E6E;
 
-  --main-primary: #6060D0;
+  --main-primary: #599907;
 }
 
 @theme {
@@ -111,7 +111,7 @@ body {
   --text-secondary: #CDD6D7;
   --text-tetiary: #798586;
 
-  --main-primary: #6060D0;
+  --main-primary: #599907;
 }
 
 .loader {

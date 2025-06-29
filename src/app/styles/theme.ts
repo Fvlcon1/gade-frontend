@@ -13,13 +13,13 @@ export const lightColors = {
         quantinary : "#D0D0D0"
     },
     border : {
-        primary : "#E4E4E4",
-        secondary : '#F2F2F2',
-        tetiary : '#DDDDDD',
-        quantinary : '#C6C6D0',
+        primary : "#EDEDED",
+        secondary : '#D1D1D1',
+        tetiary : '#B3B3B3',
+        quantinary : '#6E6E6E',
     },
     main : {
-        primary : '#6060D0'
+        primary : '#599907'
     }
 }
 
@@ -42,7 +42,7 @@ export const darkColors = {
         quantinary : '#909090',
     },
     main : {
-        primary : '#6060D0'
+        primary : '#599907'
     }
 }
 
@@ -58,6 +58,8 @@ export const theme = {
     colors : getColors(),
     text: {
         size: { 
+            xs : TypographySize.xs,
+            xs2 : TypographySize.xs2,
             SM: TypographySize.SM,
             body: TypographySize.body,
             body2 : TypographySize.body2,

@@ -5,12 +5,16 @@ import React, { useState } from "react";
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     const [sidebarExpanded, setSidebarExpanded] = useState(false);
     return (
-        <div className="flex w-full gap-2">
+        <div className="flex w-full gap-2 h-full">
             {/* Left Panel */}
-            <div className="absolute top-0 left-1.5 z-[1001] h-full">
+            <div className="px-4 z-[1001] h-full min-h-full py-4">
                 <LeftPanel onExpandChange={setSidebarExpanded} />
             </div>
-            {children}
+
+            {/* Main Content */}
+            <div className={`h-full w-full overflow-y-auto`}>
+                {children}
+            </div>
         </div>
     )
 }

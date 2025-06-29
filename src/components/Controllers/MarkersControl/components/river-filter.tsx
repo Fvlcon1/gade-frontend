@@ -42,7 +42,7 @@ const RiverFilter = () => {
                 bold={theme.text.bold.md}
                 className="pl-1"
             >
-                Filter by distance to river
+                Distance to river
             </Text>
 
             <div className="w-full px-1">

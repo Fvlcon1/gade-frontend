@@ -15,7 +15,7 @@ export interface AppTypographyProps {
   className? : string
   fontfamily? : 'montserrat' | 'greater-theory'
   bold?: TypographyBold;
-  size?: TypographySize;
+  size?: TypographySize | string | number;
   textColor?: string;
   colorTheme? : string;
   wrap?: boolean;

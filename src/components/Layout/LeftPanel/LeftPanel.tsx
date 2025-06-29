@@ -42,7 +42,7 @@ const LeftPanel = ({ onExpandChange }) => {
   if (!hasMounted) return null; // <-- PREVENT HYDRATION MISMATCH
 
   return (
-    <div className="h-full py-4">
+    <div className="h-full">
       <div
         className={`${
           isExpanded ? "w-[214px]" : "w-[54px]"
@@ -106,7 +106,7 @@ const LeftPanel = ({ onExpandChange }) => {
                   }`}
                 >
                   <Icon
-                    size={20}
+                    size={18}
                     className={`${
                       isActive
                         ? "text-[var(--color-main-primary)]"
@@ -132,12 +132,12 @@ const LeftPanel = ({ onExpandChange }) => {
           <div className="w-full h-px bg-[var(--color-border-primary)] my-1" />
 
           <div className="flex items-center gap-2 px-2 py-[8px] rounded-lg hover:bg-[var(--color-bg-tetiary)] cursor-pointer w-full">
-            <HelpCircle className="text-[var(--color-text-tetiary)] w-[18px] h-[18px]" />
+            <HelpCircle size={17} className="text-[var(--color-text-tetiary)]" />
             {isExpanded && <span className="text-sm text-[var(--color-text-tetiary)]">FAQ</span>}
           </div>
 
           <div className="flex items-center gap-2 px-2 py-[8px] rounded-lg hover:bg-[var(--color-bg-tetiary)] cursor-pointer w-full">
-            <Settings className="text-[var(--color-text-tetiary)] w-[18px] h-[18px]" />
+            <Settings size={19} className="text-[var(--color-text-tetiary)]" />
             {isExpanded && <span className="text-sm text-[var(--color-text-tetiary)]">Settings</span>}
           </div>
 

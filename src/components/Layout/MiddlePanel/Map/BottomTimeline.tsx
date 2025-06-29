@@ -98,7 +98,7 @@ const BottomTimeline: React.FC<BottomTimelineProps> = ({
 					>
 						{/* Active Range */}
 						<div
-							className="absolute h-[6px] bg-[#635bff] rounded-full"
+							className="absolute h-[6px] bg-main-primary rounded-full"
 							style={{
 								left: `${leftPercent}%`,
 								width: `${rightPercent - leftPercent}%`,
@@ -109,7 +109,7 @@ const BottomTimeline: React.FC<BottomTimelineProps> = ({
 						{/* Thumb Start */}
 						<div
 							onMouseDown={() => !isPlaying && setDragging(0)}
-							className="absolute top-1/2 w-4 h-4 bg-[#635bff] border-2 border-white rounded-full shadow-md -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10"
+							className="absolute top-1/2 w-4 h-4 bg-main-primary border-2 border-white rounded-full shadow-md -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10"
 							style={{
 								left: `${leftPercent}%`,
 							}}
@@ -118,7 +118,7 @@ const BottomTimeline: React.FC<BottomTimelineProps> = ({
 						{/* Thumb End */}
 						<div
 							onMouseDown={() => !isPlaying && setDragging(1)}
-							className="absolute top-1/2 w-4 h-4 bg-[#635bff] border-2 border-white rounded-full shadow-md -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10"
+							className="absolute top-1/2 w-4 h-4 bg-main-primary border-2 border-white rounded-full shadow-md -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10"
 							style={{
 								left: `${rightPercent}%`,
 							}}

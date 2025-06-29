@@ -68,7 +68,7 @@ const DateRange = ({
                     bold={theme.text.bold.md}
                     className="pl-1"
                 >
-                    Filter by date range
+                    Detection date
                 </Text>
             </div>
 
