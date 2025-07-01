@@ -11,31 +11,36 @@ export const menuItems = [
   {
     icon: IoStatsChart,
     label: "Dashboard",
-    href: "/",
+    href: "/dashboard",
     requiredRole: null,
+    size : 15
   },
   {
     icon: MdMap,
     label: "Map",
     href: "/map",
     requiredRole: null,
+    size : 16
   },
   {
     icon: FaFileAlt,
     label: "Reports",
     href: "/reports",
     requiredRole: null,
+    size : 14
   },
   {
     icon: AiFillAlert,
     label: "Alerts",
     href: "/alerts",
     requiredRole: null,
+    size : 17
   },
   {
     icon: FaUsers,
     label: "Accounts",
     href: "/account",
     requiredRole: "ADMIN",
+    size : 16
   }
 ];

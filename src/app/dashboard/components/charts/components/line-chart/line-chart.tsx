@@ -6,10 +6,12 @@ import { DatePicker } from "antd"
 import { useState } from "react"
 import dayjs from "dayjs"
 import useLineChart from "./hooks/useLineChart"
+import { useDashboardContext } from "@/app/dashboard/context/dashboard-context"
 
 const LineChart = () => {
     const [selectedDate, setSelectedDate] = useState<string>("")
-    const { lineChartSeries, isLineChartDataPending } = useLineChart()
+    const { lineChartSeries, categories } = useLineChart()
+    const {isMetricsPending} = useDashboardContext()
 
     const handleMonthChange = (value: string) => {
         setSelectedDate(value)
@@ -24,10 +26,10 @@ const LineChart = () => {
                             textColor={theme.colors.main.primary}
                             bold={theme.text.bold.md}
                         >
-                            Reported cases
+                            Area Over Time
                         </Text>
                         <Text textColor={theme.colors.text.tetiary}>
-                            Cases reported over the past year
+                            Monthly detected area over the past year
                         </Text>
                     </div>
 
@@ -52,8 +54,9 @@ const LineChart = () => {
                 {/** Chart */}
                 <div className="ml-[-10px] mt-[-10px]">
                     <ChartComponent
-                        isLineChartDataPending={isLineChartDataPending}
+                        isLineChartDataPending={isMetricsPending}
                         lineChartSeries={lineChartSeries}
+                        categories={categories}
                     />
                 </div>
             </div>

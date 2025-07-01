@@ -13,7 +13,7 @@ export default function AccountLayout({
   return (
     <div className="relative w-screen h-screen overflow-hidden">
       {/* Left Panel */}
-      <div className="absolute top-0 left-1.5 z-[1001] h-full">
+      <div className="absolute top-0 left-1.5 z-[1001] h-full py-4">
         <LeftPanel onExpandChange={setSidebarExpanded} />
       </div>
 

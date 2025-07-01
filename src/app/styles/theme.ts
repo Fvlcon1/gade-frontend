@@ -19,7 +19,7 @@ export const lightColors = {
         quantinary : '#6E6E6E',
     },
     main : {
-        primary : '#599907'
+        primary : '#5A87C7'
     }
 }
 
@@ -42,7 +42,7 @@ export const darkColors = {
         quantinary : '#909090',
     },
     main : {
-        primary : '#599907'
+        primary : '#5A87C7'
     }
 }
 

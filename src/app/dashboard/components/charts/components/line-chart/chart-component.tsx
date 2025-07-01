@@ -13,15 +13,18 @@ const Chart = dynamic(() => import('react-apexcharts'), {
 const ClaimsTimelineChart = ({
     isLineChartDataPending,
     lineChartSeries,
+    categories
 }: {
     isLineChartDataPending: boolean
     lineChartSeries: any
+    categories: any
 }) => {
     if (isLineChartDataPending) {
         return <ChartSkeleton />
     }
 
     const series = lineChartSeries
+    console.log({series})
 
     const options: ApexOptions = {
         chart: {
@@ -43,7 +46,7 @@ const ClaimsTimelineChart = ({
             }
         },
         xaxis: {
-            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            categories,
             axisBorder: { show: false },
             axisTicks: { show: false },
             labels: {

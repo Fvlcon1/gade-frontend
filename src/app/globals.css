@@ -32,7 +32,7 @@
   --border-tetiary: #B3B3B3;
   --border-quantinary: #6E6E6E;
 
-  --main-primary: #599907;
+  --main-primary: #5A87C7;
 }
 
 @theme {
@@ -111,7 +111,7 @@ body {
   --text-secondary: #CDD6D7;
   --text-tetiary: #798586;
 
-  --main-primary: #599907;
+  --main-primary: #5A87C7;
 }
 
 .loader {

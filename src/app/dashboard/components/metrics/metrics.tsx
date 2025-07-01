@@ -4,10 +4,20 @@ import { hexOpacity } from "@/utils/hexOpacity"
 import Text from "@styles/components/text"
 import theme from "@styles/theme"
 import useMetrics from "./hooks/useMetrics"
+import { useDashboardContext } from "../../context/dashboard-context"
+import { useState } from "react"
+import MetricSkeleton from "./metric-skeleton"
 
-const Metric = ({metric}: {metric: any}) => {
+interface Metric {
+    title: string;
+    value: string;
+    footer: string;
+    icon: any;
+}
+
+const Metric = ({metric}: {metric: Metric}) => {
     return (
-        <div className="relative flex flex-col gap-0 bg-bg-primary-lighter rounded-2xl border-[1px] border-border-primary p-2 w-[250px]">
+        <div className="relative flex flex-col gap-0 bg-bg-primary-lighter rounded-2xl border-[1px] border-border-primary p-2 w-[270px]">
             {/* header */}
             <div className="flex items-center gap-2">
                 <div className="w-[20px] h-[20px] rounded-sm bg-main-primary/15 flex items-center justify-center">
@@ -57,10 +67,15 @@ const Metric = ({metric}: {metric: any}) => {
 
 const Metrics = () => {
     const {metrics} = useMetrics()
+    const {isMetricsPending} = useDashboardContext()
     return (
         <div className="w-full gap-8 flex mt-[-12px]">
             {
-                metrics.map((metric, index) => (
+                isMetricsPending ? (
+                    Array.from({ length: 4 }).map((_, index) => (
+                        <MetricSkeleton key={index} />
+                    ))
+                ) : metrics.map((metric, index) => (
                     <Metric key={index} metric={metric} />
                 ))
             }
