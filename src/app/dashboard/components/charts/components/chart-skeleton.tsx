@@ -1,60 +1,67 @@
 import React from 'react';
 import theme from '@styles/theme';
-import SlideIn from '@styles/components/slidein';
 
-const ClaimsTimelineChartSkeleton = () => {
+const ChartSkeleton = () => {
     return (
-        <SlideIn direction="bottom" className="flex flex-1 rounded-xl border-[1px] border-border-secondary">
-            <div className="w-full h-full flex flex-col gap-4 p-4 pr-0">
-                {/* Header skeleton */}
-                <div className="flex flex-col gap-2">
-                    <div className="h-6 w-1/3 rounded-md bg-gray-200 animate-pulse"></div>
-                    <div className="h-4 w-2/3 rounded-md bg-gray-200 animate-pulse"></div>
+        <div className="animate-pulse w-full px-2 py-2" style={{ height: '450px' }}>
+            {/* Chart Title Skeleton */}
+            <div className="h-6 w-1/4 rounded-md bg-gray-200 mb-4"></div>
+
+            {/* Legend Skeleton */}
+            <div className="flex justify-center gap-6 mb-6">
+                {['Submitted', 'Approved', 'Flagged', 'Declined'].map((item) => (
+                    <div key={item} className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-gray-300"></div>
+                        <div className="h-4 w-16 rounded-md bg-gray-200"></div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Chart Area Skeleton */}
+            <div className="relative h-[350px] w-full border border-gray-200 rounded-lg p-4">
+                {/* Y-axis labels */}
+                <div className="absolute left-0 top-0 h-full w-8 flex flex-col justify-between pr-2">
+                    {[0, 25, 50, 75, 100].map((val) => (
+                        <div key={val} className="h-4 w-full rounded-md bg-gray-200"></div>
+                    ))}
                 </div>
 
-                {/* Chart skeleton */}
-                <div className="relative h-[450px] w-full ml-[-10px] mt-[-10px]">
-                    {/* Y-axis */}
-                    <div className="absolute left-2 top-0 h-full w-8 flex flex-col justify-between pr-2">
-                        {[0, 1, 2, 3].map((_, i) => (
-                            <div key={i} className="h-4 w-full rounded-md bg-gray-200 animate-pulse"></div>
+                {/* Main chart area */}
+                <div className="absolute left-8 right-0 top-0 h-full">
+                    {/* Grid lines */}
+                    <div className="relative h-full w-full">
+                        {[0, 25, 50, 75, 100].map((val, i) => (
+                            <div
+                                key={i}
+                                className="absolute left-0 right-0 h-px bg-gray-200"
+                                style={{ top: `${val}%` }}
+                            ></div>
                         ))}
                     </div>
 
-                    {/* Main chart area */}
-                    <div className="absolute left-8 right-0 top-0 h-full">
-                        {/* Grid lines */}
-                        <div className="relative h-full w-full">
-                            {[0, 1, 2, 3].map((_, i) => (
-                                <div
-                                    key={i}
-                                    className="absolute left-0 right-0 h-px bg-gray-200"
-                                    style={{ top: `${25 + (i * 25)}%` }}
-                                ></div>
-                            ))}
-                        </div>
-
-                        {/* Chart content */}
-                        <div className="relative h-full w-full overflow-hidden">
-                            {/* Simulated chart lines */}
-                            <div className="absolute bottom-0 left-0 right-0 h-3/4">
-                                <div className="absolute bottom-0 w-full h-1/3 bg-gray-200 opacity-30 rounded-t-lg"></div>
-                                <div className="absolute bottom-0 w-full h-2/3 bg-gray-200 opacity-20 rounded-t-lg"></div>
+                    {/* Bars - Simulating 12 months of data */}
+                    <div className="absolute bottom-0 left-0 right-0 h-full flex items-end gap-1 px-8">
+                        {Array.from({ length: 12 }).map((_, i) => (
+                            <div key={i} className="flex-1 flex flex-col justify-end gap-1">
+                                {/* Stacked bars */}
+                                <div className="h-1/4 bg-indigo-200 rounded-t-sm"></div>
+                                <div className="h-1/3 bg-emerald-200 rounded-t-sm"></div>
+                                <div className="h-1/5 bg-amber-200 rounded-t-sm"></div>
+                                <div className="h-1/6 bg-red-200 rounded-t-sm"></div>
                             </div>
-                        </div>
-                    </div>
-
-                    {/* X-axis */}
-                    <div className="absolute left-8 right-0 bottom-0 h-6 flex justify-between px-4">
-                        {['', '', '', '', '', ''].map((_, i) => (
-                            <div key={i} className="h-4 w-8 rounded-md bg-gray-200 animate-pulse"></div>
                         ))}
                     </div>
+                </div>
+
+                {/* X-axis labels */}
+                <div className="absolute left-8 right-0 bottom-0 h-8 flex justify-between px-8">
+                    {['', '', '', '', '', '', '', '', '', '', '', ''].map((_, i) => (
+                        <div key={i} className="h-4 w-6 rounded-md bg-gray-200"></div>
+                    ))}
                 </div>
             </div>
-        </SlideIn>
-
+        </div>
     );
 };
 
-export default ClaimsTimelineChartSkeleton;
+export default ChartSkeleton;

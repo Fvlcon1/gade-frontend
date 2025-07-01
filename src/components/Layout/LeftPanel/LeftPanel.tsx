@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from "react";
-import { usePathname } from "next/navigation"; 
+import { usePathname } from "next/navigation";
 import { menuItems } from "./menuItems";
 import Link from "next/link";
 import Image from "next/image";
@@ -10,6 +10,7 @@ import ClickableTab from "@components/ui/clickable/clickabletab";
 import { useAuthStore } from "@/lib/store/auth-store";
 import Text from "@/app/styles/components/text";
 import { TypographySize, TypographyBold } from "@styles/style.types";
+import theme from "@styles/theme";
 
 export const getActiveMenuItem = (pathname: string) => {
   return menuItems.find((item) => item.href === pathname);
@@ -44,12 +45,11 @@ const LeftPanel = ({ onExpandChange }) => {
   return (
     <div className="h-full">
       <div
-        className={`${
-          isExpanded ? "w-[214px]" : "w-[54px]"
-        } h-full bg-white/90 backdrop-blur-md border-[0.5px] border-[var(--color-border-primary)] rounded-xl flex flex-col py-3 px-2 transition-all duration-500 ease-in-out relative `}
+        className={`${isExpanded ? "w-[250px]" : "w-[54px]"
+          } h-full bg-white/90 backdrop-blur-md border-[1px] border-border-primary rounded-2xl flex flex-col transition-all duration-500 ease-in-out relative `}
       >
-        <div className={`flex flex-col ${isExpanded ? "items-start" : "items-center"} gap-4`}>
-          <div className="flex items-center justify-between w-full relative group">
+        <div className={`flex flex-col ${isExpanded ? "items-start" : "items-center"} gap-4 `}>
+          <div className={`flex items-center ${isExpanded ? "justify-between px-3" : "justify-center px-1"} w-full relative group border-b-[1px] border-border-primary bg-bg-primary-lighter py-3 rounded-t-2xl`}>
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full overflow-hidden">
                 <Image
@@ -66,58 +66,53 @@ const LeftPanel = ({ onExpandChange }) => {
             <div
               onClick={toggleExpansion}
               className={`absolute top-1/2 transform -translate-y-1/2 w-[25px] h-[25px] bg-[var(--color-bg-tetiary)] rounded-full flex items-center justify-center cursor-pointer transition-all duration-500 ease-in-out active:scale-90
-                ${
-                  isExpanded 
-                    ? "right-[-10] translate-x-1/2" 
-                    : "left-[35px] group-hover:opacity-100"
+                ${isExpanded
+                  ? "right-5 translate-x-1/2"
+                  : "right-[-30px] group-hover:opacity-100"
                 }
                 ${!isExpanded && "opacity-0 group-hover:opacity-100"}
               `}
             >
               <LuArrowRightToLine
                 size={14}
-                className={`text-[var(--color-main-primary)] transition-transform duration-300 ${
-                  isExpanded ? "rotate-180" : ""
-                }`}
+                className={`text-[var(--color-main-primary)] transition-transform duration-300 ${isExpanded ? "rotate-180" : ""
+                  }`}
               />
             </div>
           </div>
-
-          <div className="w-full h-px bg-[var(--color-border-primary)]" />
         </div>
 
-        <div className={`flex flex-col ${isExpanded ? "items-start" : "items-center"} gap-1 mt-2`}>
+        <div className={`flex flex-col ${isExpanded ? "items-start" : "items-center"} gap-1 mt-2 px-2`}>
           <span className={`text-xs text-gray-400 px-2 ${isExpanded ? "self-start" : "hidden"}`}>Main</span>
           {filteredMenuItems.map((item, index) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
 
             return (
-              <Link 
-                key={index} 
-                href={item.href} 
+              <Link
+                key={index}
+                href={item.href}
                 className="w-full"
                 prefetch={false}
                 legacyBehavior={false}
               >
                 <div
-                  className={`flex items-center gap-2 px-2 py-[8px] rounded-lg cursor-pointer transition-all ${
-                    isActive ? "bg-[var(--main-primary-20)]" : "hover:bg-[var(--color-bg-tetiary)]"
-                  }`}
+                  className={`flex items-center gap-2 px-2 py-[8px] rounded-lg cursor-pointer transition-all 
+                    ${isActive ? "bg-main-primary/20" : "hover:bg-[var(--color-bg-tetiary)]"}
+                    ${!isExpanded ? "justify-center" : ""}   
+                  `}
                 >
                   <Icon
-                    size={18}
-                    className={`${
-                      isActive
+                    size={item.size ?? 16}
+                    className={`${isActive
                         ? "text-[var(--color-main-primary)]"
                         : "text-[var(--color-text-tetiary)]"
-                    }`}
+                      }`}
                   />
                   {isExpanded && (
                     <Text
-                      textColor="rgb(31 41 55)"
-                      size={TypographySize.body}
-                      bold={TypographyBold.md}
+                      textColor={isActive ? theme.colors.main.primary : theme.colors.text.secondary}
+                      bold={isActive ? theme.text.bold.md : theme.text.bold.sm2}
                     >
                       {item.label}
                     </Text>
@@ -128,21 +123,20 @@ const LeftPanel = ({ onExpandChange }) => {
           })}
         </div>
 
-        <div className={`mt-auto flex flex-col ${isExpanded ? "items-start" : "items-center"} gap-2`}>
-          <div className="w-full h-px bg-[var(--color-border-primary)] my-1" />
+        <div className={`mt-auto flex flex-col ${isExpanded ? "items-start" : "items-center"} gap-0`}>
 
-          <div className="flex items-center gap-2 px-2 py-[8px] rounded-lg hover:bg-[var(--color-bg-tetiary)] cursor-pointer w-full">
+          {/* <div className={`${isExpanded ? "" : "justify-center"} flex items-center gap-2 px-2 py-[8px] rounded-lg hover:bg-[var(--color-bg-tetiary)] cursor-pointer w-full`}>
             <HelpCircle size={17} className="text-[var(--color-text-tetiary)]" />
-            {isExpanded && <span className="text-sm text-[var(--color-text-tetiary)]">FAQ</span>}
+            {isExpanded ? <Text>FAQ</Text> : null}
           </div>
 
-          <div className="flex items-center gap-2 px-2 py-[8px] rounded-lg hover:bg-[var(--color-bg-tetiary)] cursor-pointer w-full">
+          <div className={`${isExpanded ? "" : "justify-center"} flex items-center gap-2 px-2 py-[8px] rounded-lg hover:bg-[var(--color-bg-tetiary)] cursor-pointer w-full`}>
             <Settings size={19} className="text-[var(--color-text-tetiary)]" />
-            {isExpanded && <span className="text-sm text-[var(--color-text-tetiary)]">Settings</span>}
-          </div>
+            {isExpanded ? <Text>Settings</Text> : null}
+          </div> */}
 
-          <div className="flex items-center gap-2 px-2 py-[8px]">
-            <div className="w-[28px] h-[28px] overflow-hidden rounded-full">
+          <div className="flex flex-1 w-full items-center rounded-b-2xl border-t-[1px] border-border-primary gap-2 px-3 justify-center py-3 bg-bg-primary-lighter hover:bg-bg-secondary duration-200 cursor-pointer">
+            <div className="min-w-[28px] min-h-[28px] overflow-hidden rounded-full flex">
               <Image
                 src="/assets/LeftPanel/profile.png"
                 alt="Profile"
@@ -152,9 +146,18 @@ const LeftPanel = ({ onExpandChange }) => {
               />
             </div>
             {isExpanded && (
-              <span className="text-sm text-[var(--color-text-tetiary)] truncate">
-                {user?.email || 'Not logged in'}
-              </span>
+              <div className="flex flex-1 w-full flex-col overflow-x-hidden">
+                <div className="flex flex-1 w-full">
+                  <Text ellipsis>
+                    {`${user?.first_name} ${user?.last_name}` || 'Not logged in'}
+                  </Text>
+                </div>
+                <div className="flex flex-1 w-full mt-[-2px]">
+                  <Text ellipsis textColor={theme.colors.text.tetiary}>
+                    {user?.email || 'Not logged in'}
+                  </Text>
+                </div>
+              </div>
             )}
           </div>
         </div>

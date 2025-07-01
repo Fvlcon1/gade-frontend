@@ -6,7 +6,7 @@ const cookies = new Cookies();
 const baseURL = process.env.NEXT_PUBLIC_API_URL;
 
 const getToken = () => {
-    return cookies.get("accessToken");
+    return cookies.get("access_token");
 };
 
 const getHeaders = () => {
