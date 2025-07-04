@@ -1,11 +1,20 @@
 'use client'
 
 import LeftPanel from "@components/Layout/LeftPanel/LeftPanel"
-import Text from "@styles/components/text";
 import { useState } from "react"
+import Filter from "./components/filter";
+import { FaUsers } from "react-icons/fa6";
+import Metrics from "./components/metrics/metrics";
+import Header from "@components/header/header";
+import Divider from "@components/ui/divider/divider";
+import Controls from "./components/controls/controls";
+import Table from "./components/table";
+import Pagination from "@components/pagination/pagination";
+import { useAccountsContext } from "./context/context";
 
 const Accounts = () => {
     const [sidebarExpanded, setSidebarExpanded] = useState(false);
+    const {pageId, setPageId, pageSize, setPageSize} = useAccountsContext()
 
     return (
         <div className="w-full h-full flex">
@@ -13,16 +22,25 @@ const Accounts = () => {
                 <LeftPanel onExpandChange={setSidebarExpanded} />
             </div>
 
-            <div className={`flex w-full duration-400 h-full pt-4 ${sidebarExpanded ? 'pl-[272px]' : 'pl-[72px]'}`}>
-                <div className="w-[250px] h-[80%] rounded-2xl border-[1px] border-border-primary">
-                    <div className="w-full h-[50px] flex px-3 items-center rounded-t-2xl bg-bg-primary-lighter border-b-[1px] border-border-primary">
-                        <Text>
-                            Filter
-                        </Text>
+            <div className={`flex gap-4 pr-4 w-full duration-400 h-full pt-5 ${sidebarExpanded ? 'pl-[272px]' : 'pl-[72px]'}`}>
+                <div className="flex flex-col gap-3 w-full">
+                    <Header
+                        title="User Account Management"
+                        icon={FaUsers}
+                        size={"18px"}
+                    />
+
+                    <div className="flex flex-col gap-4 w-full">
+                        <Metrics />
+                        <Divider />
+                        <Controls />
+                        <Divider />
+                        <Table />
+                        <Pagination 
+                            currentPage={pageId}
+                            onPageChange={(page) => setPageId(page)}
+                        />
                     </div>
-                </div>
-                <div className="flex flex-1 w-full h-full">
-                    
                 </div>
             </div>
         </div>

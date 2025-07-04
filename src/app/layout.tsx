@@ -5,7 +5,7 @@ import "./styles/css/loader.css"
 import { Providers } from "./providers";
 import SpatialDataInitializer from './SpatialDataInitializer';
 import { QueryProvider } from '@/providers/query-provider';
-import { Toaster } from '@/components/ui/sonner';
+import { Toaster } from "react-hot-toast";
 import { ThemeProvider } from '@/components/ThemeProvider';
 
 const montserrat = Montserrat({
@@ -33,6 +33,17 @@ export default function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const toaster = (
+		<Toaster
+			containerStyle={{
+				fontFamily: "montserrat",
+				zIndex: 999999,
+				fontWeight: 500,
+				fontSize: "12px",
+			}}
+		/>
+	)
+
 	return (
 		<html lang="en" className="h-full">
 			<body
@@ -43,7 +54,7 @@ export default function RootLayout({
 						<Providers>
 							<SpatialDataInitializer />
 							{children}
-							<Toaster />
+							{toaster}
 						</Providers>
 					</ThemeProvider>
 				</QueryProvider>

@@ -22,6 +22,7 @@ type InputProps = {
     autoSelect?: boolean;
     autoComplete?: HTMLInputAutoCompleteAttribute;
     inputProps?: DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+    disabled?: boolean;
 } & (
     | { value: string; setValue?: Dispatch<SetStateAction<string>> }
     | { value: number; setValue?: Dispatch<SetStateAction<number>> }
@@ -46,16 +47,15 @@ const Input = ({
     borderColor,
     ref,
     autoSelect,
-    autoComplete
+    autoComplete,
+    disabled
 }: InputProps) => {
     const [inputFocus, setInputFocus] = useState<boolean>(autofocus ?? false);
     const [hover, setHover] = useState<boolean>(false);
     
-    // ✅ Properly typed useRef with null safety
     const inputRef = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
-        // ✅ Fix: Use optional chaining to prevent null errors
         if (autoSelect) {
             inputRef.current?.select();
         }
@@ -63,10 +63,13 @@ const Input = ({
 
     return (
         <div
-            className={`flex w-full h-fit gap-2 px-[15px] py-[10px] items-center rounded-lg bg-bg-primary border-border-primary border-[1px] border-solid duration-200 ${className}`}
+            className={`
+                flex w-full h-fit gap-2 px-[15px] py-[10px] items-center rounded-lg bg-bg-primary border-border-primary border-[1px] border-solid duration-200 ${className}
+                ${disabled ? "opacity-50 cursor-not-allowed" : ""}
+            `}
             onClick={onClick}
             style={{
-                borderColor: (inputFocus || hover) ? theme.colors.main.primary : borderColor || theme.colors.border.primary
+                borderColor: ((inputFocus || hover) && !disabled) ? theme.colors.main.primary : borderColor || theme.colors.border.primary
             }}
         >
             {PreIcon && PreIcon}
@@ -74,9 +77,12 @@ const Input = ({
                 {...inputProps}
                 ref={ref ?? inputRef}
                 placeholder={placeholder ?? inputProps?.placeholder ?? "Input text"}
+                style={{
+                    fontFamily: "montserrat"
+                }}
                 type={type ?? inputProps?.type ?? "text"}
                 required={required ?? inputProps?.required}
-                className={`flex w-full flex-1 bg-transparent h-fit outline-none placeholder:text-[12px] placeholder:text-text-tetiary text-text-primary md:text-[12px] text-[16px] ${inputClassName}`}
+                className={`${disabled ? "cursor-not-allowed" : ""} flex w-full flex-1 bg-transparent font-medium h-fit outline-none placeholder:text-[12px] placeholder:text-text-tetiary text-text-secondary md:text-[12px] text-[16px] ${inputClassName}`}
                 onFocus={(e) => {
                     setInputFocus(true);
                     inputProps?.onFocus?.(e);
@@ -101,8 +107,8 @@ const Input = ({
                     onChange ? onChange(e) : setValue && setValue(e.target.value as any);
                     inputProps?.onChange?.(e);
                 }}
-                disabled={inputProps?.disabled}
                 autoComplete={autoComplete ?? inputProps?.autoComplete}
+                disabled={disabled}
             />
             {PostIcon && PostIcon}
         </div>

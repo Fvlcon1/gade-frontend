@@ -25,7 +25,7 @@ export const menuItems = [
   {
     icon: FaFileAlt,
     label: "Reports",
-    href: "/reports",
+    href: "/report",
     requiredRole: null,
     size : 14
   },
@@ -39,7 +39,7 @@ export const menuItems = [
   {
     icon: FaUsers,
     label: "Accounts",
-    href: "/account",
+    href: "/accounts",
     requiredRole: "ADMIN",
     size : 16
   }
