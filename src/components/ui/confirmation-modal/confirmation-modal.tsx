@@ -25,15 +25,15 @@ const ConfirmationModal = ({
     close: () => void;
     description?: string,
     children?: React.ReactNode,
-    onConfirm: () => Promise<void>,
+    onConfirm: () => void,
     cta?: string
     loading?: boolean
     title?: string
     icon?: React.ReactNode
     color?: string,
 }) => {
-    const handleConfirm = async () => {
-        await onConfirm()
+    const handleConfirm = () => {
+        onConfirm()
     }
     
     return (

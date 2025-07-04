@@ -11,51 +11,48 @@ import OutlineButton from "@components/ui/button/outlineButton";
 import { useReportsContext } from "../../context/report-context";
 
 const Controls = () => {
-    const [searchValue, setSearchValue] = useState('');
-    const [statusValue, setStatusValue] = useState('All Status');
-    const [priorityValue, setPriorityValue] = useState('All Priority');
-    const { refetchReports, selectedStatus, selectedPriority, setSelectedStatus, setSelectedPriority } = useReportsContext()
+    const { refetchReports, selectedStatus, selectedSeverity, setSelectedStatus, setSelectedSeverity } = useReportsContext()
 
     const handleStatusChange = (status: string) => {
-        setStatusValue(status)
         setSelectedStatus(status)
     }
 
     const statusOptions: DropdownItem[] = [
+        { key: "1", label: "All Status", onClick: () => handleStatusChange(''), isSelected: selectedStatus === null || selectedStatus === '' },
         { key: "2", label: "Open", onClick: () => handleStatusChange('Open'), isSelected: selectedStatus === 'Open' },
-        { key: "3", label: "In Review", onClick: () => handleStatusChange('In Review'), isSelected: selectedStatus === 'In Review' },
-        { key: "4", label: "Resolved", onClick: () => handleStatusChange('Resolved'), isSelected: selectedStatus === 'Resolved' },
+        { key: "3", label: "Under Review", onClick: () => handleStatusChange('Under Review'), isSelected: selectedStatus === 'Under Review' },
+        { key: "4", label: "Closed", onClick: () => handleStatusChange('Closed'), isSelected: selectedStatus === 'Closed' },
     ]
 
-    const priorityOptions: DropdownItem[] = [
-        { key: "2", label: "High", onClick: () => handlePriorityChange('High'), isSelected: selectedPriority === 'High' },
-        { key: "3", label: "Medium", onClick: () => handlePriorityChange('Medium'), isSelected: selectedPriority === 'Medium' },
-        { key: "4", label: "Low", onClick: () => handlePriorityChange('Low'), isSelected: selectedPriority === 'Low' },
+    const severityOptions: DropdownItem[] = [
+        { key: "1", label: "All Severity", onClick: () => handleSeverityChange(''), isSelected: selectedSeverity === null || selectedSeverity === '' },
+        { key: "2", label: "High", onClick: () => handleSeverityChange('High'), isSelected: selectedSeverity === 'High' },
+        { key: "3", label: "Medium", onClick: () => handleSeverityChange('Medium'), isSelected: selectedSeverity === 'Medium' },
+        { key: "4", label: "Low", onClick: () => handleSeverityChange('Low'), isSelected: selectedSeverity === 'Low' },
     ]
 
-    const handlePriorityChange = (priority: string) => {
-        setPriorityValue(priority)
-        setSelectedPriority(priority)
+    const handleSeverityChange = (severity: string) => {
+        setSelectedSeverity(severity)
     }
     return (
         <>
             <div className="w-full flex gap-2 justify-center items-center">
                 <div className="flex gap-2 w-[1024px] items-center">
-                    <Input
+                    {/* <Input
                         placeholder="Search reports"
                         value={searchValue}
                         setValue={setSearchValue}
                         PreIcon={<IoSearch color={theme.colors.text.tetiary} />}
                         className="!max-w-[500px]"
                         borderColor={theme.colors.border.secondary}
-                    />
+                    /> */}
 
                     <Dropdown
                         menuItems={statusOptions}
                     >
                         <Input
-                            placeholder="Status"
-                            value={statusValue}
+                            placeholder="All Status"
+                            value={selectedStatus || ""}
                             setValue={handleStatusChange}
                             PostIcon={<BiChevronDown color={theme.colors.text.tetiary} />}
                             PreIcon={<HiOutlineStatusOnline color={theme.colors.text.secondary} />}
@@ -64,12 +61,12 @@ const Controls = () => {
                     </Dropdown>
 
                     <Dropdown
-                        menuItems={priorityOptions}
+                        menuItems={severityOptions}
                     >
                         <Input
-                            placeholder="Priority"
-                            value={priorityValue}
-                            setValue={handlePriorityChange}
+                            placeholder="All Severity"
+                            value={selectedSeverity || ""}
+                            setValue={handleSeverityChange}
                             PostIcon={<BiChevronDown color={theme.colors.text.tetiary} />}
                             PreIcon={<FaUserShield color={theme.colors.text.secondary} />}
                             borderColor={theme.colors.border.secondary}

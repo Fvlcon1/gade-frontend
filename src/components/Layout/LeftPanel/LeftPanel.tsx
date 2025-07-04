@@ -98,7 +98,7 @@ const LeftPanel = ({ onExpandChange }) => {
               >
                 <div
                   className={`flex items-center gap-2 px-2 py-[8px] rounded-lg cursor-pointer transition-all 
-                    ${isActive ? "bg-main-primary/20" : "hover:bg-[var(--color-bg-tetiary)]"}
+                    ${isActive ? "bg-main-primary/10" : "hover:bg-[var(--color-bg-tetiary)]"}
                     ${!isExpanded ? "justify-center" : ""}   
                   `}
                 >

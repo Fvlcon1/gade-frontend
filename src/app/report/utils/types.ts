@@ -1,4 +1,5 @@
-export type FilterStatus = 'active' | 'inactive' | 'pending'
+export type FilterStatus = 'open' | 'under review' | 'closed'
+export type FilterSeverity = 'high' | 'medium' | 'low'
 export type FilterRoles = 'admin' | 'standard'
 
 export interface IMetricCard {

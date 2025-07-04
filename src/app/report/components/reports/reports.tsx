@@ -10,7 +10,7 @@ const Reports = () => {
         return (
             <div className="flex flex-col gap-3">
                 {
-                    Array.from({ length: 3 }).map((_, index) => (
+                    Array.from({ length: 8 }).map((_, index) => (
                         <ReportsSkeleton key={index} />
                     ))
                 }
@@ -18,7 +18,7 @@ const Reports = () => {
         )
     }
 
-    if(reportsData.length === 0) {
+    if(!reportsData || reportsData.length === 0) {
         return (
             <NoData />
         )

@@ -30,7 +30,7 @@ const MetricCard = ({
                 textColor={"#" + metric.color}
                 lineHeight={1}
             >
-                {metric.value}
+                {metric.value || 0}
             </Text>
 
             <div 
