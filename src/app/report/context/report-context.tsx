@@ -16,9 +16,12 @@ const ReportsContext = createContext<{
     reportsIsFetching: boolean,
     metricsData: IMetricCard[],
     selectedStatus: string,
-    selectedPriority: string,
+    selectedSeverity: string,
     setSelectedStatus: Dispatch<SetStateAction<string>>,
-    setSelectedPriority: Dispatch<SetStateAction<string>>
+    setSelectedSeverity: Dispatch<SetStateAction<string>>,
+    updateReportMutation: ({id, status}: {id: string, status: string}) => void,
+    updateReportLoading: boolean,
+    updateReportSuccess: boolean
 }>({
     pageId: 1,
     setPageId: () => {},
@@ -31,9 +34,12 @@ const ReportsContext = createContext<{
     reportsIsFetching: false,
     metricsData: [],
     selectedStatus: '',
-    selectedPriority: '',
+    selectedSeverity: '',
     setSelectedStatus: () => {},
-    setSelectedPriority: () => {}
+    setSelectedSeverity: () => {},
+    updateReportMutation: ({id, status}: {id: string, status: string}) => {},
+    updateReportLoading: false,
+    updateReportSuccess: false
 })
 
 export const ReportsContextProvider = ({ children }: { children: ReactNode }) => {

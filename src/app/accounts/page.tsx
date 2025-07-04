@@ -27,7 +27,7 @@ const Accounts = () => {
                     <Header
                         title="User Account Management"
                         icon={FaUsers}
-                        size={"18px"}
+                        size={"16px"}
                     />
 
                     <div className="flex flex-col gap-4 w-full">
