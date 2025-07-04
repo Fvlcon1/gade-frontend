@@ -4,6 +4,7 @@ import { ButtonProps } from "@/utils/@types";
 import Text from "@styles/components/text";
 import { useState } from "react";
 import { TypographyBold } from "@styles/style.types";
+import { ImSpinner10 } from "react-icons/im";
 
 const Button = ({
 	className,
@@ -69,7 +70,7 @@ const Button = ({
 	}
 
 	const loader = (
-		<div className={`loader ${loadingColor ? `!bg-[${loadingColor}]` : "!bg-white"} !w-[15px] !h-[15px] !border-[2px]`} />
+		<ImSpinner10 className="animate-spin" color={loadingColor ?? "white"} size={15} />
 	)
 	
 	const buttonText = (

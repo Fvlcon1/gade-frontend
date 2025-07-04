@@ -3,25 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Ranking } from "../utils/types";
 import { useState, Dispatch, SetStateAction } from "react";
 import { formatWithPrefix } from "@/utils/unit-utils";
-
-// Utility to convert snake_case to camelCase
-const toCamelCase = (str: string) =>
-    str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
-
-// Recursively convert all object keys to camelCase
-const transformKeysToCamelCase = (obj: any): any => {
-    if (Array.isArray(obj)) {
-        return obj.map(transformKeysToCamelCase);
-    } else if (obj !== null && typeof obj === "object") {
-        return Object.fromEntries(
-            Object.entries(obj).map(([key, value]) => [
-                toCamelCase(key),
-                transformKeysToCamelCase(value),
-            ])
-        );
-    }
-    return obj;
-};
+import { transformKeysToCamelCase } from "@/utils/utils";
 
 const getRankings = (metrics: any, setRankings: Dispatch<SetStateAction<Ranking[]>>) => {
     if (metrics?.districtsByArea) {
