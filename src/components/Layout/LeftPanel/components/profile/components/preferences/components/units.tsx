@@ -5,29 +5,30 @@ import { LuSunMoon, LuChevronDown } from "react-icons/lu"
 import { CiLight, CiDark } from "react-icons/ci"
 import Dropdown from "@components/ui/dropdown/dropdown"
 import { DropdownItem } from "@/utils/@types"
+import { useLeftPanelContext } from "@components/Layout/LeftPanel/context/context"
 
 const Units = () => {
+    const { settings, setSettings } = useLeftPanelContext()
+    const units = settings?.units
+    
+    const handleUnitsChange = (units: string) => {
+        setSettings({
+            ...settings,
+            units: units
+        })
+    }
+    
     const items: DropdownItem[] = [
         {
-            key: "meters",
-            label: "Meters",
+            key: "metric",
+            label: "Metric",
+            onClick: () => handleUnitsChange("metric")
         },
         {
-            key: "kilometers",
-            label: "Kilometers",
-        },
-        {
-            key: "feet",
-            label: "Feet",
-        },
-        {
-            key: "yards",
-            label: "Yards",
-        },
-        {
-            key: "miles",
-            label: "Miles",
-        }
+            key: "imperial",
+            label: "Imperial",
+            onClick: () => handleUnitsChange("imperial")
+        }, 
     ]
     return (
         <div className="flex items-center justify-between w-full">
@@ -45,7 +46,7 @@ const Units = () => {
             >
                 <Input
                     placeholder="Select units"
-                    value="Meters"
+                    value={units}
                     className="!w-[120px] !h-[35px]"
                     PostIcon={<LuChevronDown size={15} color={theme.colors.text.secondary} />}
                     inputProps={{

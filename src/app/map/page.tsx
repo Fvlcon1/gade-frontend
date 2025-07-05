@@ -12,6 +12,7 @@ import MarkersControl from "../../components/Controllers/MarkersControl/MarkersC
 import TimelineController from "../../components/Controllers/timeline-controller/TimelineController";
 import { initialLayers } from "../../components/Controllers/LayersControl";
 import { useSpatialStore } from "@/lib/store/spatial-store";
+import { useAuthStore } from "@/lib/store/auth-store";
 
 const InteractiveMapClient = dynamic(() => import("../../components/Layout/MiddlePanel/Map/InteractiveMapClient"), {
   ssr: false,
@@ -32,7 +33,6 @@ const Page = () => {
   const [showMarkers, setShowMarkers] = useState(false);
   const [showTimeline, setShowTimeline] = useState(false);
   const [activeTab, setActiveTab] = useState("layers");
-  const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [activeBasemap, setActiveBasemap] = useState('cartocdnLight');
   const [previousBasemap, setPreviousBasemap] = useState('cartocdnLight');
   const [activeFeatureLayers, setActiveFeatureLayers] = useState<Layer[]>(initialLayers.filter(layer => layer.checked));
@@ -47,6 +47,7 @@ const Page = () => {
   const [comparisonActive, setComparisonActive] = useState(false);
   const [comparisonStartDate, setComparisonStartDate] = useState<string | null>(null);
   const [comparisonEndDate, setComparisonEndDate] = useState<string | null>(null);
+  const { sidebarExpanded } = useAuthStore();
 
   useEffect(() => {
     const timer = setTimeout(() => setMapReady(true), 300);
@@ -168,7 +169,7 @@ const Page = () => {
     setTimelineMode('comparison');
   };
 
-  const floatingNavLeft = sidebarExpanded ? "232px" : "72px";
+  const floatingNavLeft = sidebarExpanded ? "268px" : "72px";
 
   // Correct basemap switching logic
   useEffect(() => {
@@ -208,7 +209,7 @@ const Page = () => {
 
       {/* Left Panel */}
       <div className="absolute top-0 left-1.5 z-[1001] h-full py-2 shadow-xl">
-        <LeftPanel onExpandChange={setSidebarExpanded} />
+        <LeftPanel />
       </div>
 
       {/* Floating Navigation */}

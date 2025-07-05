@@ -5,18 +5,33 @@ import { LuSunMoon, LuChevronDown } from "react-icons/lu"
 import { CiLight, CiDark } from "react-icons/ci"
 import Dropdown from "@components/ui/dropdown/dropdown"
 import { DropdownItem } from "@/utils/@types"
+import { useLeftPanelContext } from "@components/Layout/LeftPanel/context/context"
 
 const Theme = () => {
+    const { settings, setSettings } = useLeftPanelContext()
+    const appTheme = settings?.appTheme
+    
+    const handleThemeChange = (theme: string) => {
+        setSettings({
+            ...settings,
+            appTheme: theme
+        })
+    }
     const items: DropdownItem[] = [
+        {
+            key: "system",
+            label: "System",
+            onClick: () => handleThemeChange("system")
+        },
         {
             key: "light",
             label: "Light",
-            icon: <CiLight size={20} color={theme.colors.text.secondary} />
+            onClick: () => handleThemeChange("light")
         },
         {
             key: "dark",
             label: "Dark",
-            icon: <CiDark size={20} color={theme.colors.text.secondary} />
+            onClick: () => handleThemeChange("dark")
         }
     ]
     return (
@@ -34,7 +49,7 @@ const Theme = () => {
             >
                 <Input
                     placeholder="Select theme"
-                    value="Light"
+                    value={appTheme}
                     className="!w-[120px] !h-[35px]"
                     PreIcon={<LuSunMoon size={20} color={theme.colors.text.secondary} />}
                     PostIcon={<LuChevronDown size={15} color={theme.colors.text.secondary} />}

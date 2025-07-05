@@ -13,6 +13,8 @@ interface AuthState {
   setError: (error: string | null) => void;
   setLoading: (isLoading: boolean) => void;
   logout: () => void;
+  sidebarExpanded: boolean;
+  setSidebarExpanded: (expanded: boolean) => void;
 }
 
 const cookies = new Cookies()
@@ -54,6 +56,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   ...getInitialState(),
   isLoading: false,
   error: null,
+  sidebarExpanded: false,
+  setSidebarExpanded: (expanded) => set({ sidebarExpanded: expanded }),
   setUser: (user) => {
     if (user) {
       localStorage.setItem('user', JSON.stringify(user));
