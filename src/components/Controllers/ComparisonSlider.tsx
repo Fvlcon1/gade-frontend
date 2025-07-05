@@ -21,7 +21,7 @@ const ComparisonSlider: React.FC<ComparisonSliderProps> = ({ isVisible, sidebarE
   const handleMouseMove = (e: MouseEvent) => {
     if (!dragging) return;
     const screenWidth = window.innerWidth;
-    const sidebarWidth = sidebarExpanded ? 232 : 72;
+    const sidebarWidth = sidebarExpanded ? 268 : 72;
     let newPosition = (e.clientX / screenWidth);
     // Clamp between 0 and 1
     newPosition = Math.max(0, Math.min(1, newPosition));

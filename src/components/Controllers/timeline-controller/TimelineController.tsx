@@ -217,7 +217,7 @@ const TimelineController: React.FC<TimelineControllerProps> = ({
     }
   }, [isOpen, onModeChange, activeTab]);
 
-  const leftPosition = sidebarExpanded ? "296px" : "136px";
+  const leftPosition = sidebarExpanded ? "332px" : "136px";
 
   return (
     <AnimatePresence>

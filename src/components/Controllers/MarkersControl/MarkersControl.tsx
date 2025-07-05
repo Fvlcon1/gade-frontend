@@ -227,7 +227,7 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
     )
   }
 
-  const leftPosition = sidebarExpanded ? "296px" : "136px";
+  const leftPosition = sidebarExpanded ? "332px" : "136px";
 
   return (
     <AnimatePresence>

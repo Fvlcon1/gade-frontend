@@ -2,7 +2,7 @@
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import LeftPanel from "@components/Layout/LeftPanel/LeftPanel";
-import { menuItems } from "@components/Layout/LeftPanel/menuItems";
+import { menuItems } from "@components/Layout/LeftPanel/components/menuItems";
 import Title from '@components/Layout/Reports/Title';
 
 

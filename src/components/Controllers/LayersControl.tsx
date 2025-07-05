@@ -95,7 +95,7 @@ const LayersControl: React.FC<LayersControlProps> = ({
   }, [onLayerChange]);
 
   const selectedFeatureCount = featureLayers.filter(l => l.checked).length;
-  const leftPosition = sidebarExpanded ? '295px' : '135px';
+  const leftPosition = sidebarExpanded ? '332px' : '135px';
 
   const Divider = ({ className }: { className?: string }) => {
     return (

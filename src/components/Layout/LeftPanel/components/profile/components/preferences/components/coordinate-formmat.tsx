@@ -6,16 +6,29 @@ import { CiLight, CiDark } from "react-icons/ci"
 import Dropdown from "@components/ui/dropdown/dropdown"
 import { DropdownItem } from "@/utils/@types"
 import { BiCurrentLocation } from "react-icons/bi"
+import { useLeftPanelContext } from "@components/Layout/LeftPanel/context/context"
 
 const CoordinateFormat = () => {
+    const { settings, setSettings } = useLeftPanelContext()
+    const coordinateFormat = settings?.coordinateFormat
+
+    const handleCoordinateFormatChange = (format: string) => {
+        setSettings({
+            ...settings,
+            coordinateFormat: format
+        })
+    }
+    
     const items: DropdownItem[] = [
         {
-            key: "decimal",
-            label: "Decimal",
+            key: "dd",
+            label: "dd (decimal degrees)",
+            onClick: () => handleCoordinateFormatChange("dd")
         },
         {
-            key: "degree",
-            label: "Degree",
+            key: "dms",
+            label: "dms (degree minutes seconds)",
+            onClick: () => handleCoordinateFormatChange("dms")
         }
     ]
     return (
@@ -33,7 +46,7 @@ const CoordinateFormat = () => {
             >
                 <Input
                     placeholder="Select coordinate format"
-                    value="Decimal"
+                    value={coordinateFormat}
                     className="!w-[150px] !h-[35px]"
                     PreIcon={<BiCurrentLocation size={20} color={theme.colors.text.secondary} />}
                     PostIcon={<LuChevronDown size={15} color={theme.colors.text.secondary} />}

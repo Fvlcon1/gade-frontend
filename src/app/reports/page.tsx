@@ -3,7 +3,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState, useCallback, useEffect } from 'react';
 import { FaSync } from 'react-icons/fa';
 import LeftPanel from "@components/Layout/LeftPanel/LeftPanel";
-import { menuItems } from "@components/Layout/LeftPanel/menuItems";
+import { menuItems } from "@components/Layout/LeftPanel/components/menuItems";
 import Title from '@components/Layout/Reports/Title';
 import Summary from '../../components/Layout/Reports/Summary';
 import FilterBar from '@components/Layout/Reports/FilterBar';

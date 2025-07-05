@@ -11,15 +11,16 @@ import Controls from "./components/controls/controls";
 import Table from "./components/table";
 import Pagination from "@components/pagination/pagination";
 import { useAccountsContext } from "./context/context";
+import { useAuthStore } from "@/lib/store/auth-store";
 
 const Accounts = () => {
-    const [sidebarExpanded, setSidebarExpanded] = useState(false);
+    const { sidebarExpanded } = useAuthStore();
     const {pageId, setPageId, pageSize, setPageSize} = useAccountsContext()
 
     return (
         <div className="w-full h-full flex">
             <div className="absolute top-0 left-1.5 z-[1001] h-full py-4">
-                <LeftPanel onExpandChange={setSidebarExpanded} />
+                <LeftPanel />
             </div>
 
             <div className={`flex gap-4 pr-4 w-full duration-400 h-full pt-5 ${sidebarExpanded ? 'pl-[272px]' : 'pl-[72px]'}`}>

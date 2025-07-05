@@ -1,18 +1,17 @@
 import Text from "@styles/components/text"
 import theme from "@styles/theme"
-import Input from "@components/ui/input/input"
-import { LuSunMoon, LuChevronDown } from "react-icons/lu"
-import { CiLight, CiDark } from "react-icons/ci"
-import Dropdown from "@components/ui/dropdown/dropdown"
-import { DropdownItem } from "@/utils/@types"
 import { Switch } from "antd"
-import { useState } from "react"
+import { useLeftPanelContext } from "@components/Layout/LeftPanel/context/context"
 
 const Notification = () => {
-    const [checked, setChecked] = useState(true);
+    const { settings, setSettings } = useLeftPanelContext()
+    const notificationsEnabled = settings?.notificationsEnabled
 
     const onChange = (checked: boolean) => {
-        setChecked(checked);
+        setSettings({
+            ...settings,
+            notificationsEnabled: checked
+        })
     };
 
     return (
@@ -26,7 +25,7 @@ const Notification = () => {
                 </Text>
             </div>
 
-            <Switch onChange={onChange} checked={checked} />
+            <Switch onChange={onChange} checked={notificationsEnabled} />
         </div>
     )
 }
