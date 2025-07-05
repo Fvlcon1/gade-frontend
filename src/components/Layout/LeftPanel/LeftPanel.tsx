@@ -11,6 +11,11 @@ import { useAuthStore } from "@/lib/store/auth-store";
 import Text from "@/app/styles/components/text";
 import { TypographySize, TypographyBold } from "@styles/style.types";
 import theme from "@styles/theme";
+import Dropdown from "@components/ui/dropdown/dropdown";
+import { DropdownItem } from "@/utils/@types";
+import { FaUserCircle } from "react-icons/fa";
+import Profile from "./profile/components/profile";
+import ProfileView from "./profile/profile-view";
 
 export const getActiveMenuItem = (pathname: string) => {
   return menuItems.find((item) => item.href === pathname);
@@ -135,31 +140,37 @@ const LeftPanel = ({ onExpandChange }) => {
             {isExpanded ? <Text>Settings</Text> : null}
           </div> */}
 
-          <div className="flex flex-1 w-full items-center rounded-b-2xl border-t-[1px] border-border-primary gap-2 px-3 justify-center py-3 bg-bg-primary-lighter hover:bg-bg-secondary duration-200 cursor-pointer">
-            <div className="min-w-[28px] min-h-[28px] overflow-hidden rounded-full flex">
-              <Image
-                src="/assets/LeftPanel/profile.png"
-                alt="Profile"
-                width={28}
-                height={28}
-                className="rounded-full object-cover"
-              />
-            </div>
-            {isExpanded && (
-              <div className="flex flex-1 w-full flex-col overflow-x-hidden">
-                <div className="flex flex-1 w-full">
-                  <Text ellipsis>
-                    {`${user?.first_name} ${user?.last_name}` || 'Not logged in'}
-                  </Text>
-                </div>
-                <div className="flex flex-1 w-full mt-[-2px]">
-                  <Text ellipsis textColor={theme.colors.text.tetiary}>
-                    {user?.email || 'Not logged in'}
-                  </Text>
-                </div>
+          <Dropdown
+            component={<ProfileView />}
+            position="top-left"
+            className="!w-fit !p-0 !rounded-2xl !ml-4 !overflow-visible !max-h-fit"
+          >
+            <div className="flex flex-1 w-full items-center rounded-b-2xl border-t-[1px] border-border-primary gap-2 px-3 justify-center py-3 bg-bg-primary-lighter hover:bg-bg-secondary duration-200 cursor-pointer">
+              <div className="min-w-[28px] min-h-[28px] overflow-hidden rounded-full flex">
+                <Image
+                  src="/assets/LeftPanel/profile.png"
+                  alt="Profile"
+                  width={28}
+                  height={28}
+                  className="rounded-full object-cover"
+                />
               </div>
-            )}
-          </div>
+              {isExpanded && (
+                <div className="flex flex-1 w-full flex-col overflow-x-hidden">
+                  <div className="flex flex-1 w-full">
+                    <Text ellipsis>
+                      {`${user?.first_name} ${user?.last_name}` || 'Not logged in'}
+                    </Text>
+                  </div>
+                  <div className="flex flex-1 w-full mt-[-2px]">
+                    <Text ellipsis textColor={theme.colors.text.tetiary}>
+                      {user?.email || 'Not logged in'}
+                    </Text>
+                  </div>
+                </div>
+              )}
+            </div>
+          </Dropdown>
         </div>
       </div>
     </div>

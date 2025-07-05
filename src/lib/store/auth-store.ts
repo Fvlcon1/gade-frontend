@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { User, LoginCredentials } from '@/types/auth';
+import Cookies from 'universal-cookie';
 
 interface AuthState {
   user: User | null;
@@ -13,6 +14,8 @@ interface AuthState {
   setLoading: (isLoading: boolean) => void;
   logout: () => void;
 }
+
+const cookies = new Cookies()
 
 // Initialize state from localStorage if available
 const getInitialState = () => {
@@ -76,6 +79,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: () => {
     localStorage.removeItem('user');
     localStorage.removeItem('pendingLogin');
+    cookies.remove('access_token');
+    cookies.remove('refresh_token');
     set({ 
       user: null,
       pendingLogin: null,

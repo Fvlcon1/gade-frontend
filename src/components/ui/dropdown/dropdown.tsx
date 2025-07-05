@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, ReactNode } from "react";
+import { useState, useRef, ReactNode, useLayoutEffect } from "react";
 import { useClickAway } from "react-use";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
@@ -15,6 +15,8 @@ import { hexOpacity } from "@/utils/hexOpacity";
 // ────────────────────────────────────────────
 // Types
 // ────────────────────────────────────────────
+type DropdownPosition = "bottom-right" | "bottom-left" | "top-right" | "top-left";
+
 interface DropdownProps extends React.HTMLAttributes<HTMLDivElement> {
 	children?: ReactNode;
 	menuItems?: DropdownItem[];
@@ -22,6 +24,8 @@ interface DropdownProps extends React.HTMLAttributes<HTMLDivElement> {
 	outterContainerClassName?: string;
 	display?: boolean;
 	component?: ReactNode;
+	position?: DropdownPosition;
+	onClose?: () => void;
 }
 
 const Dropdown = ({
@@ -32,15 +36,79 @@ const Dropdown = ({
 	display,
 	component,
 	onClick,
+	position,
+	onClose,
 	...rest
 }: DropdownProps) => {
 	const [isOpen, setIsOpen] = useState(false);
+	const [autoPosition, setAutoPosition] = useState<DropdownPosition>("bottom-right");
 	const menuRef = useRef<HTMLDivElement>(null);
+	const triggerRef = useRef<HTMLDivElement>(null);
 
 	// Close when clicking outside
 	useClickAway(menuRef, () => {
-		if (display === undefined) setIsOpen(false);
+		handleClose();
 	});
+
+	const handleClose = () => {
+		if (display === undefined) setIsOpen(false);
+		onClose?.();
+	}
+
+	// Auto-position logic
+	useLayoutEffect(() => {
+		if (!(display ?? isOpen) || position) return;
+		const menu = menuRef.current;
+		const trigger = triggerRef.current;
+		if (!menu || !trigger) return;
+
+		const menuRect = menu.getBoundingClientRect();
+		const triggerRect = trigger.getBoundingClientRect();
+		const vw = window.innerWidth;
+		const vh = window.innerHeight;
+
+		let best: DropdownPosition = "bottom-right";
+		// Try bottom-right
+		if (
+			triggerRect.bottom + menuRect.height <= vh &&
+			triggerRect.right + menuRect.width <= vw
+		) {
+			best = "bottom-right";
+		} else if (
+			triggerRect.bottom + menuRect.height <= vh &&
+			triggerRect.left - menuRect.width >= 0
+		) {
+			best = "bottom-left";
+		} else if (
+			triggerRect.top - menuRect.height >= 0 &&
+			triggerRect.right + menuRect.width <= vw
+		) {
+			best = "top-right";
+		} else if (
+			triggerRect.top - menuRect.height >= 0 &&
+			triggerRect.left - menuRect.width >= 0
+		) {
+			best = "top-left";
+		}
+		setAutoPosition(best);
+	}, [display, isOpen, position]);
+
+	// Map position to className
+	const getMenuPositionClass = () => {
+		const pos = position || autoPosition;
+		switch (pos) {
+			case "bottom-right":
+				return "right-0 mt-2 top-full";
+			case "bottom-left":
+				return "left-0 mt-2 top-full";
+			case "top-right":
+				return "right-0 mb-2 bottom-full";
+			case "top-left":
+				return "left-0 mb-2 bottom-full";
+			default:
+				return "right-0 mt-2 top-full";
+		}
+	};
 
 	return (
 		<div
@@ -50,9 +118,10 @@ const Dropdown = ({
 		>
 			{/* Toggle button */}
 			<div
+				ref={triggerRef}
 				onClick={(e) => {
-					if (display === undefined) setIsOpen((prev) => !prev);
-					onClick?.(e); // keep parent handler if provided
+					if (display === undefined) isOpen ? handleClose() : setIsOpen((prev) => !prev)
+					onClick?.(e);
 				}}
 			>
 				{children}
@@ -65,7 +134,7 @@ const Dropdown = ({
 						initial={{ opacity: 0, y: -10 }}
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: -10 }}
-						className={`absolute overflow-y-auto right-0 mt-2 min-w-[150px] max-h-[300px] w-full bg-bg-primary border border-border-primary rounded-lg shadow-lg shadow-[#4d4ddc11] z-50 py-1 pt-[6px] ${className ?? ""}`}
+						className={`absolute overflow-y-auto min-w-[150px] max-h-[300px] w-full bg-bg-primary border border-border-primary rounded-lg shadow-lg shadow-[#4d4ddc11] z-50 py-1 pt-[6px] ${getMenuPositionClass()} ${className ?? ""}`}
 					>
 						{/* items */}
 						{menuItems && (
@@ -83,7 +152,7 @@ const Dropdown = ({
 											className={`${item.type === "title" ? "px-3" : "px-1"} gap-2 ${item.disabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer"
 												}`}
 											onClick={() => {
-												if (!item.disabled && display === undefined) setIsOpen(false);
+												if (!item.disabled && display === undefined) handleClose();
 												item.onClick?.();
 											}}
 										>
