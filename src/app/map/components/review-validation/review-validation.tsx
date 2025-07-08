@@ -10,6 +10,8 @@ import { useRef } from "react"
 import Filter from "./components/filter"
 import { SpatialData } from "@/lib/store/spatial-store"
 import { Status } from "./utils/types"
+import { AnimatePresence } from "framer-motion"
+import { useSpatialStore } from "@/lib/store/spatial-store"
 
 const statusMapping: Record<string, Status> = {
     "OPEN": "Open",
@@ -19,11 +21,12 @@ const statusMapping: Record<string, Status> = {
 }
 const ReviewValidation = ({
     mapRef
-} : {
+}: {
     mapRef: React.RefObject<any>;
 }) => {
     const [updateCard, setUpdateCard] = useState<SpatialData["features"][number] | null>(null)
     const panelRef = useRef<HTMLDivElement>(null)
+    const { isReviewValidationVisible } = useSpatialStore()
     return (
         <>
             <UpdateStatusModal
@@ -32,33 +35,41 @@ const ReviewValidation = ({
                 currentStatus={statusMapping[updateCard?.properties.status as string]}
                 id={updateCard?.properties.id}
             />
-            <SlideIn
-                className="z-[1002] absolute top-4 right-[60px]"
-            >
-                <BlurContainer
-                    className="!bg-primary/0"
-                >
-                    {/* Add a ref to the scrollable panel */}
-                    <div
-                        ref={panelRef}
-                        className="w-[350px] relative overflow-auto h-[900px] gap-4 pb-4 flex flex-col rounded-2xl"
-                    >
-                        <TopSection />
-                        <Filter />
-                        <SiteCards
-                            updateCard={updateCard}
-                            setUpdateCard={setUpdateCard}
-                            mapRef={mapRef}
-                        />
-                        {/* FloatButton.BackTop will now scroll the panel, not the window */}
-                        <FloatButton.BackTop
-                            visibilityHeight={50}
-                            target={() => panelRef.current}
-                        />
-                        <div className="fixed rounded-b-2xl pointer-events-none bottom-0 w-full bg-gradient-to-t from-bg-primary to-transparent h-[200px]" />
-                    </div>
-                </BlurContainer>
-            </SlideIn>
+
+            <AnimatePresence>
+                {
+                    isReviewValidationVisible ? (
+                        <SlideIn
+                            className="z-[1002] absolute top-3 right-[75px]"
+                            direction="right"
+                        >
+                            <BlurContainer
+                                className="!bg-primary/0"
+                            >
+                                {/* Add a ref to the scrollable panel */}
+                                <div
+                                    ref={panelRef}
+                                    className="w-[350px] relative overflow-auto h-[900px] gap-4 pb-4 flex flex-col rounded-2xl"
+                                >
+                                    <TopSection />
+                                    <Filter />
+                                    <SiteCards
+                                        updateCard={updateCard}
+                                        setUpdateCard={setUpdateCard}
+                                        mapRef={mapRef}
+                                    />
+                                    {/* FloatButton.BackTop will now scroll the panel, not the window */}
+                                    <FloatButton.BackTop
+                                        visibilityHeight={50}
+                                        target={() => panelRef.current}
+                                    />
+                                    <div className="fixed rounded-b-2xl pointer-events-none bottom-0 w-full bg-gradient-to-t from-bg-primary to-transparent h-[200px]" />
+                                </div>
+                            </BlurContainer>
+                        </SlideIn>
+                    ) : null
+                }
+            </AnimatePresence>
         </>
     )
 }

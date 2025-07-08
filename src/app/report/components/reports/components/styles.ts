@@ -33,7 +33,7 @@ export const getSeverityBgClass = (severity: string) => {
         case "LOW":
             return "bg-green-100";
         case "MEDIUM":
-            return "bg-yellow-100";
+            return "bg-orange-100";
         case "HIGH":
             return "bg-red-100";
         default:
@@ -46,7 +46,7 @@ export const getSeverityTextColor = (severity: string) => {
         case "LOW":
             return "#059669"; // green-600
         case "MEDIUM":
-            return "#D97706"; // amber-600
+            return "#eb8334"; // orange
         case "HIGH":
             return "#EF4444"; // red-500 (recommended for high severity)
         default:

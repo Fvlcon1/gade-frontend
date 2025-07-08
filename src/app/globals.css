@@ -27,10 +27,10 @@
   --bg-primary-lighter: #FBFBFB;
 
   /* Border colors */
-  --border-primary: #8F9FB7;
-  --border-secondary: #7D8FAB;
-  --border-tetiary: #7084A3;
-  --border-quantinary: #647A9B;
+  --border-primary: #EBEDF1;
+  --border-secondary: #E0E4EB;
+  --border-tetiary: #D7DCE5;
+  --border-quantinary: #CED3DF;
 
   --main-primary: #5A87C7;
 }

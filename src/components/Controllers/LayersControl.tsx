@@ -133,14 +133,14 @@ const LayersControl: React.FC<LayersControlProps> = ({
           <div className="space-y-2">
             {/* Basemaps Section */}
             <BlurContainer>
-              <div className="py-3 gap-1 flex flex-col">
+              <div className="py-3 gap-2 flex flex-col">
                 <Text
                   bold={theme.text.bold.md}
                   className="pl-4"
                 >
                   Basemaps
                 </Text>
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1.5">
                   {basemapLayers.map((layer, index) => (
                     <Fragment key={layer.id}>
                       <label className="flex items-center gap-2 px-4 py-1 cursor-pointer">
@@ -168,7 +168,7 @@ const LayersControl: React.FC<LayersControlProps> = ({
 
             {/* Feature Layers Section */}
             <BlurContainer>
-              <div className="py-3 gap-1 flex flex-col">
+              <div className="py-3 gap-2 flex flex-col">
                 <Text
                   bold={theme.text.bold.md}
                   className="pl-4"
@@ -199,12 +199,12 @@ const LayersControl: React.FC<LayersControlProps> = ({
                 <div className="flex items-center gap-2 w-full px-3 mt-2">
                   <Button
                     text="Select All"
-                    className="flex-1"
+                    className="flex-1 !h-[32px]"
                     onClick={selectAllFeatures}
                   />
                   <OutlineButton
                     text="Deselect All"
-                    className="flex-1"
+                    className="flex-1 !h-[32px]"
                     onClick={deselectAllFeatures}
                   />
                 </div>

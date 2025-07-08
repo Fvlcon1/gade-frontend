@@ -35,7 +35,7 @@ const Timeline = ({
   }
   return (
     <BlurContainer>
-      <div className="flex flex-col w-full p-3 gap-0.5">
+      <div className="flex flex-col w-full p-3 gap-1">
         <Text
           bold={theme.text.bold.md}
           className="pl-1"

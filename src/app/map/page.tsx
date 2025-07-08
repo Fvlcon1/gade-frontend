@@ -14,6 +14,8 @@ import { initialLayers } from "../../components/Controllers/LayersControl";
 import { useSpatialStore } from "@/lib/store/spatial-store";
 import { useAuthStore } from "@/lib/store/auth-store";
 import ReviewValidation from "./components/review-validation/review-validation";
+import ZoomControls from "./components/review-validation/components/zoom-controls";
+import RightNav from "./components/review-validation/components/right-nav";
 
 const InteractiveMapClient = dynamic(() => import("../../components/Layout/MiddlePanel/Map/interactive-map/interactive-map-client"), {
   ssr: false,
@@ -261,6 +263,7 @@ const Page = () => {
       />
 
       <ReviewValidation mapRef={mapRef} />
+      <RightNav />
 
       {/* Floating Timeline Panel */}
       {showTimeline && (
@@ -290,30 +293,10 @@ const Page = () => {
       )}
 
       {/* Zoom Buttons */}
-      <div className="fixed right-4 top-4 z-[1001] bg-white/90 text-sm font-bold w-[30px] rounded-[10px] shadow-sm">
-        <div className="flex flex-col items-center justify-center">
-          <button
-            onClick={() => mapRef.current?.zoomIn()}
-            className="text-[var(--color-text-tetiary)] text-lg leading-none p-2 rounded cursor-pointer hover:bg-gray-100 w-full"
-          >
-            +
-          </button>
-
-          <div className="w-full h-[1px] bg-[#b4adad]" />
-
-          <button
-            onClick={() => mapRef.current?.zoomOut()}
-            className="text-[var(--color-text-tetiary)] text-xl leading-none p-2 rounded cursor-pointer hover:bg-gray-100 w-full"
-          >
-            −
-          </button>
-        </div>
-
-        <div className="w-full h-[1px] bg-[#b4adad]" />
-        <div className="mt-1 w-full h-[30px] bg-white/90 rounded-[10px] flex items-center text-gray-500 justify-center cursor-pointer hover:bg-gray-100">
-          <FaLocationArrow size={10} />
-        </div>
-      </div>
+      <ZoomControls
+        zoomIn={() => mapRef.current?.zoomIn()}
+        zoomOut={() => mapRef.current?.zoomOut()}
+      />
 
     </div>
   );

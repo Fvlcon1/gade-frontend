@@ -14,7 +14,7 @@ const Card = () => {
                         size={30}
                     />
                 </div>
-                <div className="flex flex-col flex-1 gap-0">
+                <div className="flex flex-col flex-1 gap-1">
                     <Text
                         size={theme.text.size.body2}
                         bold={theme.text.bold.md}

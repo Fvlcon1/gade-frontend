@@ -17,7 +17,7 @@ interface Metric {
 
 const Metric = ({metric}: {metric: Metric}) => {
     return (
-        <div className="relative flex flex-col gap-0 bg-bg-primary-lighter rounded-2xl border-[1px] border-border-primary p-2 w-[270px]">
+        <div className="relative flex flex-col gap-1 bg-bg-primary-lighter rounded-2xl border-[1px] border-border-primary p-2 w-[270px]">
             {/* header */}
             <div className="flex items-center gap-2">
                 <div className="w-[20px] h-[20px] rounded-sm bg-main-primary/15 flex items-center justify-center">

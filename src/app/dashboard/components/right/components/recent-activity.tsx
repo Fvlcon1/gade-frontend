@@ -21,8 +21,8 @@ const Activity = () => {
                     size={20}
                 />
             </div>
-            <div className="flex flex-col flex-1 gap-0 pr-4">
-                <Text>
+            <div className="flex flex-col flex-1 gap-1 pr-4">
+                <Text lineHeight={1.4}>
                     Email notifications sent to <b>Ghana police, NSB and 2 others</b>
                 </Text>
                 <Text
@@ -54,7 +54,7 @@ const RecentActivity = () => {
                 </Text>
             </div>
 
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-4">
                 {
                     Array.from({ length: 4 }).map((_, index) => (
                         <Fragment key={index}>

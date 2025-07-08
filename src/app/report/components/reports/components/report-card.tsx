@@ -55,7 +55,7 @@ const ReportCard = ({
             />
             <div className="flex flex-col">
                 <div className={`relative ${reportsIsFetching ? "cursor-wait" : ""} flex w-[1024px] cursor-pointer hover:bg-bg-secondary duration-200 items-center gap-2 justify-between py-2 pl-3 pr-4 rounded-xl bg-bg-primary-lighter border-[1px] border-border-primary`}>
-                    <div className="flex flex-col w-[50%]">
+                    <div className="flex flex-col w-[50%] gap-1">
                         <Text
                             bold={theme.text.bold.md}
                             size={theme.text.size.body2}
@@ -98,7 +98,7 @@ const ReportCard = ({
                     </Dropdown>
                 </div>
 
-                <div className={`w-fit flex ml-6 rounded-b-xl px-3 py-1 ${getSeverityBgClass(report.severity)}`}>
+                <div className={`w-fit flex ml-6 rounded-b-xl px-3 py-1 pb-1.5 ${getSeverityBgClass(report.severity)}`}>
                     <Text
                         textColor={getSeverityTextColor(report.severity)}
                         size={theme.text.size.xs}

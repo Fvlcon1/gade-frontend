@@ -10,6 +10,12 @@ import ReportsSkeleton from "./reports-skeleton"
 import getDate from "@/utils/getDate"
 import { ReportStatus } from "@/app/dashboard/utils/types"
 
+const statusMapping = {
+    OPEN : "Open",
+    CLOSED : "Closed",
+    IN_REVIEW : "Under Review"
+}
+
 const getStatusBgClass = (status: ReportStatus) => {
     switch (status) {
         case ReportStatus.OPEN:
@@ -43,9 +49,10 @@ const getStatusTextColor = (status: ReportStatus) => {
 const ReportItem = ({ report }: { report: Report }) => {
     return (
         <div className="flex items-center gap-2 justify-between py-2 pl-3 pr-4 rounded-xl bg-bg-primary-lighter border-[1px] border-border-primary">
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-1 w-[60%]">
                 <Text
                     bold={theme.text.bold.md}
+                    size={theme.text.size.body2}
                 >
                     {report.title}
                 </Text>
@@ -59,12 +66,14 @@ const ReportItem = ({ report }: { report: Report }) => {
                 </Text>
             </div>
 
-            <div className={`flex px-2 py-1 rounded-full ${getStatusBgClass(report.status)}`}>
-                <Text
-                    textColor={getStatusTextColor(report.status)}
-                >
-                    {report.status}
-                </Text>
+            <div className="flex w-[200px] justify-center">
+                <div className={`flex px-2 py-1.5 rounded-full ${getStatusBgClass(report.status)}`}>
+                    <Text
+                        textColor={getStatusTextColor(report.status)}
+                    >
+                        {statusMapping[report.status]}
+                    </Text>
+                </div>
             </div>
 
             <Text

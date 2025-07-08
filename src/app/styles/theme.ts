@@ -13,10 +13,10 @@ export const lightColors = {
         quantinary : "#D0D0D0"
     },
     border : {
-        primary : "#8F9FB7",
-        secondary : '#7D8FAB',
-        tetiary : '#7084A3',
-        quantinary : '#647A9B',
+        primary : "#EBEDF1",
+        secondary : '#E0E4EB',
+        tetiary : '#D7DCE5',
+        quantinary : '#CED3DF',
     },
     main : {
         primary : '#5A87C7'

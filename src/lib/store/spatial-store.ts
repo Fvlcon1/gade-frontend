@@ -63,7 +63,10 @@ interface SpatialState {
   filteredMiningSites: SpatialData | null;
   filteredDistricts: SpatialData | null;
   boundsFeature: SpatialData["features"][number] | null;
+
+  //View states
   comparisonViewState : ComparisonView
+  isReviewValidationVisible : boolean
 
   //Filter
   months: Array<{ monthIndex: number; year: number }>;
@@ -97,6 +100,7 @@ interface SpatialState {
   setMonths: (months : Array<{ monthIndex: number; year: number }>) => void;
   setBounds: (boundsFeature: SpatialData["features"][number] | null) => void,
   setComparisonViewState: (viewState : ComparisonView) => void,
+  setIsReviewValidationVisible: (isReviewValidationVisible : boolean) => void,
 }
 
 export const useSpatialStore = create<SpatialState>((set, get) => ({
@@ -117,6 +121,7 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
   dateRange: null,
   boundsFeature: undefined,
   comparisonViewState: "slider",
+  isReviewValidationVisible: false,
 
   // Proximity
   minProximityToRiver: 0,
@@ -131,6 +136,7 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
   setMonths: (months : Array<{ monthIndex: number; year: number }>) => set({ months: months }),
   setBounds: (boundsFeature: any) => set({ boundsFeature }),
   setComparisonViewState: (viewState : "slider" | "side-by-side") => set({ comparisonViewState: viewState }),
+  setIsReviewValidationVisible: (isReviewValidationVisible : boolean) => set({ isReviewValidationVisible }),
   setProximityFilters: (options) => set({ 
     minProximityToRiver: options.minProximityToRiver ?? get().minProximityToRiver,
     maxProximityToRiver: options.maxProximityToRiver ?? get().maxProximityToRiver,
