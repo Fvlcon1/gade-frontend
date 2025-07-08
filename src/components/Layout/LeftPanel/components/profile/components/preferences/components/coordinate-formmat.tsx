@@ -22,12 +22,12 @@ const CoordinateFormat = () => {
     const items: DropdownItem[] = [
         {
             key: "dd",
-            label: "dd (decimal degrees)",
+            label: "DD (decimal degrees)",
             onClick: () => handleCoordinateFormatChange("dd")
         },
         {
             key: "dms",
-            label: "dms (degree minutes seconds)",
+            label: "DMS (degree minutes seconds)",
             onClick: () => handleCoordinateFormatChange("dms")
         }
     ]

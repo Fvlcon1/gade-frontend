@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic';
 
 
 // Dynamically import map
-const InteractiveMapClient = dynamic(() => import('./InteractiveMapClient'), {
+const InteractiveMapClient = dynamic(() => import('./interactive-map/interactive-map-client'), {
   ssr: false,
 });
 

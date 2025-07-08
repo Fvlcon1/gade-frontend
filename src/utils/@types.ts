@@ -57,4 +57,5 @@ export interface DropdownItem {
     icon?: ReactNode;
     onClick? : ()=>void
     isSelected? : boolean
+    value? : any
 }

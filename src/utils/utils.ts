@@ -2,7 +2,7 @@ import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+    return twMerge(clsx(inputs))
 }
 
 // Utility to convert snake_case to camelCase
@@ -23,3 +23,26 @@ export const transformKeysToCamelCase = (obj: any): any => {
     }
     return obj;
 };
+
+/**
+ * Capitalizes only the first letter of the input string.
+ * @param str - The input string
+ * @returns The string with the first letter capitalized
+ */
+export function capitalizeFirstLetter(str: string): string {
+    if (!str) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
+/**
+ * Capitalizes the first letter of each word in the input string.
+ * @param str - The input string
+ * @returns The string with each word capitalized
+ */
+export function capitalizeWords(str: string): string {
+    if (!str) return "";
+    return str
+        .split(" ")
+        .map(word => capitalizeFirstLetter(word))
+        .join(" ");
+}

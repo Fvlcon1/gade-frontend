@@ -13,8 +13,9 @@ import TimelineController from "../../components/Controllers/timeline-controller
 import { initialLayers } from "../../components/Controllers/LayersControl";
 import { useSpatialStore } from "@/lib/store/spatial-store";
 import { useAuthStore } from "@/lib/store/auth-store";
+import ReviewValidation from "./components/review-validation/review-validation";
 
-const InteractiveMapClient = dynamic(() => import("../../components/Layout/MiddlePanel/Map/InteractiveMapClient"), {
+const InteractiveMapClient = dynamic(() => import("../../components/Layout/MiddlePanel/Map/interactive-map/interactive-map-client"), {
   ssr: false,
 });
 
@@ -258,6 +259,8 @@ const Page = () => {
           setActiveTab(null);
         }}
       />
+
+      <ReviewValidation mapRef={mapRef} />
 
       {/* Floating Timeline Panel */}
       {showTimeline && (

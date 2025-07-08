@@ -26,6 +26,8 @@ interface DropdownProps extends React.HTMLAttributes<HTMLDivElement> {
 	component?: ReactNode;
 	position?: DropdownPosition;
 	onClose?: () => void;
+	value?: any;
+	onChange?: (value: any) => void;
 }
 
 const Dropdown = ({
@@ -38,6 +40,8 @@ const Dropdown = ({
 	onClick,
 	position,
 	onClose,
+	value,
+	onChange,
 	...rest
 }: DropdownProps) => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -153,6 +157,7 @@ const Dropdown = ({
 												}`}
 											onClick={() => {
 												if (!item.disabled && display === undefined) handleClose();
+												if (item.value) onChange?.(item.value);
 												item.onClick?.();
 											}}
 										>

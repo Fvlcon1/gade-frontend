@@ -6,33 +6,36 @@ import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
-import { useSpatialStore } from '@/lib/store/spatial-store';
+import { SpatialData, useSpatialStore } from '@/lib/store/spatial-store';
 import L from 'leaflet';
 import 'leaflet.markercluster';
 import { useSearchParams } from "next/navigation";
-import { BASEMAP_URLS, LAYER_STYLES, HIGHLIGHT_STYLE, TOOLTIP_STYLES, HOVER_STYLE } from "./constants";
-import { MapContainerProps, LayerProps } from "./types";
-import MouseCoordinateDisplay from "./MouseCoordinateDisplay";
-import ReportsLayer from "./ReportsLayer";
-import ReportZoomHandler from "./ReportZoomHandler";
-import BottomTimeline from "./BottomTimeline";
-import ComparisonSlider from "../../../../components/Controllers/ComparisonSlider";
+import { BASEMAP_URLS, LAYER_STYLES, HIGHLIGHT_STYLE, TOOLTIP_STYLES, HOVER_STYLE } from "../constants";
+import { MapContainerProps, LayerProps } from "../types";
+import MouseCoordinateDisplay from "../MouseCoordinateDisplay";
+import ReportsLayer from "../ReportsLayer";
+import ReportZoomHandler from "../ReportZoomHandler";
+import BottomTimeline from "../BottomTimeline";
+import ComparisonSlider from "../../../../Controllers/ComparisonSlider";
 import TimelineTiles from "@components/Controllers/timeline-controller/components/timeline-tiles";
 import { getLastTwelveMonths } from "@/utils/date-utils";
+import SideBySide from "./side-by-side";
 
 const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 'timeline' | 'comparison' | null }> = ({ activeBasemap, activeFeatureLayers, playhead, timelineMode }) => {
-  const { 
+  const {
     filteredMiningSites,
     filteredDistricts,
-    forestReserves, 
+    forestReserves,
     rivers,
     reports,
-    isLoading, 
-    error, 
+    isLoading,
+    error,
     selectedDistricts,
     highlightedDistricts,
     dateRange,
-    applyFilters 
+    boundsFeature,
+    comparisonViewState,
+    applyFilters
   } = useSpatialStore();
 
   const map = useMap();
@@ -50,7 +53,7 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
     const districtsToZoom = highlightedDistricts.length > 0 ? highlightedDistricts : selectedDistricts;
     const bounds = new L.LatLngBounds([]);
 
-    filteredDistricts.features.forEach((feature: any) => {
+    filteredDistricts.features.forEach((feature) => {
       const district = feature.properties.district;
       if (districtsToZoom.length === 0 || districtsToZoom.includes(district)) {
         const layer = L.geoJSON(feature);
@@ -67,6 +70,27 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
       });
     }
   }, [map, selectedDistricts, timelineMode]);
+
+  const handleFitBounds = () => {
+    if (boundsFeature) {
+      const bounds = new L.LatLngBounds([]);
+      const layer = L.geoJSON(boundsFeature);
+      bounds.extend(layer.getBounds());
+
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, {
+          padding: [50, 50],
+          maxZoom: 16,
+          animate: true,
+          duration: 0.5,
+        })
+      }
+    }
+  }
+
+  useEffect(() => {
+    handleFitBounds()
+  }, [boundsFeature])
 
   const filteredLayerData = useMemo(() => {
     if (!filteredDistricts || !filteredMiningSites) return {};
@@ -85,12 +109,12 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
     const isSelected = selectedDistricts.includes(district);
 
     if (selectedDistricts.length === 0 && highlightedDistricts.length === 0) {
-      if(hover === true) return HIGHLIGHT_STYLE.admin;
+      if (hover === true) return HIGHLIGHT_STYLE.admin;
       return LAYER_STYLES.admin;
     }
 
     if (isHighlighted) {
-      if(hover === true) return HIGHLIGHT_STYLE.admin;
+      if (hover === true) return HIGHLIGHT_STYLE.admin;
       return LAYER_STYLES.admin;
     }
 
@@ -107,6 +131,13 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
 
     return { opacity: 0, fillOpacity: 0 };
   }, [selectedDistricts, highlightedDistricts]);
+
+  const getMiningStyle = useCallback((feature: SpatialData["features"][number]) => {
+    if (boundsFeature?.properties?.id === feature?.properties?.id)
+      return HIGHLIGHT_STYLE.mining_sites
+
+    return LAYER_STYLES.mining_sites;
+  }, [boundsFeature]);
 
   const handleMouseOver = (e: any) => {
     const layer = e.target;
@@ -183,7 +214,7 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
                 <GeoJSON
                   key={`${layer.id}-${selectedDistricts.join(',')}-${dateRange?.from || ''}-${dateRange?.to || ''}-${data.features.length}-${playhead ?? ''}`}
                   data={data}
-                  style={LAYER_STYLES[layer.id]}
+                  style={getMiningStyle}
                   onEachFeature={(feature, leafletLayer) => {
                     const date = new Date(feature.properties.detected_date).toLocaleDateString();
                     const district = feature.properties.district;
@@ -231,7 +262,7 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
 // Component to sync map events between comparison maps
 const MapSynchronizer: React.FC<{ targetMap: any }> = ({ targetMap }) => {
   const map = useMap();
-  
+
   useMapEvents({
     zoom: () => {
       if (targetMap && targetMap.current) {
@@ -244,13 +275,13 @@ const MapSynchronizer: React.FC<{ targetMap: any }> = ({ targetMap }) => {
       }
     }
   });
-  
+
   return null;
 };
 
-const InteractiveMapClient: React.FC<MapContainerProps> = ({ 
-  mapRef, 
-  activeBasemap = 'cartocdnLight', 
+const InteractiveMapClient: React.FC<MapContainerProps> = ({
+  mapRef,
+  activeBasemap = 'cartocdnLight',
   activeFeatureLayers,
   timelineMode = 'timeline',
   onTimelineModeChange,
@@ -264,7 +295,7 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
   comparisonStartDate,
   comparisonEndDate,
 }) => {
-  const { reports, fetchReports, applyFilters, miningSites } = useSpatialStore();
+  const { reports, fetchReports, applyFilters, miningSites, comparisonViewState } = useSpatialStore();
 
   const searchParams = useSearchParams();
 
@@ -312,7 +343,7 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
   useEffect(() => {
     if (timelineMode === 'timeline') {
       if (isPlaying && playhead != null) {
-      applyFilters({ year: selectedYear, playhead, range: timelineRange });
+        applyFilters({ year: selectedYear, playhead, range: timelineRange });
       } else {
         // Reset to show all data within range when not playing
         applyFilters({ year: selectedYear, range: timelineRange });
@@ -349,7 +380,7 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
   };
 
   const [months, setMonths] = useState(getLastTwelveMonths());
- 
+
   // Dynamically update planet basemap URL with year and month for timeline
   const getPlanetUrl = () => {
     const year = selectedYear;
@@ -374,7 +405,24 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
     <>
       <style>{TOOLTIP_STYLES}</style>
       {/* Comparison mode - Split screen with two maps */}
-      {comparisonActive && timelineMode === 'comparison' && (
+      {
+        comparisonActive && timelineMode === 'comparison' && comparisonViewState === 'side-by-side' ? (
+          <SideBySide
+            mapRef={mapRef}
+            topMapRef={topMapRef}
+            miningSitesLeft={miningSitesLeft}
+            miningSitesRight={miningSitesRight}
+            getPlanetUrlForMonth={getPlanetUrlForMonth}
+            comparisonStartDate={comparisonStartDate}
+            comparisonEndDate={comparisonEndDate}
+            MapSynchronizer={MapSynchronizer}
+            reports={reports}
+            searchParams={searchParams}
+            initialView={initialView}
+          />
+        ) : null
+      }
+      {comparisonActive && timelineMode === 'comparison' && comparisonViewState === 'slider' && (
         <>
           {/* Bottom Map - Start Month */}
           <div className="absolute inset-0 z-10">
@@ -404,7 +452,7 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
           </div>
 
           {/* Top Map - End Month (masked by slider) */}
-          <div 
+          <div
             className="absolute inset-0 z-20 pointer-events-none"
             style={{
               clipPath: `inset(0 0 0 ${Math.round(comparisonSliderPosition * 100)}%)`,
@@ -457,7 +505,7 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
       )}
 
       {/* Comparison slider overlay */}
-      {comparisonActive && timelineMode === 'comparison' && (
+      {comparisonActive && timelineMode === 'comparison' && comparisonViewState === 'slider' && (
         <ComparisonSlider
           isVisible={comparisonActive}
           sidebarExpanded={sidebarExpanded}
@@ -470,8 +518,8 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
 
       {/* Bottom timeline - only show in timeline mode */}
       {timelineMode === 'timeline' && (
-        <BottomTimeline 
-          isVisible={timelineMode === 'timeline'} 
+        <BottomTimeline
+          isVisible={timelineMode === 'timeline'}
           onClose={handleCloseTimeline}
           sidebarExpanded={sidebarExpanded}
           range={timelineRange}
