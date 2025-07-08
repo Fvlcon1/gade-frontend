@@ -1,34 +1,38 @@
 import { create } from 'zustand';
 import { apiClient } from '@/lib/api-client';
 import { getLastTwelveMonths } from '@/utils/date-utils';
+import L from 'leaflet';
+import { ComparisonView } from '@components/Controllers/timeline-controller/utils/types';
 
 // SpatialData type
-interface SpatialData {
+
+export interface SpatialDataProperties {
+  assets?: string;
+  category?: string;
+  district?: string;
+  name: string;
+  owner?: string;
+  region?: string;
+  status?: string;
+  type?: string;
+  detected_date?: string;
+  id? : string
+  area? : number
+  severity? : string
+  severity_type? : string
+  severity_score? : number
+  proximity_to_water? : boolean
+  inside_forest_reserve? : boolean
+  detection_date? : string
+  all_violation_types? : string
+  distance_to_water_m? : number
+  distance_to_forest_m? : number
+}
+export interface SpatialData {
   type: 'FeatureCollection';
   features: Array<{
     type: 'Feature';
-    properties: {
-      assets?: string;
-      category?: string;
-      district?: string;
-      name: string;
-      owner?: string;
-      region?: string;
-      status?: string;
-      type?: string;
-      detected_date?: string;
-      id? : string
-      area? : number
-      severity? : string
-      severity_type? : string
-      severity_score? : number
-      proximity_to_water? : boolean
-      inside_forest_reserve? : boolean
-      detection_date? : string
-      all_violation_types? : string
-      distance_to_water_m? : number
-      distance_to_forest_m? : number
-    };
+    properties: SpatialDataProperties
     geometry: any;
   }>;
 }
@@ -58,6 +62,8 @@ interface SpatialState {
   miningSites: SpatialData | null;
   filteredMiningSites: SpatialData | null;
   filteredDistricts: SpatialData | null;
+  boundsFeature: SpatialData["features"][number] | null;
+  comparisonViewState : ComparisonView
 
   //Filter
   months: Array<{ monthIndex: number; year: number }>;
@@ -89,6 +95,8 @@ interface SpatialState {
   fetchAllData: () => Promise<void>;
   fetchReports: () => Promise<void>;
   setMonths: (months : Array<{ monthIndex: number; year: number }>) => void;
+  setBounds: (boundsFeature: SpatialData["features"][number] | null) => void,
+  setComparisonViewState: (viewState : ComparisonView) => void,
 }
 
 export const useSpatialStore = create<SpatialState>((set, get) => ({
@@ -107,6 +115,8 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
   selectedDistricts: [],
   highlightedDistricts: [],
   dateRange: null,
+  boundsFeature: undefined,
+  comparisonViewState: "slider",
 
   // Proximity
   minProximityToRiver: 0,
@@ -119,6 +129,8 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
   setHighlightedDistricts: (districts) => set({ highlightedDistricts: districts }),
   setDateRange: (range) => set({ dateRange: range }),
   setMonths: (months : Array<{ monthIndex: number; year: number }>) => set({ months: months }),
+  setBounds: (boundsFeature: any) => set({ boundsFeature }),
+  setComparisonViewState: (viewState : "slider" | "side-by-side") => set({ comparisonViewState: viewState }),
   setProximityFilters: (options) => set({ 
     minProximityToRiver: options.minProximityToRiver ?? get().minProximityToRiver,
     maxProximityToRiver: options.maxProximityToRiver ?? get().maxProximityToRiver,

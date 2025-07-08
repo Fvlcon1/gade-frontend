@@ -15,7 +15,7 @@ import { GiMagicBroom } from "react-icons/gi";
 import OutlineButton from "@components/ui/button/outlineButton";
 import { MdOutlineRefresh } from "react-icons/md";
 import Timeline from "./components/timeline";
-import Compare from "./components/compare";
+import Compare from "./components/compare/compare";
 import TabToggle from "./components/tab-toggle";
 import { useSpatialStore } from "@/lib/store/spatial-store";
 

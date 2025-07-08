@@ -1,7 +1,7 @@
 import { protectedApi } from "@/utils/apis/api";
 import { useQuery } from "@tanstack/react-query";
 import { Ranking } from "../utils/types";
-import { useState, Dispatch, SetStateAction } from "react";
+import { useState, Dispatch, SetStateAction, useEffect } from "react";
 import { formatWithPrefix } from "@/utils/unit-utils";
 import { transformKeysToCamelCase } from "@/utils/utils";
 
@@ -25,6 +25,12 @@ const useDashboard = () => {
         getRankings(transformedData, setRankings)
         return transformedData
     };
+
+    useEffect(() => {
+        if (metrics) {
+            getRankings(metrics, setRankings)
+        }
+    }, [])
 
     const getReports = async () => {
         const response = await protectedApi.GET("/admin/report", {page_id: 1, page_size: 5});

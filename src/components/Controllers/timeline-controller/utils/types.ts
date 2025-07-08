@@ -1,0 +1,1 @@
+export type ComparisonView = 'slider' | 'side-by-side'

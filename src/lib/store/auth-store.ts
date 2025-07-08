@@ -81,7 +81,6 @@ export const useAuthStore = create<AuthState>((set) => ({
   setError: (error) => set({ error }),
   setLoading: (isLoading) => set({ isLoading }),
   logout: () => {
-    localStorage.removeItem('user');
     localStorage.removeItem('pendingLogin');
     cookies.remove('access_token');
     cookies.remove('refresh_token');

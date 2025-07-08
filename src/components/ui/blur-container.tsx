@@ -6,7 +6,7 @@ const BlurContainer = ({
     className?: string;
 }) => {
     return (
-        <div className={`w-full bg-white/80 backdrop-blur-lg shadow-xl rounded-xl ${className}`}>
+        <div className={`w-full bg-bg-primary/80 backdrop-blur-lg shadow-xl rounded-xl ${className}`}>
             {children}
         </div>
     )

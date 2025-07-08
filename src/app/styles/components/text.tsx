@@ -57,7 +57,7 @@ const Text = ({
                 flexWrap : wrap ? 'wrap' : 'nowrap',
                 textDecoration : underline || (onHover && clickableLink) ? 'underline' : 'none',
                 opacity : onHover && (clickable || clickableLink) ? 0.7 : 1,
-                lineHeight : lineHeight,
+                lineHeight : lineHeight || 1,
                 fontStyle : italic ? 'italic' : 'normal',
                 textAlign,
                 display: display ?? maxLines ? '-webkit-box' : 'inline-block',
