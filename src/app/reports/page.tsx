@@ -135,13 +135,12 @@ export default function ReportsPage() {
   return (
     <div className="flex w-screen h-screen overflow-hidden bg-white pl-2.5">
       {/* Sidebar */}
-      <LeftPanel onExpandChange={setSidebarExpanded} />
+      <LeftPanel />
 
       {/* Main content */}
       <div
-        className={`flex-1 flex flex-col h-full overflow-hidden transition-all duration-300 ${
-          sidebarExpanded ? "px-3" : "px-5"
-        } pt-4`}
+        className={`flex-1 flex flex-col h-full overflow-hidden transition-all duration-300`}
+        pt-4
       >
         {/* Title */}
         <Title activeTitle={activeTitle} activeIcon={activeIcon} isActive={true} />
