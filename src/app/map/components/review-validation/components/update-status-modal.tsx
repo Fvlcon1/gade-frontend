@@ -25,7 +25,7 @@ const UpdateStatusModal = ({
 }) => {
     const status: Status[] = ["Open", "In Review", "False Positive", "Closed"];
     const [selectedStatus, setSelectedStatus] = useState<Status>(currentStatus);
-    const {updateStatusMutation, updateStatusPending, updateStatusSuccess, updateStatusError} = useReview()
+    const { updateStatusMutation, updateStatusPending, updateStatusSuccess, updateStatusError } = useReview()
 
     const StatusText = useCallback(({
         status,
@@ -43,9 +43,13 @@ const UpdateStatusModal = ({
         )
     }, [selectedStatus]);
 
-    useEffect(()=>{
-        if(updateStatusSuccess) close()
+    useEffect(() => {
+        if (updateStatusSuccess) close()
     }, [updateStatusSuccess])
+
+    useEffect(() => {
+        setSelectedStatus(currentStatus)
+    }, [currentStatus])
 
     const statusOptions = status.map((status) => ({
         label: <StatusText status={status} />,
@@ -62,7 +66,7 @@ const UpdateStatusModal = ({
     };
 
     const handleUpdateStatus = () => {
-        updateStatusMutation({id, status: selectedStatus})
+        updateStatusMutation({ id, status: selectedStatus })
     }
 
     return (
@@ -89,24 +93,17 @@ const UpdateStatusModal = ({
 
                             <div className="flex flex-col gap-1 px-4 py-2">
                                 <Radio.Group
-                                    defaultValue={selectedStatus}
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: 8,
+                                        alignItems: 'start',
+                                    }}
+                                    block
+                                    options={statusOptions}
+                                    value={selectedStatus}
                                     onChange={(e) => handleStatusChange(e.target.value as Status)}
-                                >
-                                    <div className="flex flex-col gap-1">
-                                        {
-                                            statusOptions.map((option) => (
-                                                <Radio
-                                                    key={option.value}
-                                                    value={option.value}
-                                                    className="flex items-center"
-                                                    style={{ color: theme.colors.main.primary }}
-                                                >
-                                                    {option.label}
-                                                </Radio>
-                                            ))
-                                        }
-                                    </div>
-                                </Radio.Group>
+                                />
                             </div>
 
                             <div className="flex items-center gap-2 bg-main-primary/5 border-t-[1px] border-border-primary px-4 py-4 rounded-b-[20px]">

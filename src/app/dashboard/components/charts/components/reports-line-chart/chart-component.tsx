@@ -34,13 +34,13 @@ const ClaimsTimelineChart = ({
         },
         colors: [theme.colors.main.primary, '#10B981', '#FF9500', '#EF4444'],
         dataLabels: { enabled: false },
-        stroke: { curve: 'straight', width: 2 },
+        stroke: { curve: 'smooth', width: 2 },
         fill: {
             type: 'gradient',
             gradient: {
-                shadeIntensity: 0,
-                opacityFrom: 0,
-                opacityTo: 0,
+                shadeIntensity: 1,
+                opacityFrom: 0.7,
+                opacityTo: 0.2,
                 stops: [0, 90, 100]
             }
         },
@@ -78,18 +78,11 @@ const ClaimsTimelineChart = ({
             strokeDashArray: 4,
             yaxis: { lines: { show: true } }
         },
-        markers: {
-            size: 7,
-            shape: 'circle',
-            colors: undefined,
-            strokeColors: '#fff',
-            strokeWidth: 2,
-        },
         tooltip: {
             theme: 'light',
             y: {
                 formatter: function (value: any) {
-                    return value;
+                    return value ;
                 }
             }
         }

@@ -64,12 +64,12 @@ const Input = ({
     return (
         <div
             className={`
-                flex w-full h-fit gap-2 px-[15px] py-[10px] items-center rounded-lg bg-bg-primary border-border-primary border-[1px] border-solid duration-200 ${className}
+                flex w-full h-fit gap-2 px-[15px] py-[10px] items-center rounded-lg bg-bg-primary border-border-secondary border-[1px] border-solid duration-200 ${className}
                 ${disabled ? "opacity-50 cursor-not-allowed" : ""}
             `}
             onClick={onClick}
             style={{
-                borderColor: ((inputFocus || hover) && !disabled) ? theme.colors.main.primary : borderColor || theme.colors.border.primary
+                borderColor: ((inputFocus || hover) && !disabled) ? theme.colors.main.primary : borderColor || theme.colors.border.secondary
             }}
         >
             {PreIcon && PreIcon}

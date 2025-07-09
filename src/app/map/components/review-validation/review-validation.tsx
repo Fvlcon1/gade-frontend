@@ -49,7 +49,7 @@ const ReviewValidation = ({
                                 {/* Add a ref to the scrollable panel */}
                                 <div
                                     ref={panelRef}
-                                    className="w-[350px] relative overflow-auto h-[900px] gap-4 pb-4 flex flex-col rounded-2xl"
+                                    className="w-[350px] relative overflow-auto h-[calc(100vh-70px)] gap-4 pb-4 flex flex-col rounded-2xl"
                                 >
                                     <TopSection />
                                     <Filter />

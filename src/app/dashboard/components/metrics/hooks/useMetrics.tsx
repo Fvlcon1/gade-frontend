@@ -16,20 +16,20 @@ const useMetrics = () => {
         setMetrics([
             {
                 title: "Illegal sites detected",
-                value: formatNumber(totalIllegalSites),
+                value: formatNumber(totalIllegalSites, 0),
                 footer: "+4 Reports today",
                 icon: RiRadarFill,
                 
             },
             {
                 title: "Reported cases",
-                value: formatNumber(totalReportedCases),
+                value: formatNumber(totalReportedCases, 0),
                 footer: "+105 Improvement",
                 icon: FaClock
             },
             {
                 title: "Total area detected (Ha)",
-                value: formatWithPrefix(totalAreaDetected, "Ha", 0),
+                value: formatWithPrefix(totalAreaDetected, "", 0),
                 footer: "+1 Today",
                 icon: FaChromecast
             },

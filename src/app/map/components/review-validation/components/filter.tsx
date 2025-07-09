@@ -1,6 +1,10 @@
 import Text from "@styles/components/text"
 import theme from "@styles/theme"
 import { useReviewContext } from "../context/review-context"
+import Input from "@components/ui/input/input"
+import { useSpatialStore } from "@/lib/store/spatial-store"
+import { IoSearch } from "react-icons/io5"
+import Divider from "@components/ui/divider/divider"
 
 const Chip = ({
     value,
@@ -24,20 +28,34 @@ const Chip = ({
 
 const Filter = () => {
     const { severities, selectedSeverity, setSelectedSeverity } = useReviewContext()
+    const {reviewValidationSearchValue, setReviewValidationSearchValue, applyFilters} = useSpatialStore()
     return (
-        <div className="flex gap-2 px-4">
-            {
-                severities.map((severity, index) => {
-                    return (
-                        <Chip
-                            key={index}
-                            value={severity}
-                            isSelected={selectedSeverity === severity}
-                            onClick={() => setSelectedSeverity(severity)}
-                        />
-                    )
-                })
-            }
+        <div className="flex flex-col gap-2 px-4">
+            {/* <Input 
+                placeholder="Search"
+                value={reviewValidationSearchValue}
+                PreIcon={<IoSearch color={theme.colors.text.tetiary} />}
+                onChange={(e) => {
+                    setReviewValidationSearchValue(e.target.value)
+                    applyFilters()
+                }}
+                className="!h-[35px] !px-2"
+            /> */}
+            <div className="flex gap-2">
+                {
+                    severities.map((severity, index) => {
+                        return (
+                            <Chip
+                                key={index}
+                                value={severity}
+                                isSelected={selectedSeverity === severity}
+                                onClick={() => setSelectedSeverity(severity)}
+                            />
+                        )
+                    })
+                }
+            </div>
+            <Divider className="my-2" />
         </div>
     )
 }

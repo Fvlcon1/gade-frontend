@@ -4,13 +4,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import LineChart from "./line-chart/line-chart";
 import BarChart from "./bar-chart/bar-chart";
-import ReportsBarChart from "./reports-bar-chart/reports-bar-chart";
+import ReportsLineChart from "./reports-line-chart/reports-line-chart";
 
 const ChartCarousel = () => {
     const charts = [
         { id: 1, component: <LineChart />, label: "Area over time" },
-        { id: 2, component: <BarChart />, label: "Districts by area" },
-        { id: 3, component: <ReportsBarChart />, label: "Reported cases over time" },
+        { id: 2, component: <ReportsLineChart />, label: "Reports over time" },
+        { id: 3, component: <BarChart />, label: "Districts by area" },
     ];
 
     const [[currentIndex, direction], setCurrentIndex] = useState([0, 0]);

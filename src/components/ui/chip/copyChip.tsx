@@ -10,10 +10,12 @@ const Copychip = ({
     children,
     containerClassName = "",
     text = "",
+    onClick,
 }: {
     children?: ReactNode;
     containerClassName?: string;
     text?: string;
+    onClick?: (e? : React.MouseEvent) => void;
 }) => {
     const [copied, setCopied] = useState(false);
 
@@ -41,11 +43,14 @@ const Copychip = ({
             <Pressable scaleFactor={1.015}>
                 <div
                     className={`relative px-3 py-1 bg-bg-tetiary flex justify-center items-center overflow-hidden hover:bg-bg-quantinary rounded-lg cursor-pointer w-fit group ${containerClassName}`}
-                    onClick={handleCopy}
+                    onClick={(e) => {
+                        onClick?.(e);
+                        handleCopy();
+                    }}
                 >
                     {children ?? <Text>{text}</Text>}
 
-                    <div className="absolute right-0 top-0 px-2 flex items-center justify-center h-full bg-[#00000006] backdrop-filter backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <div className="absolute right-0 top-0 px-2 rounded-r-lg flex items-center justify-center h-full bg-[#00000006] backdrop-filter backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <IoCopy color={theme.colors.text.primary} />
                     </div>
                 </div>

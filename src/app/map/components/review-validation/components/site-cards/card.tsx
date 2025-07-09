@@ -6,6 +6,7 @@ import { formatNumber } from "@/utils/number-utils";
 import { formatWithPrefix } from "@/utils/unit-utils";
 import { capitalizeWords } from "@/utils/utils";
 import Button from "@components/ui/button/button";
+import Copychip from "@components/ui/chip/copyChip";
 import ClickableTab from "@components/ui/clickable/clickabletab"
 import Text from "@styles/components/text"
 import theme from "@styles/theme"
@@ -142,7 +143,7 @@ const Card = ({
     mapRef: React.RefObject<any>
     isSelected: boolean,
 }) => {
-    const { severity, area, district, region, detected_date, severity_score, all_violation_types, distance_to_forest_m, distance_to_water_m } = feature.properties
+    const { severity, id, area, district, region, detected_date, severity_score, all_violation_types, distance_to_forest_m, distance_to_water_m } = feature.properties
     const violationTypes = parseViolationTypes(all_violation_types)
     const { setBounds, boundsFeature } = useSpatialStore();
     const isCardSelected = boundsFeature === feature
@@ -231,6 +232,12 @@ const Card = ({
                                         <VerticalDivider />
                                         <Info title="Severity" value={capitalizeWords(severity)} />
                                     </div>
+                                    {/* <Copychip
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                        }}
+                                        text={id}
+                                    /> */}
                                     <div className="flex flex-wrap gap-2">
                                         <Chip
                                             title="Forest Distance"

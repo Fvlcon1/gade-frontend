@@ -63,6 +63,7 @@ interface SpatialState {
   filteredMiningSites: SpatialData | null;
   filteredDistricts: SpatialData | null;
   boundsFeature: SpatialData["features"][number] | null;
+  reviewValidationSearchValue : string
 
   //View states
   comparisonViewState : ComparisonView
@@ -101,6 +102,8 @@ interface SpatialState {
   setBounds: (boundsFeature: SpatialData["features"][number] | null) => void,
   setComparisonViewState: (viewState : ComparisonView) => void,
   setIsReviewValidationVisible: (isReviewValidationVisible : boolean) => void,
+  fetchMiningSites: () => Promise<void>,
+  setReviewValidationSearchValue: (searchValue : string) => void
 }
 
 export const useSpatialStore = create<SpatialState>((set, get) => ({
@@ -122,6 +125,7 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
   boundsFeature: undefined,
   comparisonViewState: "slider",
   isReviewValidationVisible: false,
+  reviewValidationSearchValue: "",
 
   // Proximity
   minProximityToRiver: 0,
@@ -137,6 +141,7 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
   setBounds: (boundsFeature: any) => set({ boundsFeature }),
   setComparisonViewState: (viewState : "slider" | "side-by-side") => set({ comparisonViewState: viewState }),
   setIsReviewValidationVisible: (isReviewValidationVisible : boolean) => set({ isReviewValidationVisible }),
+  setReviewValidationSearchValue: (searchValue : string) => set({ reviewValidationSearchValue: searchValue }),
   setProximityFilters: (options) => set({ 
     minProximityToRiver: options.minProximityToRiver ?? get().minProximityToRiver,
     maxProximityToRiver: options.maxProximityToRiver ?? get().maxProximityToRiver,
@@ -182,6 +187,18 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
       })
     };
 
+    const filteredMiningSitesBySearch = () : SpatialData => {
+      const result = {
+        ...filteredMiningSites,
+        features: filteredMiningSites.features.filter(feature => {
+          const id = feature.properties.id;
+          return id.toLowerCase() === get().reviewValidationSearchValue.toLowerCase();
+        })
+      }
+      console.log({result})
+      return result
+    }
+
     const filterByProximityToRivers = () : SpatialData => {
       return {
         ...filteredMiningSites,
@@ -210,6 +227,10 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
     if (get().maxProximityToForestReserve)
       filteredMiningSites = filterByProximityToForestReserves()
 
+    //Filter by search
+    if (get().reviewValidationSearchValue.length > 0)
+      filteredMiningSites = filteredMiningSitesBySearch()
+
     const filteredDistricts = {
       ...districts,
       features: districts.features.filter(feature =>
@@ -217,10 +238,7 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
         selectedDistricts.includes(feature.properties.district)
       )
     };
-
     console.log({filteredMiningSites})
-
-    console.log('Filtered Mining Sites:', filteredMiningSites.features.length);
     set({ filteredMiningSites, filteredDistricts });
   },
   fetchReports: async () => {
@@ -239,37 +257,31 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
     }
   },
 
+  fetchMiningSites: async () => {
+    try {
+      const miningSites = await apiClient.spatial.miningSites();
+      set({
+        miningSites,
+        // filteredMiningSites : miningSites,
+        error: null
+      });
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Failed to fetch mining sites',
+      });
+    }
+  },
+
   fetchAllData: async () => {
     set({ isLoading: true, error: null });
     try {
-      console.log('Fetching all data...');
       // Fetch all data in parallel
       const [districts, forestReserves, rivers, miningSites] = await Promise.allSettled([
         apiClient.spatial.districts(),
         apiClient.spatial.forestReserves(),
         apiClient.spatial.rivers(),
         apiClient.spatial.miningSites(),
-      ]);
-
-      
-      // const districts = await apiClient.spatial.districts();
-      // const forestReserves = await apiClient.spatial.forestReserves();
-      // const rivers = await apiClient.spatial.rivers();
-      // const miningSites = await apiClient.spatial.miningSites();
-      
-      // console.log({districts, forestReserves, rivers, miningSites})
-      
-      // set({
-      //   districts: districts,
-      //   forestReserves: forestReserves,
-      //   rivers: rivers,
-      //   miningSites: miningSites,
-      //   reportsLastUpdated: Date.now(),
-      //   filteredMiningSites: miningSites,
-      //   filteredDistricts: districts,
-      //   isLoading: false,
-      //   error: null
-      // });
+      ])
 
       set({
         districts: districts.status === "fulfilled" ? districts.value : null,
@@ -282,8 +294,6 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
         isLoading: false,
         error: null
       });
-
-      console.log('Data fetched successfully');
     } catch (error) {
       console.error('Failed to fetch data:', error);
       set({

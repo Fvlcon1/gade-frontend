@@ -72,7 +72,7 @@ const ReportCard = ({
                         </Text>
                     </div>
 
-                    <div className={`flex px-3 py-1 rounded-full ${getStatusBgClass(report.status)}`}>
+                    <div className={`flex px-3 py-2 rounded-full ${getStatusBgClass(report.status)}`}>
                         <Text
                             textColor={getStatusTextColor(report.status)}
                             size={theme.text.size.xs}
