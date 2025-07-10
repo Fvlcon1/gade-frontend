@@ -4,6 +4,7 @@ import ChartSkeleton from '../chart-skeleton';
 import dynamic from 'next/dynamic';
 import { ApexOptions } from 'apexcharts';
 import useLineChart from './hooks/useLineChart';
+import { formatWithPrefix } from '@/utils/unit-utils';
 
 const Chart = dynamic(() => import('react-apexcharts'), {
     ssr: false,
@@ -62,7 +63,8 @@ const ClaimsTimelineChart = ({
                     colors: '#6B7280',
                     fontSize: '12px',
                     fontFamily: 'Montserrat'
-                }
+                },
+                formatter: (val: number) => `${formatWithPrefix(val, '', 0)}`
             }
         },
         legend: {

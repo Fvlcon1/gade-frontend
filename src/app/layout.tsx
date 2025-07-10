@@ -7,6 +7,7 @@ import SpatialDataInitializer from './SpatialDataInitializer';
 import { QueryProvider } from '@/providers/query-provider';
 import { Toaster } from "react-hot-toast";
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { SettingsContextProvider } from '@/app/context/settings-context';
 
 const montserrat = Montserrat({
 	variable: "--font-montserrat",
@@ -47,14 +48,16 @@ export default function RootLayout({
 	return (
 		<html lang="en" className="h-full">
 			<body
-				className={`${montserrat.variable} antialiased dark duration-500 h-full min-h-full`}
+				className={`${montserrat.variable} antialiased duration-500 h-full min-h-full`}
 			>
 				<QueryProvider>
 					<ThemeProvider>
 						<Providers>
-							<SpatialDataInitializer />
-							{children}
-							{toaster}
+							<SettingsContextProvider>
+								<SpatialDataInitializer />
+								{children}
+								{toaster}
+							</SettingsContextProvider>
 						</Providers>
 					</ThemeProvider>
 				</QueryProvider>

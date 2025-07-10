@@ -3,7 +3,7 @@ import { protectedApi } from "@/utils/apis/api";
 import { transformKeysToCamelCase } from "@/utils/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { UpdateSettingsPayload } from "../utils/types";
+import { UpdateSettingsPayload } from "../../components/Layout/LeftPanel/utils/types";
 
 const isEqual = (a: any, b: any) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -13,7 +13,9 @@ const useSettings = () => {
 
     const getSettings = async () => {
         const response = await protectedApi.GET("/settings/profile");
-        return transformKeysToCamelCase(response.preferences);
+        const settings = transformKeysToCamelCase(response.preferences);
+        storeSettings(settings);
+        return settings;
     };
 
     const {
@@ -37,8 +39,9 @@ const useSettings = () => {
             });
             return transformKeysToCamelCase(response.preferences);
         },
-        onSuccess: () => {
+        onSuccess: (data) => {
             toast.success("Settings updated successfully");
+            storeSettings(data);
             queryClient.invalidateQueries({ queryKey: ["settings"] });
         },
         onError: (error: any) => {
@@ -47,41 +50,29 @@ const useSettings = () => {
     });
 
     useEffect(() => {
-        if (settings) {
-            setLocalSettings({
-                appTheme: settings.appTheme,
-                coordinateFormat: settings.coordinateFormat,
-                defaultMapview: settings.defaultMapview,
-                notificationsEnabled: settings.notificationsEnabled,
-                units: settings.units,
-            });
-        }
-    }, [settings]);
+        const storedSettings = localStorage.getItem("settings");
+        if (storedSettings) setLocalSettings(JSON.parse(storedSettings));
+    }, []);
 
-    useEffect(() => {
-        console.log({localSettings})
-        if (!settings || !localSettings) return;
+    const storeSettings = (settings: UpdateSettingsPayload) => {
+        setLocalSettings(settings);
+        localStorage.setItem("settings", JSON.stringify(settings));
+    };
 
-        const currentSettings = {
-            appTheme: settings.appTheme,
-            coordinateFormat: settings.coordinateFormat,
-            defaultMapview: settings.defaultMapview,
-            notificationsEnabled: settings.notificationsEnabled,
-            units: settings.units,
-        };
-
-        if (!isEqual(currentSettings, localSettings)) {
-            updateSettings(localSettings);
-        }
-    }, [localSettings]);
+    const saveSettings = (newSettings: UpdateSettingsPayload) => {
+        updateSettings(newSettings);
+    };
 
     return {
         settings: localSettings,
         setSettings: setLocalSettings,
+        storeSettings,
+        saveSettings,
         settingsLoading,
         settingsError,
         updateSettingsLoading,
     };
+
 };
 
 export default useSettings;

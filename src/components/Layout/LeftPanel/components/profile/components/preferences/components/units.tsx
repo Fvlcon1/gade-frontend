@@ -5,17 +5,19 @@ import { LuSunMoon, LuChevronDown } from "react-icons/lu"
 import { CiLight, CiDark } from "react-icons/ci"
 import Dropdown from "@components/ui/dropdown/dropdown"
 import { DropdownItem } from "@/utils/@types"
-import { useLeftPanelContext } from "@components/Layout/LeftPanel/context/context"
+import { useSettingsContext } from "@/app/context/settings-context"
 
 const Units = () => {
-    const { settings, setSettings } = useLeftPanelContext()
+    const { settings, saveSettings, storeSettings } = useSettingsContext()
     const units = settings?.units
     
     const handleUnitsChange = (units: string) => {
-        setSettings({
+        const newSettings = {
             ...settings,
             units: units
-        })
+        }
+        storeSettings(newSettings)
+        saveSettings(newSettings)
     }
     
     const items: DropdownItem[] = [
@@ -32,7 +34,7 @@ const Units = () => {
     ]
     return (
         <div className="flex items-center justify-between w-full">
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-1">
                 <Text>
                     Units
                 </Text>

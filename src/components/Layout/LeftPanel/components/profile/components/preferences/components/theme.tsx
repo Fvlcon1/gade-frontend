@@ -5,17 +5,35 @@ import { LuSunMoon, LuChevronDown } from "react-icons/lu"
 import { CiLight, CiDark } from "react-icons/ci"
 import Dropdown from "@components/ui/dropdown/dropdown"
 import { DropdownItem } from "@/utils/@types"
-import { useLeftPanelContext } from "@components/Layout/LeftPanel/context/context"
+import { useSettingsContext } from "@/app/context/settings-context"
 
 const Theme = () => {
-    const { settings, setSettings } = useLeftPanelContext()
+    const { settings, saveSettings, storeSettings } = useSettingsContext()
     const appTheme = settings?.appTheme
     
     const handleThemeChange = (theme: string) => {
-        setSettings({
+        document.documentElement.classList.toggle("dark");
+        localStorage.setItem("theme", theme);
+        
+        const newSettings = {
             ...settings,
             appTheme: theme
-        })
+        }
+        storeSettings(newSettings)
+        saveSettings(newSettings)
+
+        // switch (theme) {
+        //     case "light":
+        //         document.documentElement.classList.remove("dark");
+        //         document.documentElement.classList.add("light");
+        //         localStorage.setItem("theme", "light");
+        //         break;
+        //     case "dark":
+        //         document.documentElement.classList.remove("light");
+        //         document.documentElement.classList.add("dark");
+        //         localStorage.setItem("theme", "dark");
+        //         break;
+        // }
     }
     const items: DropdownItem[] = [
         {
@@ -36,7 +54,7 @@ const Theme = () => {
     ]
     return (
         <div className="flex items-center justify-between w-full">
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-1">
                 <Text>
                     Theme
                 </Text>

@@ -6,17 +6,19 @@ import { CiLight, CiDark } from "react-icons/ci"
 import Dropdown from "@components/ui/dropdown/dropdown"
 import { DropdownItem } from "@/utils/@types"
 import { BiCurrentLocation } from "react-icons/bi"
-import { useLeftPanelContext } from "@components/Layout/LeftPanel/context/context"
+import { useSettingsContext } from "@/app/context/settings-context"
 
 const CoordinateFormat = () => {
-    const { settings, setSettings } = useLeftPanelContext()
+    const { settings, saveSettings, storeSettings } = useSettingsContext()
     const coordinateFormat = settings?.coordinateFormat
 
     const handleCoordinateFormatChange = (format: string) => {
-        setSettings({
+        const newSettings = {
             ...settings,
             coordinateFormat: format
-        })
+        }
+        storeSettings(newSettings)
+        saveSettings(newSettings)
     }
     
     const items: DropdownItem[] = [
@@ -33,7 +35,7 @@ const CoordinateFormat = () => {
     ]
     return (
         <div className="flex items-center justify-between w-full">
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-1">
                 <Text>
                     Coordinate Format
                 </Text>

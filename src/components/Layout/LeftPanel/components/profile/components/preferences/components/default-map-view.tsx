@@ -1,27 +1,43 @@
 import Text from "@styles/components/text"
 import theme from "@styles/theme"
 import Input from "@components/ui/input/input"
-import { useLeftPanelContext } from "@components/Layout/LeftPanel/context/context"
+import { useSettingsContext } from "@/app/context/settings-context"
 import { useState, useEffect } from "react"
 
 const DefaultMapView = () => {
-    const { settings, setSettings } = useLeftPanelContext()
-    const defaultMapView = settings?.defaultMapview
-    
-    const [lat, setLat] = useState(defaultMapView?.lat || 0)
-    const [lon, setLon] = useState(defaultMapView?.lon || 0)
-    const [zoom, setZoom] = useState(defaultMapView?.zoom || 0)
-    
-    const handleDefaultMapViewChange = () => {
-        setSettings({
-            ...settings,
-            defaultMapview: { lat, lon, zoom }
-        })
-    }
+    const { settings, saveSettings, storeSettings } = useSettingsContext()
+    const defaultMapView = settings?.defaultMapview;
 
+    const [lat, setLat] = useState(defaultMapView?.lat || 0);
+    const [lon, setLon] = useState(defaultMapView?.lon || 0);
+    const [zoom, setZoom] = useState(defaultMapView?.zoom || 0);
+
+    // Sync local state with context/settings changes
     useEffect(() => {
-        handleDefaultMapViewChange()
-    }, [lat, lon, zoom])
+        setLat(defaultMapView?.lat || 0);
+        setLon(defaultMapView?.lon || 0);
+        setZoom(defaultMapView?.zoom || 0);
+    }, [defaultMapView]);
+
+    // Debounced save: only if values changed from settings
+    useEffect(() => {
+        if (
+            lat === (defaultMapView?.lat || 0) &&
+            lon === (defaultMapView?.lon || 0) &&
+            zoom === (defaultMapView?.zoom || 0)
+        ) {
+            return; // Don't save if nothing changed
+        }
+        const handler = setTimeout(() => {
+            const newSettings = {
+                ...settings,
+                defaultMapview: { lat, lon, zoom },
+            };
+            storeSettings(newSettings);
+            saveSettings(newSettings);
+        }, 600);
+        return () => clearTimeout(handler);
+    }, [lat, lon, zoom, defaultMapView, settings]);
     
     return (
         <div className="flex flex-col w-full gap-1">
