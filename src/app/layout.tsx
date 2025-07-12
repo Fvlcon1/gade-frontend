@@ -6,8 +6,8 @@ import { Providers } from "./providers";
 import SpatialDataInitializer from './SpatialDataInitializer';
 import { QueryProvider } from '@/providers/query-provider';
 import { Toaster } from "react-hot-toast";
-import { ThemeProvider } from '@/components/ThemeProvider';
 import { SettingsContextProvider } from '@/app/context/settings-context';
+import { ThemeProvider } from "@styles/theme-context";
 
 const montserrat = Montserrat({
 	variable: "--font-montserrat",
@@ -18,16 +18,6 @@ export const metadata: Metadata = {
 	title: "GADE",
 	description: "GADE",
 };
-
-// // Initialize theme
-// const savedTheme = localStorage.getItem('theme');
-// if (savedTheme === 'dark') {
-//   document.documentElement.classList.add('dark');
-// } else {
-//   // Default to light theme
-//   localStorage.setItem('theme', 'light');
-//   document.documentElement.classList.remove('dark');
-// }
 
 export default function RootLayout({
 	children,

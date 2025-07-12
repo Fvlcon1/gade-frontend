@@ -1,136 +1,133 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
+/*
+  DARK THEME IMPLEMENTATION
+  - Uses .dark class on <html> or <body> (recommended by Tailwind)
+  - All variables are set in :root for light, and overridden in .dark for dark mode
+*/
 
-  to {
-    transform: rotate(360deg);
-  }
-}
+/* :root {
+	--text-primary: #283A52;
+	--text-secondary: #3F5B83;
+	--text-tetiary: #95A3B7;
 
-.rotate {
-  animation: spin 1s linear infinite;
-}
+	--bg-primary: #FFFFFF;
+	--bg-secondary: #F4F4F4;
+	--bg-tetiary: #EBEBEB;
+	--bg-quantinary: #D0D0D0;
+	--bg-primary-lighter: #FBFBFB;
 
-:root {
-  --text-primary: #283A52;
-  --text-secondary: #3F5B83;
-  --text-tetiary: #95A3B7;
+	--border-primary: #EBEDF1;
+	--border-secondary: #E0E4EB;
+	--border-tetiary: #D7DCE5;
+	--border-quantinary: #CED3DF;
 
-  --bg-primary: #FFFFFF;
-  --bg-secondary: #F4F4F4;
-  --bg-tetiary: #EBEBEB;
-  --bg-quantinary: #D0D0D0;
-  --bg-primary-lighter: #FBFBFB;
+	--main-primary: #5A87C7;
+} */
 
-  /* Border colors */
-  --border-primary: #EBEDF1;
-  --border-secondary: #E0E4EB;
-  --border-tetiary: #D7DCE5;
-  --border-quantinary: #CED3DF;
-
-  --main-primary: #5A87C7;
-}
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-text-primary: var(--text-primary);
-  --color-text-secondary: var(--text-secondary);
-  --color-text-tetiary: var(--text-tetiary);
+	--color-text-primary: #283A52;
+	--color-text-secondary: #3F5B83;
+	--color-text-tetiary: #95A3B7;
 
-  --color-bg-primary: var(--bg-primary);
-  --color-bg-secondary: var(--bg-secondary);
-  --color-bg-tetiary: var(--bg-tetiary);
-  --color-bg-quantinary: var(--bg-quantinary);
-  --color-bg-primary-lighter: var(--bg-primary-lighter);
+	--color-bg-primary: #FFFFFF;
+	--color-bg-secondary: #F4F4F4;
+	--color-bg-tetiary: #EBEBEB;
+	--color-bg-quantinary: #D0D0D0;
+	--color-bg-primary-lighter: #FBFBFB;
 
-  --color-border-primary: var(--border-primary);
-  --color-border-secondary: var(--border-secondary);
-  --color-border-tetiary: var(--border-tetiary);
-  --color-border-quantinary: var(--border-quantinary);
+	--color-border-primary: #EBEDF1;
+	--color-border-secondary: #E0E4EB;
+	--color-border-tetiary: #D7DCE5;
+	--color-border-quantinary: #CED3DF;
 
-  --color-main-primary: var(--main-primary);
+	--color-main-primary: #5A87C7;
+}
+
+.dark {
+	--color-text-primary: #F1FCFD;
+	--color-text-secondary: #CDD6D7;
+	--color-text-tetiary: #798586;
+
+	--color-bg-primary: #0B0A0A;
+	--color-bg-secondary: #1B1E1E;
+	--color-bg-tetiary: #323737;
+	--color-bg-quantinary: #373D3E;
+	--color-bg-primary-lighter: #141515;
+
+	--color-border-primary: #1D1D1D;
+	--color-border-secondary: #2F2F2F;
+	--color-border-tetiary: #4D4D4D;
+	--color-border-quantinary: #909090;
+
+	--color-main-primary: #5A87C7;
+}
+
+html.dark {
+	color-scheme: dark;
 }
 
 body {
-  background: var(--color-bg-primary);
-  color: var(--color-text-primary);
+	background: var(--color-bg-primary);
+	color: var(--color-text-primary);
 }
 
 .hide-scrollbar::-webkit-scrollbar {
-  display: none;
+	display: none;
 }
 
 .hide-scrollbar {
-  -ms-overflow-style: none;
-  /* IE and Edge */
-  scrollbar-width: none;
-  /* Firefox */
+	-ms-overflow-style: none;
+	/* IE and Edge */
+	scrollbar-width: none;
+	/* Firefox */
 }
 
 /* Custom scrollbar styles */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+	width: 6px;
+	height: 6px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+	background: transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 3px;
+	background: #d1d5db;
+	border-radius: 3px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+	background: #9ca3af;
 }
 
 /* For Firefox */
 .custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: #d1d5db transparent;
+	scrollbar-width: thin;
+	scrollbar-color: #d1d5db transparent;
 }
 
-.dark {
-  --bg-primary: #0B0A0A;
-  --bg-secondary: #141515;
-  --bg-tetiary: #1B1E1E;
-  --bg-quantinary: #323737;
-  --bg-primary-lighter: #373D3E;
-
-  --border-primary: #1D1D1D;
-  --border-secondary: #2F2F2F;
-  --border-tetiary: #4D4D4D;
-  --border-quantinary: #909090;
-
-  --text-primary: #F1FCFD;
-  --text-secondary: #CDD6D7;
-  --text-tetiary: #798586;
-
-  --main-primary: #5A87C7;
-}
 
 .loader {
-  width: 50px;
-  height: 50px;
-  border: 5px solid var(--color-bg-primary);
-  border-bottom-color: var(--color-main-primary);
-  border-radius: 50%;
-  display: inline-block;
-  box-sizing: border-box;
-  animation: rotation .9s linear infinite;
+	width: 50px;
+	height: 50px;
+	border: 5px solid var(--color-bg-primary);
+	border-bottom-color: var(--color-main-primary);
+	border-radius: 50%;
+	display: inline-block;
+	box-sizing: border-box;
+	animation: rotation .9s linear infinite;
 }
 
 @keyframes rotation {
-  0% {
-    transform: rotate(0deg);
-  }
+	0% {
+		transform: rotate(0deg);
+	}
 
-  100% {
-    transform: rotate(360deg);
-  }
+	100% {
+		transform: rotate(360deg);
+	}
 }

@@ -1,8 +1,8 @@
 'use client'
 import { AppTypographyProps, TypographyBold, TypographySize } from "@styles/style.types"
-import theme from "@styles/theme"
 import { Montserrat } from "next/font/google"
 import { useState } from "react"
+import { useTheme } from "@/app/styles/theme-context"
 
 const montserrat = Montserrat({
     subsets: ["latin"],
@@ -32,12 +32,13 @@ const Text = ({
 } : AppTypographyProps) => {
 
     const [onHover, setOnHover] = useState<boolean>(false)
+    const { theme } = useTheme()
 
     return (
         <span
             className={`
                 ${className} 
-                w-fit 
+                w-fit duration-300
                 ${
                     fontfamily === 'montserrat' 
                     ? montserrat.variable 
@@ -78,6 +79,7 @@ const Text = ({
 }
 
 export const Head1 = (props : AppTypographyProps) => {
+    const { theme } = useTheme()
     return (
         <Text
             size={TypographySize.HL}

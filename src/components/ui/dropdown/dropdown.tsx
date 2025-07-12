@@ -186,7 +186,7 @@ const Dropdown = ({
 // ────────────────────────────────────────────
 const DropdownRow = ({ item }: { item: DropdownItem }) => (
 	<div
-		className={`${!item.disabled ? "hover:bg-bg-secondary px-2 py-[3px] rounded-md flex gap-[6px] items-center" : "flex"
+		className={`${!item.disabled ? "hover:bg-bg-secondary px-2 py-[6px] rounded-md flex gap-[6px] items-center" : "flex"
 			} ${item.isSelected ? "bg-main-primary/10" : ""}`}
 	>
 		{item.isSelected && <FaCheck color={theme.colors.main.primary} size={12} />}

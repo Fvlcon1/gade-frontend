@@ -1,20 +1,18 @@
 import Text from "@styles/components/text"
-import theme from "@styles/theme"
 import Input from "@components/ui/input/input"
 import { LuSunMoon, LuChevronDown } from "react-icons/lu"
 import { CiLight, CiDark } from "react-icons/ci"
 import Dropdown from "@components/ui/dropdown/dropdown"
 import { DropdownItem } from "@/utils/@types"
 import { useSettingsContext } from "@/app/context/settings-context"
+import { useTheme } from "@/app/styles/theme-context"
 
 const Theme = () => {
     const { settings, saveSettings, storeSettings } = useSettingsContext()
+    const { theme, setThemeColor } = useTheme()
     const appTheme = settings?.appTheme
     
     const handleThemeChange = (theme: string) => {
-        document.documentElement.classList.toggle("dark");
-        localStorage.setItem("theme", theme);
-        
         const newSettings = {
             ...settings,
             appTheme: theme
@@ -22,18 +20,20 @@ const Theme = () => {
         storeSettings(newSettings)
         saveSettings(newSettings)
 
-        // switch (theme) {
-        //     case "light":
-        //         document.documentElement.classList.remove("dark");
-        //         document.documentElement.classList.add("light");
-        //         localStorage.setItem("theme", "light");
-        //         break;
-        //     case "dark":
-        //         document.documentElement.classList.remove("light");
-        //         document.documentElement.classList.add("dark");
-        //         localStorage.setItem("theme", "dark");
-        //         break;
-        // }
+        switch (theme) {
+            case "light":
+                document.documentElement.classList.remove("dark");
+                document.documentElement.classList.add("light");
+                localStorage.setItem("theme", "light");
+                setThemeColor("light");
+                break;
+            case "dark":
+                document.documentElement.classList.remove("light");
+                document.documentElement.classList.add("dark");
+                localStorage.setItem("theme", "dark");
+                setThemeColor("dark");
+                break;
+        }
     }
     const items: DropdownItem[] = [
         {
