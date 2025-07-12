@@ -2,6 +2,7 @@ import Text from "@styles/components/text"
 import theme from "@styles/theme"
 import { getRelativeTime } from "@/utils/getDate"
 import { useAuthStore } from "@/lib/store/auth-store"
+import { hexOpacity } from "@/utils/hexOpacity"
 
 const ProfileInfo = () => {
     const {user} = useAuthStore()
@@ -29,16 +30,16 @@ const ProfileInfo = () => {
                                 {`${user?.first_name.charAt(0).toUpperCase()}${user?.last_name.charAt(0).toUpperCase()}`}
                             </Text>
                         </div>
-                        <div className="flex flex-col mt-3">
+                        <div className="flex flex-col mt-3 gap-1">
                             <Text
-                                textColor={theme.colors.bg.primary}
+                                textColor={"#ffffff"}
                                 size={theme.text.size.body2}
                                 bold={theme.text.bold.md}
                             >
                                 {`${user?.first_name} ${user?.last_name}`}
                             </Text>
                             <Text
-                                textColor={theme.colors.bg.quantinary}
+                                textColor={"#ffffff" + hexOpacity(70)}
                             >
                                 Admin
                             </Text>

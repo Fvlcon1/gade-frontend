@@ -105,7 +105,7 @@ const Pagination: React.FC<PaginationProps> = ({
 
     const buttonBaseClasses = "min-w-[44px] h-[44px] border-none rounded-xl bg-transparent text-gray-600 font-medium cursor-pointer transition-all duration-300 ease-out flex items-center justify-center relative overflow-hidden text-sm hover:bg-indigo-50 hover:text-indigo-500 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none disabled:hover:bg-transparent disabled:hover:text-gray-600 disabled:hover:shadow-none";
 
-    const activeClasses = "bg-gradient-to-br from-main-primary to-main-primary text-white -translate-y-0.5 shadow-xl shadow-indigo-300";
+    const activeClasses = "bg-gradient-to-br from-main-primary to-main-primary text-white -translate-y-0.5 shadow-xl shadow";
 
     const navButtonClasses = "px-4 text-xs uppercase tracking-wider font-semibold";
 

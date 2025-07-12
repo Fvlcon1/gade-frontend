@@ -27,7 +27,7 @@ const EditModal = ({
                     <Container
                         isVisible={isVisible}
                         close={close}
-                        className=""
+                        className="border-[1px] border-border-secondary"
                         title="Edit User"
                     >
                         <div

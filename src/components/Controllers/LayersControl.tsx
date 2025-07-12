@@ -1,22 +1,13 @@
 'use client';
-import React, { useState, useCallback, Fragment } from 'react';
+import React, { useState, useCallback, Fragment, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IoClose, IoLayersOutline, IoMapOutline } from 'react-icons/io5';
 import Text from '@styles/components/text';
-import theme from '@styles/theme';
 import ClickableTab from '@components/ui/clickable/clickabletab';
 import BlurContainer from '@components/ui/blur-container';
 import OutlineButton from '@components/ui/button/outlineButton';
 import Button from '@components/ui/button/button';
-
-// Basemap definitions
-const basemaps = [
-  { id: 'cartocdnLight', label: 'Light Basemap', checked: true },
-  { id: 'osm', label: 'Open Street Map', checked: false },
-  { id: 'cartocdnDark', label: 'Dark Basemap', checked: false },
-  { id: 'satellite', label: 'Google Satellite', checked: false },
-  { id: 'planet', label: 'Planet', checked: false },
-];
+import { useTheme } from '@/app/styles/theme-context';
 
 // Feature layer definitions with colors matching LAYER_STYLES
 export const initialLayers = [
@@ -50,8 +41,22 @@ const LayersControl: React.FC<LayersControlProps> = ({
   onBasemapChange = () => { },
   onLayerChange = () => { }
 }) => {
+  const {theme, themeColor} = useTheme()
+  // Basemap definitions
+  const basemaps = useMemo(() => [
+    { id: 'cartocdnLight', label: 'Light Basemap', checked: themeColor === 'light' },
+    { id: 'osm', label: 'Open Street Map', checked: false },
+    { id: 'cartocdnDark', label: 'Dark Basemap', checked: themeColor === 'dark' },
+    { id: 'satellite', label: 'Google Satellite', checked: false },
+    { id: 'planet', label: 'Planet', checked: false },
+  ], [themeColor]);
   const [basemapLayers, setBasemapLayers] = useState(basemaps);
   const [featureLayers, setFeatureLayers] = useState(initialLayers);
+
+  useEffect(() => {
+    onBasemapChange(basemaps.find(layer => layer.checked)?.id || '');
+    setBasemapLayers(basemaps);
+  }, [basemaps]);
 
   const toggleBasemap = useCallback((id: string) => {
     setBasemapLayers(prev => {
@@ -100,7 +105,7 @@ const LayersControl: React.FC<LayersControlProps> = ({
   const Divider = ({ className }: { className?: string }) => {
     return (
       <div className={`w-full pl-8 ${className}`}>
-        <div className="w-full h-0.25 bg-border-primary/80" />
+        <div className="w-full h-0.25 bg-border-primary" />
       </div>
     )
   }
@@ -117,7 +122,7 @@ const LayersControl: React.FC<LayersControlProps> = ({
           className="absolute top-[10px] z-[1001] w-[240px] gap-2 flex flex-col"
         >
           {/* Header */}
-          <div className="w-full h-[33px] bg-white/80 backdrop-blur-sm shadow-xl px-3 pr-1 flex items-center justify-between rounded-[10px]">
+          <div className="w-full h-[33px] bg-bg-primary/80 dark:border-[1px] dark:border-border-primary dark:shadow-bg-primary/50 backdrop-blur-sm shadow px-3 pr-1 flex items-center justify-between rounded-[10px]">
             <Text bold={theme.text.bold.md}>
               Map Layers
             </Text>
@@ -132,7 +137,7 @@ const LayersControl: React.FC<LayersControlProps> = ({
           {/* Content Container */}
           <div className="space-y-2">
             {/* Basemaps Section */}
-            <BlurContainer>
+            <BlurContainer className='border-[1px] border-border-primary'>
               <div className="py-3 gap-2 flex flex-col">
                 <Text
                   bold={theme.text.bold.md}
@@ -140,7 +145,7 @@ const LayersControl: React.FC<LayersControlProps> = ({
                 >
                   Basemaps
                 </Text>
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-2">
                   {basemapLayers.map((layer, index) => (
                     <Fragment key={layer.id}>
                       <label className="flex items-center gap-2 px-4 py-1 cursor-pointer">
@@ -149,7 +154,7 @@ const LayersControl: React.FC<LayersControlProps> = ({
                           name="basemap"
                           checked={layer.checked}
                           onChange={() => toggleBasemap(layer.id)}
-                          className="w-3 h-3 accent-[#4F46E5]"
+                          className="w-3 h-3 accent-main-primary"
                         />
                         <Text
                           textColor={layer.checked ? theme.colors.main.primary : theme.colors.text.secondary}
@@ -167,7 +172,7 @@ const LayersControl: React.FC<LayersControlProps> = ({
             </BlurContainer>
 
             {/* Feature Layers Section */}
-            <BlurContainer>
+            <BlurContainer className='border-[1px] border-border-primary'>
               <div className="py-3 gap-2 flex flex-col">
                 <Text
                   bold={theme.text.bold.md}

@@ -8,8 +8,7 @@ import { PiWarningCircleBold } from "react-icons/pi"
 import Button from "@components/ui/button/button"
 import OutlineButton from "@components/ui/button/outlineButton"
 import useDelete from "./useDelete"
-import { IUserInfo } from '../../utils/types';
-import { getRelativeTime } from "@/utils/getDate"
+import { User } from "@/types/auth";
 
 const effects = [
     "All user data will be permanently deleted",
@@ -17,16 +16,16 @@ const effects = [
     "This action cannot be reversed or undone"
 ]
 
-const ConfirmationModal = ({
+const DeleteConfirmationModal = ({
     isVisible,
     close,
     user
 }: {
     isVisible: boolean;
     close: () => void;
-    user: IUserInfo
+    user: User
 }) => {
-    const { deleteUserMutation, isDeletePending } = useDelete({ close, id: user.id })
+    const { deleteUserMutation, isDeletePending } = useDelete({ close, id: user?.id })
     return (
         <AnimatePresence>
             {
@@ -42,9 +41,9 @@ const ConfirmationModal = ({
                             <div className="w-full flex flex-col rounded-xl">
 
                                 {/* Head */}
-                                <div className="bg-[#d550501b] border-b-[1px] rounded-t-2xl border-border-primary p-2 py-4 flex flex-col gap-2 items-center">
-                                    <div className="w-[40px] h-[40px] rounded-full flex items-center justify-center bg-red-400">
-                                        <TiWarning color={theme.colors.bg.primary} size={20} />
+                                <div className="bg-[#cf454c17] border-b-[1px] rounded-t-2xl border-[#cf454c20] p-2 py-4 flex flex-col gap-2 items-center">
+                                    <div className="w-[40px] h-[40px] rounded-full flex items-center justify-center bg-[#cf454c]">
+                                        <TiWarning color={"white"} size={20} />
                                     </div>
                                     <Text
                                         size={theme.text.size.HM}
@@ -83,14 +82,14 @@ const ConfirmationModal = ({
                                                 </div>
                                                 <div className="flex flex-col mt-3 gap-1">
                                                     <Text
-                                                        textColor={theme.colors.bg.primary}
+                                                        textColor={"white"}
                                                         size={theme.text.size.body2}
                                                         bold={theme.text.bold.md}
                                                     >
                                                         {`${user?.first_name} ${user?.last_name}`}
                                                     </Text>
                                                     <Text
-                                                        textColor={theme.colors.bg.quantinary}
+                                                        textColor={"white"}
                                                     >
                                                         {user.role}
                                                     </Text>
@@ -98,32 +97,22 @@ const ConfirmationModal = ({
                                             </div>
 
                                             {/* Bottom Section */}
-                                            <div className="flex flex-col gap-1">
-                                                <Text>
-                                                    <Text
-                                                        textColor={theme.colors.text.tetiary}
-                                                    >
-                                                        Email:&nbsp;
-                                                    </Text>
-                                                    {user.email}
+                                            <Text>
+                                                <Text
+                                                    textColor={theme.colors.text.tetiary}
+                                                >
+                                                    Email:&nbsp;
                                                 </Text>
-                                                <Text>
-                                                    <Text
-                                                        textColor={theme.colors.text.tetiary}
-                                                    >
-                                                        Last active:&nbsp;
-                                                    </Text>
-                                                    {getRelativeTime(new Date(user.last_active))}
-                                                </Text>
-                                            </div>
+                                                {user.email}
+                                            </Text>
                                         </div>
                                     </div>
 
                                     {/* Effects */}
-                                    <div className="w-full flex flex-col gap-2 mt-4 p-4 bg-[#d550501b] border-[1px] border-[#e3656526] rounded-xl">
+                                    <div className="w-full flex flex-col gap-2 mt-4 p-4 bg-[#cf454c17] border-[1px] border-[#e3656526] rounded-xl">
                                         {
                                             effects.map((effect, index) => (
-                                                <div 
+                                                <div
                                                     key={index}
                                                     className="w-full flex items-center gap-2"
                                                 >
@@ -161,4 +150,4 @@ const ConfirmationModal = ({
         </AnimatePresence>
     )
 }
-export default ConfirmationModal
+export default DeleteConfirmationModal

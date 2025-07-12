@@ -1,12 +1,15 @@
+'use client'
+
 import Text from "@styles/components/text"
-import theme from "@styles/theme"
 import { IoStatsChart } from "react-icons/io5"
 import Metrics from "./components/metrics/metrics"
 import Charts from "./components/charts/charts"
 import Right from "./components/right/right"
 import RecentReports from "./components/recent-reports/recent-reports"
+import { useTheme } from "@/app/styles/theme-context"
 
 const Header = () => {
+    const { theme } = useTheme()
     return (
         <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">

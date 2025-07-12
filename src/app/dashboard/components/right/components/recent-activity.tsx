@@ -1,8 +1,8 @@
 import Text from "@styles/components/text"
-import theme from "@styles/theme"
 import { Fragment } from "react"
 import { IoMdPulse } from "react-icons/io"
 import { MdPieChart } from "react-icons/md"
+import { useTheme } from "@/app/styles/theme-context"
 
 const Divider = () => {
     return (
@@ -13,6 +13,7 @@ const Divider = () => {
 }
 
 const Activity = () => {
+    const { theme } = useTheme()
     return (
         <div className="flex items-center gap-3">
             <div className="w-[40px] h-[40px] rounded-full bg-main-primary/10 flex items-center justify-center">
@@ -36,6 +37,7 @@ const Activity = () => {
 }
 
 const RecentActivity = () => {
+    const { theme } = useTheme()
     return (
         <div className="flex flex-col gap-4 pl-4">
             {/* header */}

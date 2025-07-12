@@ -1,3 +1,5 @@
+'use client'
+
 import Container from "@components/ui/container/container"
 import Overlay from "@components/ui/overlay/overlay"
 import Text from "@styles/components/text"
@@ -8,6 +10,19 @@ import Button from "@components/ui/button/button"
 import OutlineButton from "@components/ui/button/outlineButton"
 import { hexOpacity } from "@/utils/hexOpacity"
 import { useEffect } from "react"
+
+type ConfirmationModalProps = {
+    isVisible: boolean;
+    close: () => void;
+    description?: string;
+    children?: React.ReactNode;
+    onConfirm: () => void;
+    cta?: string;
+    loading?: boolean | (() => boolean);
+    title?: string;
+    icon?: React.ReactNode;
+    color?: string;
+};
 
 const ConfirmationModal = ({
     isVisible,
@@ -20,18 +35,7 @@ const ConfirmationModal = ({
     title,
     icon,
     color,
-}: {
-    isVisible: boolean;
-    close: () => void;
-    description?: string,
-    children?: React.ReactNode,
-    onConfirm: () => void,
-    cta?: string
-    loading?: boolean
-    title?: string
-    icon?: React.ReactNode
-    color?: string,
-}) => {
+}: ConfirmationModalProps) => {
     const handleConfirm = () => {
         onConfirm()
     }
@@ -52,7 +56,7 @@ const ConfirmationModal = ({
 
                                 {/* Head */}
                                 <div 
-                                    className="bg-red-50 border-b-[1px] border-border-primary p-2 py-4 flex flex-col gap-1 items-center"
+                                    className="bg-red-50 border-b-[1px] rounded-t-2xl border-border-primary p-2 py-4 flex flex-col gap-1 items-center"
                                     style={{
                                         backgroundColor: color ? color + hexOpacity(10) : theme.colors.main.primary + hexOpacity(10)
                                     }}
@@ -97,7 +101,7 @@ const ConfirmationModal = ({
                                     <Button
                                         onClick={handleConfirm}
                                         text={cta ?? "Continue"}
-                                        loading={loading}
+                                        loading={typeof loading === 'function' ? loading() : loading}
                                         className="flex-1"
                                     />
                                 </div>

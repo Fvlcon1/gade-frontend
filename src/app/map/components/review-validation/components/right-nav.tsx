@@ -22,7 +22,7 @@ const RightNav = () => {
     }, [activeItem])
     
     return (
-        <div className="absolute top-3 right-4 z-[1001] bg-white/80 backdrop-blur-sm rounded-xl gap-0.5 shadow-xl flex flex-col items-center justify-around p-2">
+        <div className="absolute top-3 right-4 z-[1001] dark:bg-bg-secondary/80 bg-bg-primary/80 backdrop-blur-sm rounded-xl gap-0.5 shadow-xl flex flex-col items-center justify-around p-2">
             {
                 navItems.map((item, index) => (
                     <Tooltip

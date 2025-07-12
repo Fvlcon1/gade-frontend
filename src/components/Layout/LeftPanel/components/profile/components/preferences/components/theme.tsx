@@ -22,16 +22,13 @@ const Theme = () => {
 
         switch (theme) {
             case "light":
-                document.documentElement.classList.remove("dark");
-                document.documentElement.classList.add("light");
-                localStorage.setItem("theme", "light");
                 setThemeColor("light");
                 break;
             case "dark":
-                document.documentElement.classList.remove("light");
-                document.documentElement.classList.add("dark");
-                localStorage.setItem("theme", "dark");
                 setThemeColor("dark");
+                break;
+            case "system":
+                setThemeColor("system");
                 break;
         }
     }
@@ -39,17 +36,20 @@ const Theme = () => {
         {
             key: "system",
             label: "System",
-            onClick: () => handleThemeChange("system")
+            onClick: () => handleThemeChange("system"),
+            isSelected: appTheme === "system"
         },
         {
             key: "light",
             label: "Light",
-            onClick: () => handleThemeChange("light")
+            onClick: () => handleThemeChange("light"),
+            isSelected: appTheme === "light"
         },
         {
             key: "dark",
             label: "Dark",
-            onClick: () => handleThemeChange("dark")
+            onClick: () => handleThemeChange("dark"),
+            isSelected: appTheme === "dark"
         }
     ]
     return (

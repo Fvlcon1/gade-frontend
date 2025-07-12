@@ -1,9 +1,10 @@
-import theme from "@styles/theme";
 import Text from "@styles/components/text";
 import { MdPieChart } from "react-icons/md"
 import { BsInfoCircleFill } from "react-icons/bs"
+import { useTheme } from "@/app/styles/theme-context"
 
 const Card = () => {
+    const { theme } = useTheme()
     return (
         <div className="relative overflow-hidden w-full h-[150px] flex items-center rounded-2xl bg-bg-secondary">
 

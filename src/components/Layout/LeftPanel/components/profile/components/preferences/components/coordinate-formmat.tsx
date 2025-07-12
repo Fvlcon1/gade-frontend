@@ -25,12 +25,14 @@ const CoordinateFormat = () => {
         {
             key: "dd",
             label: "DD (decimal degrees)",
-            onClick: () => handleCoordinateFormatChange("dd")
+            onClick: () => handleCoordinateFormatChange("dd"),
+            isSelected: coordinateFormat === "dd"
         },
         {
             key: "dms",
             label: "DMS (degree minutes seconds)",
-            onClick: () => handleCoordinateFormatChange("dms")
+            onClick: () => handleCoordinateFormatChange("dms"),
+            isSelected: coordinateFormat === "dms"
         }
     ]
     return (

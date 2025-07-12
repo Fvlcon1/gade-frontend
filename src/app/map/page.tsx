@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { FaLayerGroup, FaLocationArrow } from "react-icons/fa";
 import { FaSliders } from "react-icons/fa6";
 import { BsFillClockFill } from "react-icons/bs";
-
 import LeftPanel from "@components/Layout/LeftPanel/LeftPanel";
 import LayersControl from "../../components/Controllers/LayersControl";
 import MarkersControl from "../../components/Controllers/MarkersControl/MarkersControl";
@@ -16,6 +15,7 @@ import { useAuthStore } from "@/lib/store/auth-store";
 import ReviewValidation from "./components/review-validation/review-validation";
 import ZoomControls from "./components/review-validation/components/zoom-controls";
 import RightNav from "./components/review-validation/components/right-nav";
+import { useTheme } from "@styles/theme-context";
 
 const InteractiveMapClient = dynamic(() => import("../../components/Layout/MiddlePanel/Map/interactive-map/interactive-map-client"), {
   ssr: false,
@@ -51,6 +51,7 @@ const Page = () => {
   const [comparisonStartDate, setComparisonStartDate] = useState<string | null>(null);
   const [comparisonEndDate, setComparisonEndDate] = useState<string | null>(null);
   const { sidebarExpanded } = useAuthStore();
+  const {theme} = useTheme();
 
   useEffect(() => {
     const timer = setTimeout(() => setMapReady(true), 300);
@@ -221,20 +222,20 @@ const Page = () => {
         animate={{ opacity: 1, y: 0 }}
         style={{ left: floatingNavLeft }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
-        className="absolute top-[10px] z-[1001] bg-white/90 backdrop-blur-sm rounded-xl gap-0.5 shadow-xl flex flex-col items-center justify-around p-2"
+        className="absolute top-[10px] z-[1001] bg-bg-primary/80 backdrop-blur-sm rounded-xl gap-0.5 shadow-xl flex flex-col items-center justify-around p-2"
       >
         <ToolButton
-          icon={<FaLayerGroup size={16} />}
+          icon={<FaLayerGroup size={16} color={theme.colors.text.secondary} />}
           isActive={activeTab === "layers"}
           onClick={() => handleTabClick("layers")}
         />
         <ToolButton
-          icon={<FaSliders size={16} />}
+          icon={<FaSliders size={16} color={theme.colors.text.secondary} />}
           isActive={activeTab === "marker"}
           onClick={() => handleTabClick("marker")}
         />
         <ToolButton
-          icon={<BsFillClockFill size={16} />}
+          icon={<BsFillClockFill size={16} color={theme.colors.text.secondary} />}
           isActive={activeTab === "chart"}
           onClick={() => handleTabClick("chart")}
         />

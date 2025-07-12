@@ -11,6 +11,24 @@ const useSettings = () => {
     const queryClient = useQueryClient();
     const [localSettings, setLocalSettings] = useState<UpdateSettingsPayload | null>(null);
 
+    const resetPreferences = async () => {
+        const response = await protectedApi.POST("/settings/preferences/reset");
+        const settings = transformKeysToCamelCase(response.preferences);
+        storeSettings(settings);
+        queryClient.invalidateQueries({ queryKey: ["settings"] });
+    }
+
+    const { mutate: resetPreferencesMutation, isPending: resetPreferencesLoading } = useMutation({
+        mutationFn: resetPreferences,
+        onSuccess: () => {
+            toast.success("Preferences reset successfully");
+            queryClient.invalidateQueries({ queryKey: ["settings"] });
+        },
+        onError: (error: any) => {
+            toast.error(error?.response?.data?.detail || "Failed to reset preferences");
+        },
+    });
+
     const getSettings = async () => {
         const response = await protectedApi.GET("/settings/profile");
         const settings = transformKeysToCamelCase(response.preferences);
@@ -71,6 +89,8 @@ const useSettings = () => {
         settingsLoading,
         settingsError,
         updateSettingsLoading,
+        resetPreferencesMutation,
+        resetPreferencesLoading,
     };
 
 };

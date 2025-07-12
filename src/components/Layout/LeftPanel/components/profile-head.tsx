@@ -6,10 +6,7 @@ const ProfileHead = () => {
     const { user } = useAuthStore()
     return (
         <div
-            className="w-[28px] h-[28px] rounded-full p-2 flex items-center justify-center"
-            style={{
-                backgroundColor: "#dcdaec"
-            }}
+            className="w-[28px] h-[28px] rounded-full p-2 flex items-center justify-center bg-bg-quantinary"
         >
             <Text
                 size={theme.text.size.xs}

@@ -8,6 +8,7 @@ import CoordinateFormat from "./components/coordinate-formmat"
 import DefaultMapView from "./components/default-map-view"
 import Notification from "./components/notification"
 import Units from "./components/units"
+import Actions from "./components/actions"
 
 const Preferences = ({
     setViewState
@@ -40,6 +41,8 @@ const Preferences = ({
                     <Notification />
                     <Divider />
                     <Units />
+                    <Divider />
+                    <Actions />
                 </div>
             </div>
         </Container>

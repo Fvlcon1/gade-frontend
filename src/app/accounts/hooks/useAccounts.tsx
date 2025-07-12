@@ -154,7 +154,7 @@ const useUAM = () => {
             {
                 title: "Inactive Users",
                 value: data?.filter(user => user.status === 'INACTIVE').length,
-                color: "FF0000",
+                color: "db3030",
                 icon: IoCloudOffline
             },
             {

@@ -1,10 +1,11 @@
 'use client'
-import theme from "@styles/theme";
+
 import { ButtonProps } from "@/utils/@types";
 import Text from "@styles/components/text";
 import { useState } from "react";
 import { TypographyBold } from "@styles/style.types";
 import { ImSpinner10 } from "react-icons/im";
+import { useTheme } from "@styles/theme-context";
 
 const Button = ({
 	className,
@@ -27,7 +28,7 @@ const Button = ({
 	icon,
 	loadingColor
 }: ButtonProps) => {
-
+	const {theme, themeColor} = useTheme()
 	const [onHover, setOnHover] = useState<boolean>(false)
 	const [onPress, setOnPress] = useState<boolean>(false)
 
@@ -51,8 +52,8 @@ const Button = ({
 	const getTextColor = () => {
 		return onHover ? hover?.color
 			? hover.color
-			: color ?? theme.colors.bg.primary
-			: color ?? theme.colors.bg.primary
+			: color ?? (themeColor === "dark" ? "#ffffff" : theme.colors.bg.primary)
+			: color ?? (themeColor === "dark" ? "#ffffff" : theme.colors.bg.primary)
 	}
 
 	const getButtonStyle = () => {

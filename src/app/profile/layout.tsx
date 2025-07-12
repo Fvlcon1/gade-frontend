@@ -1,12 +1,16 @@
+'use client'
+
+import ProfileProvider from "./context/profile-context"
+
 const ProfileLayout = ({
     children
 }: {
     children: React.ReactNode
 }) => {
     return (
-        <div>
+        <ProfileProvider>
             {children}
-        </div>
+        </ProfileProvider>
     )
 }
 export default ProfileLayout

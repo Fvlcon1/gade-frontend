@@ -35,7 +35,7 @@ const DeactivateConfirmationModal = ({
     const handleDelete = () => {
         deactivateUserMutation()
     }
-    
+
     return (
         <AnimatePresence>
             {
@@ -51,7 +51,7 @@ const DeactivateConfirmationModal = ({
                             <div className="w-full flex flex-col rounded-xl">
 
                                 {/* Head */}
-                                <div className="bg-orange-50 border-b-[1px] rounded-t-2xl border-border-primary p-2 py-4 flex flex-col gap-1 items-center">
+                                <div className="bg-[#dc834322] border-b-[1px] rounded-t-2xl border-border-primary p-2 py-4 flex flex-col gap-2 items-center">
                                     <div className="w-[40px] h-[40px] rounded-full flex items-center justify-center bg-orange-400">
                                         <TiWarning color={theme.colors.bg.primary} size={20} />
                                     </div>
@@ -62,7 +62,7 @@ const DeactivateConfirmationModal = ({
                                         Deactivate user account
                                     </Text>
                                     <Text className="mt-[-5px]">
-                                    Temporarily suspend user access
+                                        Temporarily suspend user access
                                     </Text>
                                 </div>
 
@@ -90,7 +90,7 @@ const DeactivateConfirmationModal = ({
                                                         {`${user?.first_name.charAt(0).toUpperCase()}${user?.last_name.charAt(0).toUpperCase()}`}
                                                     </Text>
                                                 </div>
-                                                <div className="flex flex-col mt-3">
+                                                <div className="flex flex-col mt-3 gap-1">
                                                     <Text
                                                         textColor={theme.colors.bg.primary}
                                                         size={theme.text.size.body2}
@@ -99,7 +99,7 @@ const DeactivateConfirmationModal = ({
                                                         {`${user?.first_name} ${user?.last_name}`}
                                                     </Text>
                                                     <Text
-                                                        textColor={theme.colors.bg.quantinary}
+                                                        textColor={theme.colors.bg.primary}
                                                     >
                                                         Admin
                                                     </Text>
@@ -107,7 +107,7 @@ const DeactivateConfirmationModal = ({
                                             </div>
 
                                             {/* Bottom Section */}
-                                            <div className="flex flex-col">
+                                            <div className="flex flex-col gap-1">
                                                 <Text>
                                                     <Text
                                                         textColor={theme.colors.text.tetiary}
@@ -129,10 +129,10 @@ const DeactivateConfirmationModal = ({
                                     </div>
 
                                     {/* Effects */}
-                                    <div className="w-full flex flex-col gap-2 mt-4 p-4 bg-[#fef7f291] border-[1px] border-[#e3656526] rounded-xl">
+                                    <div className="w-full flex flex-col gap-2 mt-4 p-4 bg-[#df8d5122] border-[1px] border-[#e3656526] rounded-xl">
                                         {
                                             effects.map((effect, index) => (
-                                                <div 
+                                                <div
                                                     key={index}
                                                     className="w-full flex items-center gap-2"
                                                 >

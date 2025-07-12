@@ -1,14 +1,16 @@
 import Text from "@styles/components/text"
 import theme from "@styles/theme"
 import Input from "@components/ui/input/input"
-import { LuSunMoon, LuChevronDown } from "react-icons/lu"
-import { CiLight, CiDark } from "react-icons/ci"
+import { LuChevronDown } from "react-icons/lu"
 import Dropdown from "@components/ui/dropdown/dropdown"
 import { DropdownItem } from "@/utils/@types"
 import { useSettingsContext } from "@/app/context/settings-context"
+import { useConfirmationModal } from "@components/ui/confirmation-modal/confirmation-modal-context"
+import { BsInfoCircleFill } from "react-icons/bs"
 
 const Units = () => {
     const { settings, saveSettings, storeSettings } = useSettingsContext()
+    const showConfirmation = useConfirmationModal()
     const units = settings?.units
     
     const handleUnitsChange = (units: string) => {
@@ -18,18 +20,28 @@ const Units = () => {
         }
         storeSettings(newSettings)
         saveSettings(newSettings)
+
+        showConfirmation({
+            title: "Units changed",
+            description: "Page refresh required",
+            cta: "Refresh",
+            color: theme.colors.main.primary,
+            onConfirm: () => window.location.reload()
+        })
     }
     
     const items: DropdownItem[] = [
         {
             key: "metric",
             label: "Metric",
-            onClick: () => handleUnitsChange("metric")
+            onClick: () => handleUnitsChange("metric"),
+            isSelected: units === "metric"
         },
         {
             key: "imperial",
             label: "Imperial",
-            onClick: () => handleUnitsChange("imperial")
+            onClick: () => handleUnitsChange("imperial"),
+            isSelected: units === "imperial"
         }, 
     ]
     return (
@@ -38,9 +50,12 @@ const Units = () => {
                 <Text>
                     Units
                 </Text>
-                <Text textColor={theme.colors.text.tetiary}>
-                    Select units preference
-                </Text>
+                <div className="flex items-center gap-1">
+                    <BsInfoCircleFill size={13} color={theme.colors.text.tetiary} />
+                    <Text textColor={theme.colors.text.tetiary}>
+                        Page refresh required
+                    </Text>
+                </div>
             </div>
             <Dropdown
                 menuItems={items}

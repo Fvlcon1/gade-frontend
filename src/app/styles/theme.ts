@@ -5,6 +5,8 @@ export const lightColors = {
         primary: '#283A52',
         secondary: '#3F5B83',
         tetiary: '#95A3B7',
+        danger: '#bf3834',
+        success: '#29a333',
     },
     bg: {
         primary: '#FFFFFF',
@@ -28,6 +30,8 @@ export const darkColors = {
         primary: '#F1FCFD',
         secondary: '#CDD6D7',
         tetiary: '#798586',
+        danger: '#bf3834',
+        success: '#29a333',
     },
     bg: {
         primary: '#0B0A0A',
@@ -42,7 +46,7 @@ export const darkColors = {
         quantinary: '#909090',
     },
     main: {
-        primary: '#5A87C7'
+        primary: '#83ade9'
     }
 }
 

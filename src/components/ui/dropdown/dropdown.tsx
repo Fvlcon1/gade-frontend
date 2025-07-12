@@ -5,12 +5,10 @@ import { useClickAway } from "react-use";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { FaCheck } from "react-icons/fa";
-import { IconType } from "react-icons";
-
 import Text from "@styles/components/text";
-import theme from "@styles/theme";
 import { DropdownItem } from "@/utils/@types";
 import { hexOpacity } from "@/utils/hexOpacity";
+import { useTheme } from "@/app/styles/theme-context";
 
 // ────────────────────────────────────────────
 // Types
@@ -48,6 +46,7 @@ const Dropdown = ({
 	const [autoPosition, setAutoPosition] = useState<DropdownPosition>("bottom-right");
 	const menuRef = useRef<HTMLDivElement>(null);
 	const triggerRef = useRef<HTMLDivElement>(null);
+	const { theme } = useTheme()
 
 	// Close when clicking outside
 	useClickAway(menuRef, () => {
@@ -181,24 +180,27 @@ const Dropdown = ({
 	);
 };
 
-// ────────────────────────────────────────────
-// Helper: renders one row (to reduce duplication)
-// ────────────────────────────────────────────
-const DropdownRow = ({ item }: { item: DropdownItem }) => (
-	<div
-		className={`${!item.disabled ? "hover:bg-bg-secondary px-2 py-[6px] rounded-md flex gap-[6px] items-center" : "flex"
-			} ${item.isSelected ? "bg-main-primary/10" : ""}`}
-	>
-		{item.isSelected && <FaCheck color={theme.colors.main.primary} size={12} />}
-		{item.icon && <span>{item.icon}</span>}
-		{typeof item.label === "string" ? (
-			<Text ellipsis textColor={item.isSelected ? theme.colors.main.primary : theme.colors.text.secondary}>
-				{item.label}
-			</Text>
-		) : (
-			item.label
-		)}
-	</div>
-);
+const DropdownRow = ({ item }: { item: DropdownItem }) => {
+	const { theme } = useTheme()
+	return (
+		<div
+			className={`${!item.disabled ? "hover:bg-bg-secondary px-2 py-[6px] rounded-md flex gap-[6px] items-center" : "flex"
+				} ${item.isSelected ? "bg-main-primary/10" : ""}`}
+		>
+			{item.isSelected && <FaCheck color={theme.colors.main.primary} size={12} />}
+			{item.icon && <span>{item.icon}</span>}
+			{typeof item.label === "string" ? (
+				<Text
+					ellipsis
+					textColor={item.isSelected ? theme.colors.main.primary : theme.colors.text.secondary}
+				>
+					{item.label}
+				</Text>
+			) : (
+				item.label
+			)}
+		</div>
+	)
+};
 
 export default Dropdown;

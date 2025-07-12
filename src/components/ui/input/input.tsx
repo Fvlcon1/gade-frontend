@@ -1,8 +1,8 @@
 'use client'
 
 import { hexOpacity } from "@/utils/hexOpacity"
-import theme from "@styles/theme"
 import { ChangeEventHandler, DetailedHTMLProps, Dispatch, FocusEventHandler, HTMLInputAutoCompleteAttribute, InputHTMLAttributes, ReactNode, SetStateAction, useEffect, useRef, useState } from "react"
+import { useTheme } from "@/app/styles/theme-context"
 
 type InputProps = {
     className?: string;
@@ -52,6 +52,7 @@ const Input = ({
 }: InputProps) => {
     const [inputFocus, setInputFocus] = useState<boolean>(autofocus ?? false);
     const [hover, setHover] = useState<boolean>(false);
+    const { theme } = useTheme()
     
     const inputRef = useRef<HTMLInputElement | null>(null);
 

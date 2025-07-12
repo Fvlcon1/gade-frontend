@@ -1,9 +1,9 @@
 import { IconType } from "react-icons";
 import Text from "@/app/styles/components/text";
-import theme from "@/app/styles/theme";
 import { ReactNode } from "react";
 import { TypographySize } from "@styles/style.types";
 import { hexOpacity } from "@/utils/hexOpacity";
+import { useTheme } from "@styles/theme-context";
 
 interface HeaderProps {
     title: string;
@@ -16,14 +16,15 @@ interface HeaderProps {
 const Header = ({
     title,
     icon,
-    color = theme.colors.main.primary,
-    size = theme.text.size.body,
+    color,
+    size,
     iconSize
 }: HeaderProps) => {
+    const {theme} = useTheme();
     const renderIcon = () => {
         if (typeof icon === 'function') {
             const IconComponent = icon as IconType;
-            return <IconComponent color={color} size={iconSize ?? size} />;
+            return <IconComponent color={color || theme.colors.main.primary} size={iconSize ?? size} />;
         }
         return icon;
     };
@@ -36,7 +37,7 @@ const Header = ({
                         <div 
                             className="p-1.5 rounded-md flex items-center justify-center"
                             style={{
-                                backgroundColor : color + hexOpacity(15)
+                                backgroundColor : (color || theme.colors.main.primary) + hexOpacity(15)
                             }}
                         >
                             {renderIcon()}
@@ -44,9 +45,9 @@ const Header = ({
                     ) : null
                 }
                 <Text
-                    size={size}
+                    size={size || theme.text.size.body}
                     bold={theme.text.bold.md2}
-                    textColor={color}
+                    textColor={color || theme.colors.main.primary}
                 >
                     {title}
                 </Text>

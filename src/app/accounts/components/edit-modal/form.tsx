@@ -30,10 +30,22 @@ const Form = ({
     ]
 
     const departmentDropdown: DropdownItem[] = [
-        { key: "1", label: "GADE Team", onClick: () => { formik.setFieldValue("department", "GADE Team") }, isSelected: formik.values.department === "GADE Team" },
-        { key: "2", label: "Minerals Department", onClick: () => { formik.setFieldValue("department", "Minerals Department") }, isSelected: formik.values.department === "Minerals Department" },
-        { key: "3", label: "Forestry Department", onClick: () => { formik.setFieldValue("department", "Forestry Department") }, isSelected: formik.values.department === "Forestry Department" },
-        { key: "4", label: "Ghana Armed Forces", onClick: () => { formik.setFieldValue("department", "Ghana Armed Forces") }, isSelected: formik.values.department === "Ghana Armed Forces" },
+        { key: "1", label: "Minerals Commission", onClick: () => { formik.setFieldValue("department", "Minerals Commission") }, isSelected: formik.values.department === "Minerals Commission" },
+        { key: "2", label: "Lands Commission", onClick: () => { formik.setFieldValue("department", "Lands Commission") }, isSelected: formik.values.department === "Lands Commission" },
+        { key: "3", label: "Forestry Commission", onClick: () => { formik.setFieldValue("department", "Forestry Commission") }, isSelected: formik.values.department === "Forestry Commission" },
+        { key: "4", label: "Office of Administrator of Stool lands", onClick: () => { formik.setFieldValue("department", "Office of Administrator of Stool lands") }, isSelected: formik.values.department === "Office of Administrator of Stool lands" },
+        { key: "5", label: "Environmental commission", onClick: () => { formik.setFieldValue("department", "Environmental commission") }, isSelected: formik.values.department === "Environmental commission" },
+        { key: "6", label: "Goldbod", onClick: () => { formik.setFieldValue("department", "Goldbod") }, isSelected: formik.values.department === "Goldbod" },
+        { key: "7", label: "Ghana Police", onClick: () => { formik.setFieldValue("department", "Ghana Police") }, isSelected: formik.values.department === "Ghana Police" },
+        { key: "8", label: "Ghana Army", onClick: () => { formik.setFieldValue("department", "Ghana Army") }, isSelected: formik.values.department === "Ghana Army" },
+        { key: "9", label: "National Security", onClick: () => { formik.setFieldValue("department", "National Security") }, isSelected: formik.values.department === "National Security" },
+        { key: "10", label: "Geological Survey Authority", onClick: () => { formik.setFieldValue("department", "Geological Survey Authority") }, isSelected: formik.values.department === "Geological Survey Authority" },
+        { key: "11", label: "Wildlife Division", onClick: () => { formik.setFieldValue("department", "Wildlife Division") }, isSelected: formik.values.department === "Wildlife Division" },
+        { key: "12", label: "Ghana Space Science and Technology Institute", onClick: () => { formik.setFieldValue("department", "Ghana Space Science and Technology Institute") }, isSelected: formik.values.department === "Ghana Space Science and Technology Institute" },
+        { key: "13", label: "Water Resources Commission", onClick: () => { formik.setFieldValue("department", "Water Resources Commission") }, isSelected: formik.values.department === "Water Resources Commission" },
+        { key: "14", label: "Land Use and Spatial Planning", onClick: () => { formik.setFieldValue("department", "Land Use and Spatial Planning") }, isSelected: formik.values.department === "Land Use and Spatial Planning" },
+        { key: "15", label: "National Anti-Illegal Mining Operations Secretariat", onClick: () => { formik.setFieldValue("department", "National Anti-Illegal Mining Operations Secretariat") }, isSelected: formik.values.department === "National Anti-Illegal Mining Operations Secretariat" },
+        { key: "16", label: "GADE Team", onClick: () => { formik.setFieldValue("department", "GADE Team") }, isSelected: formik.values.department === "GADE Team" },
     ]
 
     return (

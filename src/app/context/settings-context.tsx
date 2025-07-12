@@ -13,6 +13,8 @@ const SettingsContext = createContext<{
     settingsLoading: boolean;
     settingsError: Error;
     updateSettingsLoading: boolean;
+    resetPreferencesMutation: () => void;
+    resetPreferencesLoading: boolean;
 }>({
     settings: null,
     setSettings: () => {},
@@ -21,6 +23,8 @@ const SettingsContext = createContext<{
     settingsLoading: false,
     settingsError: null,
     updateSettingsLoading: false,
+    resetPreferencesMutation: () => {},
+    resetPreferencesLoading: false,
 })
 
 export const SettingsContextProvider = ({ children }: { children: React.ReactNode }) => {

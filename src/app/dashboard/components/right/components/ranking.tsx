@@ -1,10 +1,10 @@
 'use client'
 
-import theme from "@styles/theme";
 import Text from "@styles/components/text";
 import { AiFillAlert } from "react-icons/ai";
 import { useDashboardContext } from "@/app/dashboard/context/dashboard-context";
 import RankingSkeleton from "./skeleton/ranking-skeleton";
+import { useTheme } from "@/app/styles/theme-context"
 
 const MAX_WIDTH = 100;
 const MIN_WIDTH = 60;
@@ -17,6 +17,7 @@ const getWidthFromRank = (index: number, total: number) => {
 const Ranking = () => {
     const {rankings} = useDashboardContext()
     const {isMetricsPending} = useDashboardContext()
+    const { theme } = useTheme()
     
     return (
         <div className="flex flex-col gap-3 pl-4">

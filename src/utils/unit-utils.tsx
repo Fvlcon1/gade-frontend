@@ -41,63 +41,179 @@ type UnitSystem = "metric" | "imperial";
 type MeasurementType = "length" | "area" | "volume";
 
 type Unit =
-    | "m" | "km" | "ft" | "mi"          // length
-    | "m²" | "ha" | "ac"                // area
-    | "m³" | "l" | "gal";               // volume
+    | "m" | "km" | "ft" | "mi"
+    | "m²" | "ha" | "ac"
+    | "m³" | "l" | "gal";
 
 interface FormatUnitOptions {
     value: number | null | undefined;
-    system?: UnitSystem;          // default: "metric"
-    type?: MeasurementType;       // default: "length"
-    unit?: Unit;                  // default: system/type default
-    decimalPlaces?: number;       // default: 2
+    system?: UnitSystem;                // default: localStorage or "metric"
+    type?: MeasurementType;             // default: "length"
+    unit?: Unit;                        // default: system/type default
+    decimalPlaces?: number;            // default: 2
+    useMetricPrefixes?: boolean;       // enable metric prefix scaling
+    prefixStyle?: "value" | "unit";    // "value" = 5.6M km², "unit" = 5.6 Mm²
 }
 
-const unitMaps = {
+type UnitInfo = {
+    label: string;
+    factor: number;
+};
+
+const unitMaps: Record<MeasurementType, Record<UnitSystem, Record<string, UnitInfo>>> = {
     length: {
-        metric: { m: { label: "m", factor: 1 }, km: { label: "km", factor: 1 / 1000 } },
-        imperial: { ft: { label: "ft", factor: 3.28084 }, mi: { label: "mi", factor: 0.000621371 } }
+        metric: {
+            m: { label: "m", factor: 1 },
+            km: { label: "km", factor: 1 / 1000 },
+        },
+        imperial: {
+            ft: { label: "ft", factor: 3.28084 },
+            mi: { label: "mi", factor: 0.000621371 },
+        },
     },
     area: {
-        metric: { "m²": { label: "m²", factor: 1 }, ha: { label: "ha", factor: 1 / 10000 } },
-        imperial: { ac: { label: "ac", factor: 0.000247105 } }
+        metric: {
+            "m²": { label: "m²", factor: 1 },
+            ha: { label: "ha", factor: 1 / 10000 },
+        },
+        imperial: {
+            ac: { label: "ac", factor: 0.000247105 },
+        },
     },
     volume: {
-        metric: { "m³": { label: "m³", factor: 1 }, l: { label: "l", factor: 1000 } },
-        imperial: { gal: { label: "gal", factor: 264.172 } }
-    }
+        metric: {
+            "m³": { label: "m³", factor: 1 },
+            l: { label: "l", factor: 1000 },
+        },
+        imperial: {
+            gal: { label: "gal", factor: 264.172 },
+        },
+    },
 };
 
 const defaultUnits: Record<MeasurementType, Record<UnitSystem, Unit>> = {
     length: { metric: "m", imperial: "ft" },
     area: { metric: "m²", imperial: "ac" },
-    volume: { metric: "m³", imperial: "gal" }
+    volume: { metric: "m³", imperial: "gal" },
+};
+
+const metricPrefixes = [
+    { prefix: "T", factor: 1e12 },
+    { prefix: "B", factor: 1e9 },
+    { prefix: "M", factor: 1e6 },
+    { prefix: "K", factor: 1e3 },
+];
+
+const metricUnitPrefixes = [
+    { prefix: "T", factor: 1e12 },
+    { prefix: "G", factor: 1e9 },
+    { prefix: "M", factor: 1e6 },
+    { prefix: "k", factor: 1e3 },
+    { prefix: "h", factor: 1e2 },
+    { prefix: "da", factor: 1e1 },
+];
+
+const imperialAutoConvert = (
+    unitsForType: Record<Unit, UnitInfo>,
+    rawValue: number
+): { value: number; label: string } => {
+    const candidates = Object.entries(unitsForType)
+        .map(([unit, info]) => ({
+            unit,
+            factor: info.factor,
+            label: info.label,
+        }))
+        .sort((a, b) => b.factor - a.factor);
+
+    for (const c of candidates) {
+        const converted = rawValue * c.factor;
+        if (converted >= 1) {
+            return { value: converted, label: c.label };
+        }
+    }
+
+    const last = candidates[candidates.length - 1];
+    return { value: rawValue * last.factor, label: last.label };
 };
 
 export function formatWithUnit({
     value,
-    system = "metric",
+    system,
     type = "length",
     unit,
-    decimalPlaces = 2
+    decimalPlaces = 0,
+    useMetricPrefixes = true,
+    prefixStyle = "value",
 }: FormatUnitOptions): string {
-    if (value === null || value === undefined || isNaN(Number(value))) {
-        return `0.00 ${unit || defaultUnits[type][system]}`;
+    if (!Number.isFinite(value)) {
+        const fallbackSystem = system || "metric";
+        const fallbackUnit = unit || defaultUnits[type][fallbackSystem];
+        return `0.00 ${fallbackUnit}`;
     }
 
-    const unitsForType = unitMaps[type][system];
-    const chosenUnit = unit || defaultUnits[type][system];
-    const unitInfo = unitsForType[chosenUnit as keyof typeof unitsForType];
+    // Determine system if not provided
+    let resolvedSystem = system;
+    if (!resolvedSystem) {
+        if (typeof window !== "undefined") {
+            const settings = localStorage.getItem("settings");
+            resolvedSystem = JSON.parse(settings || "{}")?.units || "metric";
+        } else {
+            resolvedSystem = "metric";
+        }
+    }
 
+    const unitsForType = unitMaps[type][resolvedSystem];
+
+    let chosenUnit = unit;
+    if (!chosenUnit) {
+        const candidates = Object.entries(unitsForType)
+            .map(([unitKey, info]) => ({
+                unit: unitKey as Unit,
+                factor: info.factor,
+            }))
+            .sort((a, b) => b.factor - a.factor);
+
+        chosenUnit =
+            candidates.find((c) => value * c.factor >= 1)?.unit ||
+            candidates[candidates.length - 1].unit;
+    }
+
+    const unitInfo = unitsForType[chosenUnit];
     if (!unitInfo) {
-        // fallback: show as-is with given unit
         return `${value.toFixed(decimalPlaces)} ${chosenUnit}`;
     }
 
-    if (unitInfo && typeof unitInfo === 'object' && 'factor' in unitInfo && 'label' in unitInfo) {
-        const displayValue = value * (unitInfo as { factor: number; label: string }).factor;
-        return `${displayValue.toFixed(decimalPlaces)} ${(unitInfo as { label: string }).label}`;
+    let scaledValue = value * unitInfo.factor;
+
+    // IMPERIAL: auto convert to best unit
+    if (resolvedSystem === "imperial" && !unit) {
+        const { value: converted, label } = imperialAutoConvert(unitsForType, value);
+        return `${converted.toLocaleString(undefined, {
+            maximumFractionDigits: decimalPlaces,
+        })} ${label}`;
     }
-    // fallback: show as-is with given unit
-    return `${value.toFixed(decimalPlaces)} ${chosenUnit}`;
+
+    // METRIC: apply prefixes based on chosen style
+    const baseUnits = ["m", "m²", "m³"];
+    if (useMetricPrefixes && resolvedSystem === "metric" && baseUnits.includes(unitInfo.label)) {
+        if (prefixStyle === "value") {
+            // COMMON STYLE: Prefix on value (5.6M m²)
+            for (const p of metricPrefixes) {
+                if (Math.abs(scaledValue) >= p.factor) {
+                    scaledValue = scaledValue / p.factor;
+                    return `${scaledValue.toFixed(decimalPlaces)}${p.prefix} ${unitInfo.label}`;
+                }
+            }
+        } else if (prefixStyle === "unit") {
+            // SCIENTIFIC STYLE: Prefix on unit (5.6 Mm²)
+            for (const p of metricUnitPrefixes) {
+                if (scaledValue / p.factor >= 1) {
+                    const newValue = scaledValue / p.factor;
+                    return `${newValue.toFixed(decimalPlaces)} ${p.prefix}${unitInfo.label}`;
+                }
+            }
+        }
+    }
+
+    return `${scaledValue.toFixed(decimalPlaces)} ${unitInfo.label}`;
 }

@@ -4,7 +4,7 @@ import { FaClock } from "react-icons/fa6"
 import { RiRadarFill } from "react-icons/ri"
 import { useDashboardContext } from "@/app/dashboard/context/dashboard-context"
 import { Metric } from "@/app/dashboard/utils/types"
-import { formatWithPrefix } from "@/utils/unit-utils"
+import { formatWithPrefix, formatWithUnit } from "@/utils/unit-utils"
 import { formatNumber } from "@/utils/number-utils"
 
 const useMetrics = () => {
@@ -28,8 +28,8 @@ const useMetrics = () => {
                 icon: FaClock
             },
             {
-                title: "Total area detected (Ha)",
-                value: formatWithPrefix(totalAreaDetected, "", 0),
+                title: "Total area detected",
+                value: formatWithUnit({value : totalAreaDetected, type : "area"}),
                 footer: "+1 Today",
                 icon: FaChromecast
             },

@@ -5,7 +5,7 @@ import { lightColors, darkColors } from "./theme";
 import { getColors } from "./theme";
 import { TypographyBold, TypographySize } from "./style.types"
 
-export type ThemeType = "light" | "dark";
+export type ThemeType = "light" | "dark" | "system"
 interface Theme {
 	colors: typeof lightColors;
 	text: {
@@ -15,6 +15,7 @@ interface Theme {
 			SM: TypographySize.SM,
 			body: TypographySize.body,
 			body2: TypographySize.body2,
+			HM2: TypographySize.HM2,
 			HL: TypographySize.HL,
 			HM: TypographySize.HM,
 		},
@@ -32,7 +33,7 @@ interface ThemeContextProps {
 	colors: typeof lightColors;
 	themeColor: ThemeType;
 	setThemeColor: (theme: ThemeType) => void;
-	theme: Theme;	
+	theme: Theme;
 }
 
 const ThemeContext = createContext<ThemeContextProps>({
@@ -48,6 +49,7 @@ const ThemeContext = createContext<ThemeContextProps>({
 				SM: TypographySize.SM,
 				body: TypographySize.body,
 				body2: TypographySize.body2,
+				HM2: TypographySize.HM2,
 				HL: TypographySize.HL,
 				HM: TypographySize.HM,
 			},
@@ -71,10 +73,60 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 	});
 
 	useEffect(() => {
+		let mediaQuery: MediaQueryList | null = null;
+		const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+			if (themeColor === "system") {
+				if (e.matches) {
+					document.documentElement.classList.add("dark");
+					document.documentElement.classList.remove("light");
+				} else {
+					document.documentElement.classList.remove("dark");
+					document.documentElement.classList.add("light");
+				}
+			}
+		};
+
+		if (themeColor === "light") {
+			document.documentElement.classList.remove("dark");
+			document.documentElement.classList.add("light");
+		} else if (themeColor === "dark") {
+			document.documentElement.classList.remove("light");
+			document.documentElement.classList.add("dark");
+		} else if (themeColor === "system") {
+			document.documentElement.classList.remove("dark");
+			document.documentElement.classList.remove("light");
+			mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+			if (mediaQuery.matches) {
+				document.documentElement.classList.add("dark");
+			} else {
+				document.documentElement.classList.remove("dark");
+			}
+			mediaQuery.addEventListener("change", handleSystemThemeChange);
+		}
+
 		localStorage.setItem("theme", themeColor);
+
+		return () => {
+			if (mediaQuery) {
+				mediaQuery.removeEventListener("change", handleSystemThemeChange);
+			}
+		};
 	}, [themeColor]);
 
-	const colors = themeColor === "dark" ? darkColors : lightColors
+	const getSystemTheme = () =>
+	  typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches
+		? "dark"
+		: "light";
+	
+	const colors =
+	  themeColor === "dark"
+		? darkColors
+		: themeColor === "light"
+		? lightColors
+		: getSystemTheme() === "dark"
+		? darkColors
+		: lightColors;
+		
 	const theme: Theme = {
 		colors,
 		text: {
@@ -84,6 +136,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 				SM: TypographySize.SM,
 				body: TypographySize.body,
 				body2: TypographySize.body2,
+				HM2: TypographySize.HM2,
 				HL: TypographySize.HL,
 				HM: TypographySize.HM,
 			},
