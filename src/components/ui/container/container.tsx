@@ -1,7 +1,7 @@
 import ClickableTab from "../clickable/clickabletab";
-import theme from "@styles/theme";
 import { IoMdCloseCircle } from "react-icons/io";
 import { ReactNode, HTMLAttributes } from "react";
+import { useTheme } from "@styles/theme-context";
 
 interface ContainerProps extends HTMLAttributes<HTMLDivElement> {
     children?: ReactNode;
@@ -21,6 +21,7 @@ const Container = ({
     onClose,
     ...divProps
 }: ContainerProps) => {
+    const {theme} = useTheme();
     const handleClose = () => {
         if(close) close();
         if (onClose) onClose();

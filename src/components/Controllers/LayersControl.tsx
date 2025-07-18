@@ -11,12 +11,12 @@ import { useTheme } from '@/app/styles/theme-context';
 
 // Feature layer definitions with colors matching LAYER_STYLES
 export const initialLayers = [
-  { id: 'admin', label: 'Admin districts', checked: true, color: '#D2B48C' },
   { id: 'mining_sites', label: 'Detected mining activity', checked: true, color: '#FF4B4B' },
   { id: 'reports', label: 'Reports', checked: true, color: '#8F3C19' },
   { id: 'rivers', label: 'Rivers', checked: true, color: '#03A9F4' },
   { id: 'concessions', label: 'Mining concessions', checked: true, color: '#d3b036' },
   { id: 'forest', label: 'Forest reserves', checked: true, color: '#4CAF50' },
+  { id: 'admin', label: 'Admin districts', checked: true, color: '#D2B48C' },
 ];
 
 interface Layer {

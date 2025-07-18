@@ -213,7 +213,7 @@ const Page = () => {
       )}
 
       {/* Left Panel */}
-      <div className="absolute top-0 left-1.5 z-[1001] h-full py-2 shadow-xl">
+      <div className="absolute top-0 left-1.5 z-[1002] h-full py-2 shadow-xl">
         <LeftPanel />
       </div>
 

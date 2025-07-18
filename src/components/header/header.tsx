@@ -24,7 +24,7 @@ const Header = ({
     const renderIcon = () => {
         if (typeof icon === 'function') {
             const IconComponent = icon as IconType;
-            return <IconComponent color={color || theme.colors.main.primary} size={iconSize ?? size} />;
+            return <IconComponent color={color || theme.darkColor} size={iconSize ?? size} />;
         }
         return icon;
     };
@@ -37,7 +37,7 @@ const Header = ({
                         <div 
                             className="p-1.5 rounded-md flex items-center justify-center"
                             style={{
-                                backgroundColor : (color || theme.colors.main.primary) + hexOpacity(15)
+                                backgroundColor : (color || theme.darkColor) + hexOpacity(15)
                             }}
                         >
                             {renderIcon()}
@@ -47,7 +47,7 @@ const Header = ({
                 <Text
                     size={size || theme.text.size.body}
                     bold={theme.text.bold.md2}
-                    textColor={color || theme.colors.main.primary}
+                    textColor={color || theme.darkColor}
                 >
                     {title}
                 </Text>

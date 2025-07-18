@@ -19,7 +19,7 @@ const Preferences = ({
         <Container
             isVisible={true}
             close={() => setViewState(null)}
-            className=""
+            className="!z-[1002]"
         >
             <div
                 className="w-[400px] flex flex-col"
