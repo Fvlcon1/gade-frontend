@@ -1,11 +1,12 @@
 import Text from "@styles/components/text"
-import theme from "@styles/theme"
 import { Switch } from "antd"
 import { useSettingsContext } from "@/app/context/settings-context"
+import { useTheme } from "@/app/styles/theme-context"
 
 const Notification = () => {
     const { settings, saveSettings, storeSettings } = useSettingsContext()
     const notificationsEnabled = settings?.notificationsEnabled
+    const { theme } = useTheme()
 
     const onChange = (checked: boolean) => {
         const newSettings = {

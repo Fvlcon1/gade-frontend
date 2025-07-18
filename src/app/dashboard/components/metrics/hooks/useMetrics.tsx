@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { FaBell, FaChromecast } from "react-icons/fa"
-import { FaClock } from "react-icons/fa6"
+import { FaClock, FaTree } from "react-icons/fa6"
 import { RiRadarFill } from "react-icons/ri"
 import { useDashboardContext } from "@/app/dashboard/context/dashboard-context"
 import { Metric } from "@/app/dashboard/utils/types"
@@ -9,10 +9,18 @@ import { formatNumber } from "@/utils/number-utils"
 
 const useMetrics = () => {
     const { metrics : dashboardMetrics } = useDashboardContext()
-    const { totalAreaDetected, totalIllegalSites, totalReportedCases } = dashboardMetrics || {}
+    const { totalAreaDetected, totalIllegalSites, totalReportedCases, totalForestAreaAffected } = dashboardMetrics || {}
     const [metrics, setMetrics] = useState<Metric[]>([])
 
     useEffect(()=>{
+        const area = formatWithUnit({value : totalAreaDetected, type : "area"}).split(" ")
+        const areaFigure = area[0]
+        const areaUnit = area[1]
+
+        const forestArea = formatWithUnit({value : totalForestAreaAffected, type : "area"}).split(" ")
+        const forestAreaFigure = forestArea[0]
+        const forestAreaUnit = forestArea[1]
+        
         setMetrics([
             {
                 title: "Illegal sites detected",
@@ -28,17 +36,17 @@ const useMetrics = () => {
                 icon: FaClock
             },
             {
-                title: "Total area detected",
-                value: formatWithUnit({value : totalAreaDetected, type : "area"}),
+                title: `Total area detected (${areaUnit})`,
+                value: areaFigure,
                 footer: "+1 Today",
                 icon: FaChromecast
             },
-            // {
-            //     title: "Active alerts",
-            //     value: formatNumber(18),
-            //     footer: "+1 Today",
-            //     icon: FaBell
-            // },
+            {
+                title: `Total forest area affected (${forestAreaUnit})`,
+                value: forestAreaFigure,
+                footer: "+1 Today",
+                icon: FaTree
+            },
         ])
     }, [dashboardMetrics])
 

@@ -16,6 +16,7 @@ import ReviewValidation from "./components/review-validation/review-validation";
 import ZoomControls from "./components/review-validation/components/zoom-controls";
 import RightNav from "./components/review-validation/components/right-nav";
 import { useTheme } from "@styles/theme-context";
+import RightView from "./components/right-view/right-view";
 
 const InteractiveMapClient = dynamic(() => import("../../components/Layout/MiddlePanel/Map/interactive-map/interactive-map-client"), {
   ssr: false,
@@ -222,20 +223,20 @@ const Page = () => {
         animate={{ opacity: 1, y: 0 }}
         style={{ left: floatingNavLeft }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
-        className="absolute top-[10px] z-[1001] bg-bg-primary/80 backdrop-blur-sm rounded-xl gap-0.5 shadow-xl flex flex-col items-center justify-around p-2"
+        className="absolute top-[10px] z-[1001] border-[1px] border-border-primary bg-bg-primary/80 backdrop-blur-sm rounded-xl gap-0.5 shadow-xl flex flex-col items-center justify-around p-2"
       >
         <ToolButton
-          icon={<FaLayerGroup size={16} color={theme.colors.text.secondary} />}
+          icon={<FaLayerGroup size={16} color={activeTab === "layers" ? theme.colors.main.primary : theme.colors.text.secondary} />}
           isActive={activeTab === "layers"}
           onClick={() => handleTabClick("layers")}
         />
         <ToolButton
-          icon={<FaSliders size={16} color={theme.colors.text.secondary} />}
+          icon={<FaSliders size={16} color={activeTab === "marker" ? theme.colors.main.primary : theme.colors.text.secondary} />}
           isActive={activeTab === "marker"}
           onClick={() => handleTabClick("marker")}
         />
         <ToolButton
-          icon={<BsFillClockFill size={16} color={theme.colors.text.secondary} />}
+          icon={<BsFillClockFill size={16} color={activeTab === "chart" ? theme.colors.main.primary : theme.colors.text.secondary} />}
           isActive={activeTab === "chart"}
           onClick={() => handleTabClick("chart")}
         />
@@ -263,7 +264,7 @@ const Page = () => {
         }}
       />
 
-      <ReviewValidation mapRef={mapRef} />
+      <RightView />
       <RightNav />
 
       {/* Floating Timeline Panel */}
@@ -309,8 +310,8 @@ const ToolButton = ({ icon, isActive, onClick }) => (
     whileTap={{ scale: 0.9 }}
     transition={{ duration: 0.3, ease: "easeOut" }}
     className={`flex items-center justify-center rounded-md cursor-pointer w-[36px] h-[36px] ${isActive
-      ? "text-[var(--color-main-primary)] bg-main-primary/20"
-      : "text-[var(--color-text-tetiary)] hover:bg-gray-200"
+      ? "text-main-primary bg-main-primary/20"
+      : "text-text-tetiary hover:bg-bg-secondary"
       }`}
     onClick={onClick}
   >

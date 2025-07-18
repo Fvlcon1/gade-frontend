@@ -240,7 +240,7 @@ const MarkersControl = ({ isOpen, onClose, sidebarExpanded = false }) => {
           transition={{ duration: 0.5, ease: "easeInOut" }}
           className="absolute top-[10px] z-[1001] w-[270px] gap-2 flex flex-col"
         >
-          <div className="w-full h-[33px] bg-white/80 backdrop-blur-sm shadow-xl px-3 pr-1 flex items-center justify-between rounded-[10px]">
+          <div className="w-full h-[33px] bg-bg-primary/80 border-[1px] border-border-primary backdrop-blur-sm shadow-xl px-3 pr-1 flex items-center justify-between rounded-[10px]">
             <Text bold={theme.text.bold.md}>
               Filter
             </Text>

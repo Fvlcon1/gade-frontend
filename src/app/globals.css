@@ -31,6 +31,8 @@
 	--color-text-primary: #283A52;
 	--color-text-secondary: #3F5B83;
 	--color-text-tetiary: #95A3B7;
+	--color-text-danger: #bf3834;
+	--color-text-success: #29a333;
 
 	--color-bg-primary: #FFFFFF;
 	--color-bg-secondary: #F4F4F4;
@@ -50,6 +52,8 @@
 	--color-text-primary: #F1FCFD;
 	--color-text-secondary: #CDD6D7;
 	--color-text-tetiary: #798586;
+	--color-text-danger: #bf3834;
+	--color-text-success: #29a333;
 
 	--color-bg-primary: #0B0A0A;
 	--color-bg-secondary: #1B1E1E;
@@ -62,7 +66,7 @@
 	--color-border-tetiary: #4D4D4D;
 	--color-border-quantinary: #909090;
 
-	--color-main-primary: #83ade9;
+	--color-main-primary: #5A87C7;
 }
 
 html.dark {
@@ -130,4 +134,8 @@ body {
 	100% {
 		transform: rotate(360deg);
 	}
+}
+
+.custom-datepicker input::placeholder {
+	color: var(--color-text-tetiary) !important;
 }

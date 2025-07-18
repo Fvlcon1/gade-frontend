@@ -18,6 +18,11 @@ const TimelineTiles = ({
 			const url = getPlanetUrlByMonth(month.year, month.monthIndex);
 			const isVisible = playhead === index;
 
+			if (!url || typeof url !== 'string' || url.trim() === '' || url.includes('undefined')) {
+				console.warn('TileLayer not rendered: Invalid or missing URL for month', month, 'URL:', url);
+				return null;
+			}
+
 			return (
 				<TileLayer
 					key={`planet-${index}`}

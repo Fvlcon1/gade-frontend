@@ -6,6 +6,7 @@ import { hexOpacity } from "@/utils/hexOpacity"
 import { MdEdit, MdEmail } from "react-icons/md"
 import ChangeProfilePicture from "./change-profile-picture/change-profile-picture"
 import { useState } from "react"
+import Image from "next/image"
 
 const ProfileInfo = () => {
     const { user } = useAuthStore()
@@ -39,13 +40,25 @@ const ProfileInfo = () => {
                                         size={20}
                                     />
                                 </div>
-                                <Text
-                                    size={"40px"}
-                                    bold={theme.text.bold.md2}
-                                    textColor={theme.colors.main.primary}
-                                >
-                                    {`${user?.first_name.charAt(0).toUpperCase()}${user?.last_name.charAt(0).toUpperCase()}`}
-                                </Text>
+                                {
+                                    user?.image_url ? (
+                                        <Image
+                                            src={user?.image_url}
+                                            alt="Profile Picture"
+                                            className="w-full h-full object-cover rounded-full"
+                                            width={130}
+                                            height={130}
+                                        />
+                                    ) : (
+                                        <Text
+                                            size={"40px"}
+                                            bold={theme.text.bold.md2}
+                                            textColor={theme.colors.main.primary}
+                                        >
+                                            {`${user?.first_name.charAt(0).toUpperCase()}${user?.last_name.charAt(0).toUpperCase()}`}
+                                        </Text>
+                                    )
+                                }
                             </div>
                             <div className="flex flex-col mt-2 gap-1">
                                 <Text

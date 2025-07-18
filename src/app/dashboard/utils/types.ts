@@ -23,6 +23,7 @@ export interface Metrics {
     totalAreaDetected: number;
     totalIllegalSites: number;
     totalReportedCases: number;
+    totalForestAreaAffected: number;
 }
 
 export interface Metric {

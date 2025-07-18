@@ -4,13 +4,14 @@ import ChartSkeleton from '../chart-skeleton';
 import dynamic from 'next/dynamic';
 import { ApexOptions } from 'apexcharts';
 import useLineChart from './hooks/useLineChart';
+import { useTheme } from '@styles/theme-context';
 
 const Chart = dynamic(() => import('react-apexcharts'), {
     ssr: false,
     loading: () => <ChartSkeleton />
 });
 
-const ClaimsTimelineChart = ({
+const ReportsLineChart = ({
     isLineChartDataPending,
     lineChartSeries,
     categories
@@ -19,6 +20,8 @@ const ClaimsTimelineChart = ({
     lineChartSeries: any
     categories: any
 }) => {
+    const {themeColor, theme} = useTheme()
+
     if (isLineChartDataPending) {
         return <ChartSkeleton />
     }
@@ -28,19 +31,19 @@ const ClaimsTimelineChart = ({
     const options: ApexOptions = {
         chart: {
             height: 350,
-            type: 'area',
+            type: 'line',
             toolbar: { show: false },
             foreColor: '#9CA3AF'
         },
         colors: [theme.colors.main.primary, '#10B981', '#FF9500', '#EF4444'],
         dataLabels: { enabled: false },
-        stroke: { curve: 'smooth', width: 2 },
+        stroke: { curve: 'straight', width: 2 },
         fill: {
             type: 'gradient',
             gradient: {
                 shadeIntensity: 1,
-                opacityFrom: 0.7,
-                opacityTo: 0.2,
+                opacityFrom: 0,
+                opacityTo: 0,
                 stops: [0, 90, 100]
             }
         },
@@ -48,6 +51,15 @@ const ClaimsTimelineChart = ({
             categories,
             axisBorder: { show: false },
             axisTicks: { show: false },
+            title: {
+                text: "Months",
+                style: {
+                    fontSize: '14px',
+                    fontFamily: 'Montserrat',
+                    fontWeight: 500,
+                    color: theme.colors.text.primary
+                }
+            },
             labels: {
                 style: {
                     colors: '#6B7280',
@@ -57,6 +69,15 @@ const ClaimsTimelineChart = ({
             }
         },
         yaxis: {
+            title: {
+                text: "Reports",
+                style: {
+                    fontSize: '14px',
+                    fontFamily: 'Montserrat',
+                    fontWeight: 500,
+                    color: theme.colors.text.primary
+                }
+            },
             labels: {
                 style: {
                     colors: '#6B7280',
@@ -79,7 +100,7 @@ const ClaimsTimelineChart = ({
             yaxis: { lines: { show: true } }
         },
         tooltip: {
-            theme: 'light',
+            theme: themeColor,
             y: {
                 formatter: function (value: any) {
                     return value ;
@@ -98,4 +119,4 @@ const ClaimsTimelineChart = ({
     )
 };
 
-export default ClaimsTimelineChart;
+export default ReportsLineChart;

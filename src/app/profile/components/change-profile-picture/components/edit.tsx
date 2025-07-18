@@ -4,6 +4,7 @@ import Slider from "@mui/material/Slider";
 import Button from "@components/ui/button/button";
 import Text from "@styles/components/text";
 import { useTheme } from "@styles/theme-context";
+import useUpdateImage from "@/app/profile/hooks/useUpdateImage";
 
 // Utility to get cropped image from canvas
 async function getCroppedImg(imageSrc: string, crop: any, rotation = 0) {
@@ -38,16 +39,16 @@ async function getCroppedImg(imageSrc: string, crop: any, rotation = 0) {
         Math.round(0 - safeArea / 2 + image.height / 2 - crop.y)
     );
 
-    return new Promise<string>((resolve) => {
+    return new Promise<{url: string, blob: Blob}>((resolve) => {
         canvas.toBlob((blob) => {
-            resolve(blob ? URL.createObjectURL(blob) : "");
+            resolve(blob ? {url: URL.createObjectURL(blob), blob} : {url: "", blob: new Blob()});
         }, 'image/jpeg');
     });
 }
 
 interface EditImageProps {
     imageSrc: string;
-    onSave: (croppedImageUrl: string) => void;
+    onSave: (croppedImage: {url: string, blob: Blob}) => void;
     aspect?: number;
 }
 
@@ -59,6 +60,7 @@ const EditImage: React.FC<EditImageProps> = ({ imageSrc, onSave, aspect = 1 }) =
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
+    const {getUploadUrlMutation, updateImageMutation} = useUpdateImage()
 
     const onCropComplete = useCallback((_croppedArea, croppedAreaPixels) => {
         setCroppedAreaPixels(croppedAreaPixels);
@@ -68,6 +70,8 @@ const EditImage: React.FC<EditImageProps> = ({ imageSrc, onSave, aspect = 1 }) =
         setSaving(true);
         try {
             const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels, rotation);
+            const {upload_url : uploadUrl} = await getUploadUrlMutation()
+            await updateImageMutation({presignedUrl: uploadUrl, blob: croppedImage.blob})
             onSave(croppedImage);
         } catch (e) {
             setError("Failed to crop image.");

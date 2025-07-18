@@ -8,6 +8,7 @@ import ChartSkeleton from '../../chart-skeleton';
 import { formatNumber } from '@/utils/number-utils';
 import { formatWithPrefix } from '@/utils/unit-utils';
 import { capitalizeWords } from '@/utils/utils';
+import { useTheme } from '@styles/theme-context';
 
 const Chart = dynamic(() => import('react-apexcharts'), {
     ssr: false,
@@ -32,6 +33,7 @@ const barColors = [
 
 const BarChartComponent = () => {
     const { isMetricsPending } = useDashboardContext();
+    const {themeColor, theme} = useTheme()
     
     const { barChartSeries, categories } = useBarChart();
     const getShade = (opacity : number) => "#70018f" + hexOpacity(opacity)
@@ -66,6 +68,15 @@ const BarChartComponent = () => {
             axisBorder: { show: false },
             axisTicks: { show: false },
             categories : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+            title: {
+                text: "Districts",
+                style: {
+                    fontSize: '14px',
+                    fontFamily: 'Montserrat',
+                    fontWeight: 500,
+                    color: theme.colors.text.primary
+                }
+            },
             labels: {
                 style: {
                     colors: '#6B7280',
@@ -75,6 +86,15 @@ const BarChartComponent = () => {
             }
         },
         yaxis: {
+            title: {
+                text: "Area",
+                style: {
+                    fontSize: '14px',
+                    fontFamily: 'Montserrat',
+                    fontWeight: 500,
+                    color: theme.colors.text.primary
+                }
+            },
             labels: {
                 style: {
                     colors: '#6B7280',
@@ -100,7 +120,7 @@ const BarChartComponent = () => {
             yaxis: { lines: { show: true } }
         },
         tooltip: {
-            theme: 'light',
+            theme: themeColor,
         },
         fill: {
             opacity: 1

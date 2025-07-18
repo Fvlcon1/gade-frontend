@@ -3,13 +3,7 @@ import { useMutation } from "@tanstack/react-query"
 import { toast } from "react-hot-toast"
 import { Status } from "../utils/types"
 import { useSpatialStore } from "@/lib/store/spatial-store"
-
-const statusMapping: Record<Status, string> = {
-    "Open": "OPEN",
-    "In Review": "IN_REVIEW",
-    "False Positive": "FALSE_POSITIVE",
-    "Closed": "CLOSED"
-}
+import { statusMapping } from "../utils/constants"
 
 const useReview = () => {
     const {fetchMiningSites, applyFilters} = useSpatialStore()

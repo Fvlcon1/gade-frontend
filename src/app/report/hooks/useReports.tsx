@@ -30,26 +30,19 @@ const useReports = () => {
 
     const getReports = async () => {
         const filter  : any= {
-            page: pageId,
+            page_id: pageId,
             page_size: pageSize,
         }
         if(selectedStatus){
-            console.log("I have a status")
             filter.status = statusMapping[selectedStatus.toLowerCase()]
         }
         if(selectedSeverity){
             filter.severity = severityMapping[selectedSeverity.toLowerCase()]
         }
-        console.log({filter})
         const response = await protectedApi.GET("admin/report", filter)
-        setMetricsData(transformMetricsData(response))
         setReportsData(transformKeysToCamelCase(response))
         return response
     }
-
-    useEffect(()=>{
-        console.log({selectedStatus, selectedSeverity})
-    }, [selectedStatus, selectedSeverity])
 
     const updateReport = async ({id, status}: {id: string, status: string}) => {
         const response = await protectedApi.PATCH(`admin/report/${id}/status`, { status : statusMapping[status] })
@@ -73,40 +66,50 @@ const useReports = () => {
         staleTime: 0
     })
 
+    const getReportMetrics = async () => {
+        const response = await protectedApi.GET("admin/report/metrics")
+        setMetricsData(transformMetricsData(response))
+        return response
+    }
+
+    const {data: fetchedMetricsData, isLoading: metricsLoading, error: metricsError, refetch: refetchMetrics, isFetching: metricsIsFetching } = useQuery({
+        queryKey: ["metrics"],
+        queryFn: getReportMetrics,
+        staleTime: 0
+    })
+
     const transformMetricsData = (data: any) => {
         const metrics: IMetricCard[] = [
             {
                 title: "Total Reports",
-                value: data?.length,
+                value: data?.total_reports,
                 color: "6060D0",
                 icon: GoAlertFill
             },
             {
                 title: "High Severity",
-                value: data?.filter(report => report.severity === 'HIGH').length,
+                value: data?.high_severity,
                 color: "299B46",
                 icon: GoAlertFill
             },
             {
                 title: "Medium Severity",
-                value: data?.filter(report => report.severity === 'MEDIUM').length,
+                value: data?.medium_severity,
                 color: "FF0000",
                 icon: GoAlertFill
             },
             {
                 title: "Low Severity",
-                value: data?.filter(report => report.severity === 'LOW').length,
+                value: data?.low_severity,
                 color: "FF9500",
                 icon: GoAlertFill
             },
         ]
-        console.log({metrics})
         return metrics
     }
 
     useEffect(()=>{
         if(data){
-            setMetricsData(transformMetricsData(data))
             setReportsData(transformKeysToCamelCase(data))
         }
     }, [])
@@ -122,6 +125,10 @@ const useReports = () => {
         refetchReports,
         reportsIsFetching,
         metricsData,
+        metricsLoading,
+        metricsError,
+        refetchMetrics,
+        metricsIsFetching,
         selectedStatus,
         selectedSeverity,
         setSelectedStatus,

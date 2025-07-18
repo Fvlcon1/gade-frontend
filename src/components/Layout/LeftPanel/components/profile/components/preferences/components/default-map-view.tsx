@@ -1,12 +1,13 @@
 import Text from "@styles/components/text"
-import theme from "@styles/theme"
 import Input from "@components/ui/input/input"
 import { useSettingsContext } from "@/app/context/settings-context"
 import { useState, useEffect } from "react"
+import { useTheme } from "@/app/styles/theme-context"
 
 const DefaultMapView = () => {
     const { settings, saveSettings, storeSettings } = useSettingsContext()
     const defaultMapView = settings?.defaultMapview;
+    const { theme } = useTheme()
 
     const [lat, setLat] = useState(defaultMapView?.lat || 0);
     const [lon, setLon] = useState(defaultMapView?.lon || 0);

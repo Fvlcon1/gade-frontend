@@ -23,6 +23,7 @@ const useSettings = () => {
         onSuccess: () => {
             toast.success("Preferences reset successfully");
             queryClient.invalidateQueries({ queryKey: ["settings"] });
+            window.location.reload();
         },
         onError: (error: any) => {
             toast.error(error?.response?.data?.detail || "Failed to reset preferences");

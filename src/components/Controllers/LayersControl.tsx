@@ -11,12 +11,12 @@ import { useTheme } from '@/app/styles/theme-context';
 
 // Feature layer definitions with colors matching LAYER_STYLES
 export const initialLayers = [
-  // { id: 'mining', label: 'Mining concessions', checked: true }, // Commented out concessions
+  { id: 'admin', label: 'Admin districts', checked: true, color: '#D2B48C' },
+  { id: 'mining_sites', label: 'Detected mining activity', checked: true, color: '#FF4B4B' },
   { id: 'reports', label: 'Reports', checked: true, color: '#8F3C19' },
   { id: 'rivers', label: 'Rivers', checked: true, color: '#03A9F4' },
-  { id: 'mining_sites', label: 'Detected mining activity', checked: true, color: '#FF4B4B' }, // Matches mining_sites color
-  { id: 'forest', label: 'Forest reserves', checked: true, color: '#4CAF50' }, // Matches forest color
-  { id: 'admin', label: 'Admin districts', checked: true, color: '#D2B48C' }, // Matches admin color
+  { id: 'concessions', label: 'Mining concessions', checked: true, color: '#d3b036' },
+  { id: 'forest', label: 'Forest reserves', checked: true, color: '#4CAF50' },
 ];
 
 interface Layer {
@@ -41,12 +41,12 @@ const LayersControl: React.FC<LayersControlProps> = ({
   onBasemapChange = () => { },
   onLayerChange = () => { }
 }) => {
-  const {theme, themeColor} = useTheme()
+  const {theme, themeColor, systemTheme} = useTheme()
   // Basemap definitions
   const basemaps = useMemo(() => [
-    { id: 'cartocdnLight', label: 'Light Basemap', checked: themeColor === 'light' },
+    { id: 'cartocdnLight', label: 'Light Basemap', checked: themeColor === 'light' || systemTheme === 'light' },
     { id: 'osm', label: 'Open Street Map', checked: false },
-    { id: 'cartocdnDark', label: 'Dark Basemap', checked: themeColor === 'dark' },
+    { id: 'cartocdnDark', label: 'Dark Basemap', checked: themeColor === 'dark' || systemTheme === 'dark' },
     { id: 'satellite', label: 'Google Satellite', checked: false },
     { id: 'planet', label: 'Planet', checked: false },
   ], [themeColor]);
@@ -122,7 +122,7 @@ const LayersControl: React.FC<LayersControlProps> = ({
           className="absolute top-[10px] z-[1001] w-[240px] gap-2 flex flex-col"
         >
           {/* Header */}
-          <div className="w-full h-[33px] bg-bg-primary/80 dark:border-[1px] dark:border-border-primary dark:shadow-bg-primary/50 backdrop-blur-sm shadow px-3 pr-1 flex items-center justify-between rounded-[10px]">
+          <div className="w-full h-[33px] bg-bg-primary/80 dark:border-[1px] dark:border-border-primary dark:shadow-bg-primary/50 backdrop-blur-sm shadow-xl px-3 pr-1 flex items-center justify-between rounded-[10px]">
             <Text bold={theme.text.bold.md}>
               Map Layers
             </Text>

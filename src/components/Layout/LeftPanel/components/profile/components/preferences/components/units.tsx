@@ -1,5 +1,4 @@
 import Text from "@styles/components/text"
-import theme from "@styles/theme"
 import Input from "@components/ui/input/input"
 import { LuChevronDown } from "react-icons/lu"
 import Dropdown from "@components/ui/dropdown/dropdown"
@@ -7,11 +6,13 @@ import { DropdownItem } from "@/utils/@types"
 import { useSettingsContext } from "@/app/context/settings-context"
 import { useConfirmationModal } from "@components/ui/confirmation-modal/confirmation-modal-context"
 import { BsInfoCircleFill } from "react-icons/bs"
+import { useTheme } from "@/app/styles/theme-context"
 
 const Units = () => {
     const { settings, saveSettings, storeSettings } = useSettingsContext()
     const showConfirmation = useConfirmationModal()
     const units = settings?.units
+    const { theme } = useTheme()
     
     const handleUnitsChange = (units: string) => {
         const newSettings = {

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 // Define public routes that don't require authentication
-const publicRoutes = ['/signin', '/setup', '/2fa'];
+const publicRoutes = ['/login', '/setup', '/2fa'];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -23,11 +23,11 @@ export function middleware(request: NextRequest) {
   }
 
   // If no token is found, redirect to sign in
-  if (!accessToken || !refreshToken) {
-    const url = new URL('/signin', request.url);
-    url.searchParams.set('from', pathname); 
-    return NextResponse.redirect(url);
-  }
+  // if (!accessToken || !refreshToken) {
+  //   const url = new URL('/login', request.url);
+  //   url.searchParams.set('from', pathname); 
+  //   return NextResponse.redirect(url);
+  // }
 
   return NextResponse.next();
 }

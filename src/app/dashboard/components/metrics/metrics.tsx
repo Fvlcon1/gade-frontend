@@ -2,12 +2,10 @@
 
 import { hexOpacity } from "@/utils/hexOpacity"
 import Text from "@styles/components/text"
-import theme from "@styles/theme"
 import useMetrics from "./hooks/useMetrics"
 import { useDashboardContext } from "../../context/dashboard-context"
-import { useState } from "react"
 import MetricSkeleton from "./metric-skeleton"
-
+import { useTheme } from "@styles/theme-context"
 interface Metric {
     title: string;
     value: string;
@@ -16,19 +14,32 @@ interface Metric {
 }
 
 const Metric = ({metric}: {metric: Metric}) => {
+    const {theme, themeColor, systemTheme} = useTheme()
+
+    const getDarkColor = () => {
+        if (themeColor === "system") {
+            if(systemTheme === "dark") {
+                return theme.colors.text.secondary
+            }
+        } else if (themeColor === "dark") {
+            return theme.colors.text.secondary
+        }
+        return theme.colors.main.primary
+    }
+
     return (
         <div className="relative flex flex-col gap-1 bg-bg-primary-lighter rounded-2xl border-[1px] border-border-primary p-2 w-[270px]">
             {/* header */}
             <div className="flex items-center gap-2">
                 <div className="w-[20px] h-[20px] rounded-sm bg-main-primary/15 flex items-center justify-center">
                     <metric.icon
-                        color={theme.colors.main.primary}
+                        color={getDarkColor()}
                         size={12}
                     />
                 </div>
                 <Text
                     bold={theme.text.bold.md}
-                // textColor={theme.colors.main.primary}
+                    textColor={getDarkColor()}
                 >
                     {metric.title}
                 </Text>
@@ -38,7 +49,7 @@ const Metric = ({metric}: {metric: Metric}) => {
             <Text
                 size={"40px"}
                 bold={theme.text.bold.md2}
-                textColor={theme.colors.main.primary}
+                textColor={getDarkColor()}
                 lineHeight={1}
             >
                 {metric.value}
@@ -47,7 +58,7 @@ const Metric = ({metric}: {metric: Metric}) => {
             {/* footer */}
             <div className="flex px-2 py-1 bg-bg-primary shadow-xl rounded-lg w-fit">
                 <Text
-                    textColor={theme.colors.main.primary}
+                    textColor={getDarkColor()}
                     size={theme.text.size.xs}
                 >
                     {metric.footer}
@@ -57,7 +68,7 @@ const Metric = ({metric}: {metric: Metric}) => {
             {/* Icon */}
             <div className="absolute top-1/5 right-4">
                 <metric.icon
-                    color={theme.colors.main.primary  + hexOpacity(10)}
+                    color={getDarkColor() + hexOpacity(10)}
                     size={60}
                 />
             </div>

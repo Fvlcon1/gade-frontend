@@ -9,21 +9,11 @@ import { FloatButton } from "antd"
 import { useRef } from "react"
 import Filter from "./components/filter"
 import { SpatialData } from "@/lib/store/spatial-store"
-import { Status } from "./utils/types"
+import { reverseStatusMapping } from "./utils/constants"
 import { AnimatePresence } from "framer-motion"
 import { useSpatialStore } from "@/lib/store/spatial-store"
 
-const statusMapping: Record<string, Status> = {
-    "OPEN": "Open",
-    "IN_REVIEW": "In Review",
-    "FALSE_POSITIVE": "False Positive",
-    "CLOSED": "Closed"
-}
-const ReviewValidation = ({
-    mapRef
-}: {
-    mapRef: React.RefObject<any>;
-}) => {
+const ReviewValidation = () => {
     const [updateCard, setUpdateCard] = useState<SpatialData["features"][number] | null>(null)
     const panelRef = useRef<HTMLDivElement>(null)
     const { isReviewValidationVisible } = useSpatialStore()
@@ -32,7 +22,7 @@ const ReviewValidation = ({
             <UpdateStatusModal
                 isVisible={updateCard != null}
                 close={() => setUpdateCard(null)}
-                currentStatus={statusMapping[updateCard?.properties.status as string]}
+                currentStatus={reverseStatusMapping[updateCard?.properties.status as string]}
                 id={updateCard?.properties.id}
             />
 
@@ -40,7 +30,7 @@ const ReviewValidation = ({
                 {
                     isReviewValidationVisible ? (
                         <SlideIn
-                            className="z-[1002] absolute top-3 right-[75px]"
+                            className=""
                             direction="right"
                         >
                             <BlurContainer
@@ -49,14 +39,13 @@ const ReviewValidation = ({
                                 {/* Add a ref to the scrollable panel */}
                                 <div
                                     ref={panelRef}
-                                    className="w-[350px] relative overflow-auto h-[calc(100vh-70px)] gap-4 pb-4 flex flex-col rounded-2xl"
+                                    className="w-[350px] relative overflow-auto h-[calc(100vh-70px)] gap-3 pb-4 flex flex-col rounded-2xl"
                                 >
                                     <TopSection />
                                     <Filter />
                                     <SiteCards
                                         updateCard={updateCard}
                                         setUpdateCard={setUpdateCard}
-                                        mapRef={mapRef}
                                     />
                                     {/* FloatButton.BackTop will now scroll the panel, not the window */}
                                     <FloatButton.BackTop

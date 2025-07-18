@@ -6,7 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 const useUpdateProfile = () => {
-    const { user } = useAuthStore();
+    const { user, setUser } = useAuthStore();
 
     const formik = useFormik({
         initialValues: {
@@ -36,7 +36,11 @@ const useUpdateProfile = () => {
 
     const { mutateAsync: updateProfileMutation, isPending: isUpdateProfilePending, isSuccess: isUpdateProfileSuccess } = useMutation({
         mutationFn: updateProfile,
-        onSuccess: () => {
+        onSuccess: (response) => {
+            setUser({
+                ...user,
+                ...response.profile
+            })
             toast.success("Profile updated successfully")
         },
         onError: (error: any) => {

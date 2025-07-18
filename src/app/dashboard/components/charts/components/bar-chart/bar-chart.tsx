@@ -17,17 +17,13 @@ const BarChart = () => {
     return (
         <SlideIn direction="bottom" className="flex flex-1 w-full">
             <div className="w-full h-full flex flex-col gap-2 px-4 pr-0">
-                <div className="flex flex-col gap-[2px]">
+                <div className="flex flex-col gap-[2px] flex-1 items-center">
                     <Text
-                        textColor={theme.colors.main.primary}
+                        // textColor={theme.colors.main.primary}
                         bold={theme.text.bold.md}
-                        // size={theme.text.size.HM}
-                        lineHeight={1}
+                        size={theme.text.size.HM}
                     >
                         Districts by area
-                    </Text>
-                    <Text textColor={theme.colors.text.tetiary}>
-                        Districts by area in the past year
                     </Text>
                 </div>
 

@@ -1,8 +1,11 @@
 import theme from "@styles/theme"
 import Text from "@styles/components/text"
 import { IoStatsChart, IoLayers } from "react-icons/io5"
+import { useTheme } from "@styles/theme-context"
 
 const Header = () => {
+    const {theme, themeColor, systemTheme} = useTheme()
+
     return (
         <div className="px-3 py-3 flex w-full justify-between items-center">
 
@@ -12,13 +15,13 @@ const Header = () => {
                 <div className="flex items-center gap-2">
                     <div className="w-[20px] h-[20px] rounded-sm bg-main-primary/20 flex items-center justify-center">
                         <IoStatsChart
-                            color={theme.colors.main.primary}
+                            color={theme.darkColor}
                             size={12}
                         />
                     </div>
                     <Text
                         bold={theme.text.bold.md}
-                        textColor={theme.colors.main.primary}
+                        textColor={theme.darkColor}
                     >
                         Analytics Charts
                     </Text>
@@ -33,7 +36,7 @@ const Header = () => {
 
             <div className="w-[20px] h-[20px] rounded-sm bg-main-primary/20 flex items-center justify-center">
                 <IoLayers
-                    color={theme.colors.main.primary}
+                    color={theme.darkColor}
                     size={12}
                 />
             </div>

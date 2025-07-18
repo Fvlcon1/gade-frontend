@@ -46,7 +46,7 @@ export const darkColors = {
         quantinary: '#909090',
     },
     main: {
-        primary: '#83ade9'
+        primary: '#5A87C7'
     }
 }
 

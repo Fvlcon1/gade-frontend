@@ -11,7 +11,7 @@ const Card = () => {
             <div className="w-full flex items-center px-4 gap-2">
                 <div className="w-[50px] h-[50px] rounded-full bg-main-primary/10 flex items-center justify-center">
                     <MdPieChart
-                        color={theme.colors.main.primary}
+                        color={theme.darkColor}
                         size={30}
                     />
                 </div>
@@ -19,7 +19,7 @@ const Card = () => {
                     <Text
                         size={theme.text.size.body2}
                         bold={theme.text.bold.md}
-                        textColor={theme.colors.main.primary}
+                        textColor={theme.darkColor}
                     >
                         Local Impact
                     </Text>
@@ -29,10 +29,10 @@ const Card = () => {
                     </Text>
                     <div className="flex items-center mt-1 gap-2 border-[1px] border-main-primary/30 rounded-full p-1">
                         <BsInfoCircleFill
-                            color={theme.colors.main.primary}
+                            color={theme.darkColor}
                         />
                         <Text
-                            textColor={theme.colors.main.primary}
+                            textColor={theme.darkColor}
                             ellipsis
                         >
                             Pulled from <b>GADE's</b> geospatial data

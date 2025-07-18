@@ -1,10 +1,11 @@
 import { FaClipboardCheck } from "react-icons/fa6"
 import { useState, useEffect } from "react"
-import theme from "@styles/theme"
 import { Tooltip } from "antd"
 import { useSpatialStore } from "@/lib/store/spatial-store"
+import { useTheme } from "@/app/styles/theme-context"
 
 const RightNav = () => {
+    const {theme} = useTheme()
     const [activeItem, setActiveItem] = useState(null)
     const { setIsReviewValidationVisible } = useSpatialStore()
     const navItems = [

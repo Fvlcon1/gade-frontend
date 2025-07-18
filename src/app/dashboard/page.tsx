@@ -7,6 +7,7 @@ import Charts from "./components/charts/charts"
 import Right from "./components/right/right"
 import RecentReports from "./components/recent-reports/recent-reports"
 import { useTheme } from "@/app/styles/theme-context"
+import SatelliteSpinner from "@components/ui/loaders/satellite-spinner"
 
 const Header = () => {
     const { theme } = useTheme()
@@ -15,14 +16,14 @@ const Header = () => {
             <div className="flex items-center gap-2">
                 <div className="w-[28px] h-[28px] rounded-md bg-main-primary/15 flex items-center justify-center">
                     <IoStatsChart
-                        color={theme.colors.main.primary}
+                        color={theme.darkColor}
                         size={15}
                     />
                 </div>
                 <Text
                     size={"18px"}
                     bold={theme.text.bold.md2}
-                    textColor={theme.colors.main.primary}
+                    textColor={theme.darkColor}
                 >
                     Dashboard
                 </Text>

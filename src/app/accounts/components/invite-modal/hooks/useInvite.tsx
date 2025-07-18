@@ -31,7 +31,7 @@ const useInvite = ({
             close()
         },
         onError: (error: any) => {
-            toast.error(error?.response?.data?.detail || "Failed to send invite")
+            toast.error(error?.response?.data?.message || "Failed to send invite")
         }
     })
 

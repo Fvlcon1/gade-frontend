@@ -5,12 +5,12 @@ import theme from "@styles/theme"
 import { useFormik } from "formik"
 import { MdEmail } from "react-icons/md"
 import { RiUserAddLine } from "react-icons/ri"
-import * as Yup from 'yup'
 import { DropdownItem } from "@/utils/@types"
 import { BiChevronDown } from "react-icons/bi"
 import useInvite from "./hooks/useInvite"
 import { IoSend } from "react-icons/io5"
 import OutlineButton from "@components/ui/button/outlineButton"
+import { departmentList } from "@/utils/constants"
 
 const Form = ({
     close
@@ -24,12 +24,12 @@ const Form = ({
         { key: "2", label: "Standard", onClick: () => { formik.setFieldValue("role", "STANDARD") }, isSelected: formik.values.role === "STANDARD" },
     ]
 
-    const departmentDropdown: DropdownItem[] = [
-        { key: "1", label: "GADE Team", onClick: () => { formik.setFieldValue("department", "GADE Team") }, isSelected: formik.values.department === "GADE Team" },
-        { key: "2", label: "Minerals Department", onClick: () => { formik.setFieldValue("department", "Minerals Department") }, isSelected: formik.values.department === "Minerals Department" },
-        { key: "3", label: "Forestry Department", onClick: () => { formik.setFieldValue("department", "Forestry Department") }, isSelected: formik.values.department === "Forestry Department" },
-        { key: "4", label: "Ghana Armed Forces", onClick: () => { formik.setFieldValue("department", "Ghana Armed Forces") }, isSelected: formik.values.department === "Ghana Armed Forces" },
-    ]
+    const departmentDropdown = departmentList.map((department, index) => ({
+        key: index.toString(),
+        label: department,
+        value: department,
+        isSelected: formik.values.department === department,
+    }))
 
     return (
         <form onSubmit={formik.handleSubmit} className="flex flex-col gap-2">
@@ -49,6 +49,7 @@ const Form = ({
 
             <Dropdown
                 menuItems={departmentDropdown}
+                onChange={(value) => formik.setFieldValue("department", value)}
             >
                 <FormInput
                     value={formik.values.department}

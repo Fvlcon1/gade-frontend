@@ -9,7 +9,7 @@ import { useTheme } from "@/app/styles/theme-context"
 
 const Theme = () => {
     const { settings, saveSettings, storeSettings } = useSettingsContext()
-    const { theme, setThemeColor } = useTheme()
+    const { theme } = useTheme()
     const appTheme = settings?.appTheme
     
     const handleThemeChange = (theme: string) => {
@@ -19,18 +19,6 @@ const Theme = () => {
         }
         storeSettings(newSettings)
         saveSettings(newSettings)
-
-        switch (theme) {
-            case "light":
-                setThemeColor("light");
-                break;
-            case "dark":
-                setThemeColor("dark");
-                break;
-            case "system":
-                setThemeColor("system");
-                break;
-        }
     }
     const items: DropdownItem[] = [
         {

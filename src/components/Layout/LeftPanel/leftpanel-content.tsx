@@ -14,6 +14,7 @@ import { useTheme } from "@styles/theme-context";
 import ConfirmationModal from "@components/ui/confirmation-modal/confirmation-modal";
 import { FaUserGear } from "react-icons/fa6";
 import { useSettingsContext } from "@/app/context/settings-context";
+import Logo from "./components/logo";
 
 export const getActiveMenuItem = (pathname: string) => {
   return menuItems.find((item) => item.href === pathname);
@@ -24,11 +25,15 @@ const LeftPanel = () => {
   const pathname = usePathname();
   const activeItem = getActiveMenuItem(pathname)
   const { user, sidebarExpanded: isExpanded, setSidebarExpanded: setIsExpanded } = useAuthStore();
-  const { theme } = useTheme();
+  const { theme, themeColor, systemTheme } = useTheme();
 
   useEffect(() => {
     setHasMounted(true); // <-- ADD
   }, []);
+
+  useEffect(() => {
+    console.log({themeColor, systemTheme});
+  }, [themeColor, systemTheme]);
 
   const toggleExpansion = () => {
     setIsExpanded(!isExpanded);
@@ -51,16 +56,7 @@ const LeftPanel = () => {
           <div className={`flex flex-col ${isExpanded ? "items-start" : "items-center"} gap-4 `}>
             <div className={`flex items-center ${isExpanded ? "justify-between px-3" : "justify-center px-1"} z-[1006] w-full relative group border-b-[1px] border-border-primary bg-bg-primary-lighter py-3 rounded-t-2xl`}>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full overflow-hidden">
-                  <Image
-                    src="/assets/LeftPanel/logo.png"
-                    alt="GADE Logo"
-                    width={32}
-                    height={32}
-                    className="rounded-full object-cover"
-                  />
-                </div>
-                {isExpanded && <span className="text-[16px] font-semibold text-[#B58A3D]">GADE</span>}
+                <Logo isExpanded={isExpanded} />
               </div>
 
               <div

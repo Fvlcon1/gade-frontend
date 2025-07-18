@@ -9,18 +9,26 @@ const ReviewContext = React.createContext<{
     selectedSeverity: string;
     severities: string[];
     setSelectedSeverity: (severity: string) => void;
+    selectedStatus: string;
+    statuses: string[];
+    setSelectedStatus: (status: string) => void;
 }>({
     order: "Newest",
     setOrder: () => { },
     selectedSeverity: "All",
     severities: ["All", "High", "Medium", "Low"],
-    setSelectedSeverity: () => { }
+    setSelectedSeverity: () => { },
+    selectedStatus: "All",
+    statuses: ["All Status", "Open", "In Review", "False Positive", "Closed"],
+    setSelectedStatus: () => { }
 });
 
 export const ReviewContextProvider = ({ children }: { children: React.ReactNode }) => {
     const [order, setOrder] = React.useState<Order>("Newest");
     const severities = ["All", "High", "Medium", "Low"]
     const [selectedSeverity, setSelectedSeverity] = useState("All")
+    const [selectedStatus, setSelectedStatus] = useState("All Status")
+    const statuses = ["All Status", "Open", "In Review", "False Positive", "Closed"]
 
     return (
         <ReviewContext.Provider
@@ -29,7 +37,10 @@ export const ReviewContextProvider = ({ children }: { children: React.ReactNode 
                 setOrder,
                 selectedSeverity,
                 severities,
-                setSelectedSeverity
+                setSelectedSeverity,
+                selectedStatus,
+                statuses,
+                setSelectedStatus
             }}
         >
             {children}

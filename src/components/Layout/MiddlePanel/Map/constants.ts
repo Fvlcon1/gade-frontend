@@ -21,6 +21,12 @@ export const LAYER_STYLES: Record<string, MapLayerStyle> = {
     opacity: 0.8,
     fillOpacity: 0.1,
   },
+  concessions: {
+    color: "#d3b036",
+    weight: 1,
+    opacity: 0.7,
+    fillOpacity: 0.1,
+  },
   forest: {
     color: "#4CAF50",
     weight: 1,
@@ -48,6 +54,12 @@ export const HIGHLIGHT_STYLE: Record<string, MapLayerStyle> = {
     weight: 2,
     opacity: 1,
     fillOpacity: 0.4,
+  },
+  concessions: {
+    color: "#d3b036",
+    weight: 2,
+    opacity: 1,
+    fillOpacity: 0.5,
   },
   forest: {
     color: "#66BB6A",

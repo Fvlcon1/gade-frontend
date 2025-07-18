@@ -18,7 +18,7 @@ const Activity = () => {
         <div className="flex items-center gap-3">
             <div className="w-[40px] h-[40px] rounded-full bg-main-primary/10 flex items-center justify-center">
                 <MdPieChart
-                    color={theme.colors.main.primary}
+                    color={theme.darkColor}
                     size={20}
                 />
             </div>
@@ -44,13 +44,13 @@ const RecentActivity = () => {
             <div className="flex items-center gap-2">
                 <div className="w-[20px] h-[20px] rounded-sm bg-main-primary/15 flex items-center justify-center">
                     <IoMdPulse
-                        color={theme.colors.main.primary}
+                        color={theme.darkColor}
                         size={12}
                     />
                 </div>
                 <Text
                     bold={theme.text.bold.md}
-                    textColor={theme.colors.main.primary}
+                    textColor={theme.darkColor}
                 >
                     Recent Activity
                 </Text>

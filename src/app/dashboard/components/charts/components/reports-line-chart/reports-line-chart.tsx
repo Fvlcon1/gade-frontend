@@ -21,15 +21,14 @@ const ReportsLineChart = () => {
         <SlideIn direction="bottom" className="flex flex-1 w-full">
             <div className="w-full h-full flex flex-col gap-2 pl-4">
                 <div className="w-full flex justify-between pr-4">
-                    <div className="flex flex-col gap-[2px]">
+                    <div className="flex flex-col gap-[2px] flex-1 items-center">
                         <Text
-                            textColor={theme.colors.main.primary}
+                            // textColor={theme.colors.main.primary}
                             bold={theme.text.bold.md}
+                            size={theme.text.size.HM}
+                            className="!pl-[200px]"
                         >
                             Reports Over Time
-                        </Text>
-                        <Text textColor={theme.colors.text.tetiary}>
-                            Monthly reports over the past year
                         </Text>
                     </div>
 

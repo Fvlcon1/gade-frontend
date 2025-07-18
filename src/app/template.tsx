@@ -5,9 +5,9 @@ const Template = ({children}: {children: React.ReactNode}) => {
     return (
         <>
             <MouseTrail />
-            <Slidein className="w-full h-full">
+            <div className="w-full h-full">
                 {children}
-            </Slidein>
+            </div>
         </>
     )
 }

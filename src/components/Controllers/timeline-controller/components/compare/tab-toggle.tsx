@@ -1,6 +1,6 @@
 
 import Text from "@styles/components/text";
-import theme from "@styles/theme";
+import { useTheme } from "@styles/theme-context";
 import { ComparisonView } from "../../utils/types";
 
 interface TabToggleProps {
@@ -9,6 +9,7 @@ interface TabToggleProps {
 }
 
 const TabToggle = ({ activeTab, handleTabChange }: TabToggleProps) => {
+    const { theme } = useTheme();
     return (
         <div className="flex">
             <div

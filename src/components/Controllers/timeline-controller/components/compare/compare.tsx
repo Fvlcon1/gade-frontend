@@ -50,11 +50,7 @@ const Compare = ({
 					<RangePicker
 						picker="month"
 						style={{
-							height: "35px",
-							borderRadius: "10px",
-							backgroundColor: theme.colors.bg.primary + hexOpacity(50),
 							fontFamily: "montserrat",
-							borderColor: theme.colors.text.tetiary + hexOpacity(50),
 						}}
 						value={startDate ? [dayjs(startDate), dayjs(endDate)] : undefined}
 						onChange={(dates) => {

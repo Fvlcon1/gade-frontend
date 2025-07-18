@@ -3,16 +3,16 @@ import Card from "./card"
 import { useSpatialStore } from "@/lib/store/spatial-store"
 import { useReviewContext } from "../../context/review-context"
 import { SpatialData } from "@/lib/store/spatial-store"
+import { reverseStatusMapping } from "../../utils/constants"
 
 const SiteCards = ({
     updateCard,
     setUpdateCard,
-    mapRef
 }) => {
     const [expandedCard, setExpandedCard] = useState<number | null>(null)
     const [selectedSite, setSelectedSite] = useState<SpatialData["features"][number] | null>(null)
     const {filteredMiningSites} = useSpatialStore()
-    const { order, setOrder, selectedSeverity } = useReviewContext();
+    const { order, setOrder, selectedSeverity, selectedStatus } = useReviewContext();
     const localfilteredSites = filteredMiningSites?.features.length ? [...filteredMiningSites?.features] : []
 
     if(localfilteredSites)
@@ -29,8 +29,10 @@ const SiteCards = ({
         let sites = sortSites(localfilteredSites)
         if(selectedSeverity != "All")
             sites = sites?.filter((site) => site.properties.severity?.toLowerCase() === selectedSeverity.toLowerCase())
+        if(selectedStatus != "All Status")
+            sites = sites?.filter((site) => reverseStatusMapping[site.properties.status as string]?.toLowerCase() === selectedStatus.toLowerCase())
         return sites
-    }, [order, selectedSeverity, localfilteredSites])
+    }, [order, selectedSeverity, selectedStatus, localfilteredSites])
 
     return (
         <>
@@ -44,7 +46,6 @@ const SiteCards = ({
                             isExpanded={expandedCard === index} 
                             index={index}
                             feature={siteFeature}
-                            mapRef={mapRef}
                             isSelected={selectedSite === siteFeature}
                         />
                     ))

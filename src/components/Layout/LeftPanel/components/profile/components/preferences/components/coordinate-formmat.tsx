@@ -1,16 +1,16 @@
 import Text from "@styles/components/text"
-import theme from "@styles/theme"
 import Input from "@components/ui/input/input"
-import { LuSunMoon, LuChevronDown } from "react-icons/lu"
-import { CiLight, CiDark } from "react-icons/ci"
+import { LuChevronDown } from "react-icons/lu"
 import Dropdown from "@components/ui/dropdown/dropdown"
 import { DropdownItem } from "@/utils/@types"
 import { BiCurrentLocation } from "react-icons/bi"
 import { useSettingsContext } from "@/app/context/settings-context"
+import { useTheme } from "@/app/styles/theme-context"
 
 const CoordinateFormat = () => {
     const { settings, saveSettings, storeSettings } = useSettingsContext()
     const coordinateFormat = settings?.coordinateFormat
+    const { theme } = useTheme()
 
     const handleCoordinateFormatChange = (format: string) => {
         const newSettings = {

@@ -3,7 +3,7 @@
 import { SpatialData, useSpatialStore } from "@/lib/store/spatial-store";
 import getDate, { getRelativeTime, getTime } from "@/utils/getDate";
 import { formatNumber } from "@/utils/number-utils";
-import { formatWithPrefix } from "@/utils/unit-utils";
+import { formatWithPrefix, formatWithUnit } from "@/utils/unit-utils";
 import { capitalizeWords } from "@/utils/utils";
 import Button from "@components/ui/button/button";
 import Copychip from "@components/ui/chip/copyChip";
@@ -14,11 +14,13 @@ import { AnimatePresence, motion } from 'framer-motion';
 import L from "leaflet";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { FaCircleCheck } from "react-icons/fa6";
+import { useTheme } from "@/app/styles/theme-context"
 
 const Dot = () => {
+    const { theme } = useTheme()
     return (
-        <div className="p-1 rounded-full bg-bg-primary/50">
-            <div className="w-1.5 h-1.5 rounded-full bg-bg-primary" />
+        <div className="p-1 rounded-full bg-white/50">
+            <div className="w-1.5 h-1.5 rounded-full bg-white" />
         </div>
     )
 }
@@ -27,10 +29,12 @@ const Info = ({
     title,
     value
 }) => {
+    const { theme } = useTheme()
     return (
         <div className="flex flex-col gap-1">
             <Text
                 textColor={theme.colors.text.tetiary}
+                ellipsis
             >
                 {title}
             </Text>
@@ -75,19 +79,22 @@ const variants = {
 const Chip = ({
     title,
     value
-}) => (
-    <div className="flex px-2 py-1.5 border-[1px] border-main-primary rounded-full">
-        <Text textColor={theme.colors.main.primary}>
-            {title}:&nbsp;
-        </Text>
-        <Text
-            bold={theme.text.bold.md}
-            textColor={theme.colors.main.primary}
-        >
-            {value}
-        </Text>
-    </div>
-)
+}) => {
+    const { theme } = useTheme()
+    return (
+        <div className="flex px-2 py-1.5 border-[1px] border-main-primary rounded-full">
+            <Text textColor={theme.colors.main.primary}>
+                {title}:&nbsp;
+            </Text>
+            <Text
+                bold={theme.text.bold.md}
+                textColor={theme.colors.main.primary}
+            >
+                {value}
+            </Text>
+        </div>
+    )
+}
 
 const parseViolationTypes = (input: string): string[] => {
     if (!input) return [];
@@ -132,7 +139,6 @@ const Card = ({
     setUpdateCard,
     index,
     feature,
-    mapRef,
     isSelected,
 }: {
     setExpandedCard: Dispatch<SetStateAction<number>>
@@ -140,13 +146,16 @@ const Card = ({
     setUpdateCard: (cardFeature: SpatialData["features"][number]) => void,
     index: number,
     feature: SpatialData["features"][number]
-    mapRef: React.RefObject<any>
     isSelected: boolean,
 }) => {
     const { severity, id, area, district, region, detected_date, severity_score, all_violation_types, distance_to_forest_m, distance_to_water_m } = feature.properties
     const violationTypes = parseViolationTypes(all_violation_types)
     const { setBounds, boundsFeature } = useSpatialStore();
     const isCardSelected = boundsFeature === feature
+
+    const areaValue = formatWithUnit({value : area, type : "area"}).split(" ")
+    const areaFigure = areaValue[0]
+    const areaUnit = areaValue[1]
 
     const handleCardClick = () => {
         setExpandedCard(index)
@@ -174,14 +183,14 @@ const Card = ({
                         <FaCircleCheck className="absolute top-2 right-2" color={theme.colors.main.primary} size={20} />
                     )
                 }
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1.5">
                     <Text
                         size={theme.text.size.body2}
                         bold={theme.text.bold.md}
                     >
                         Mining Violation - <Text bold={theme.text.bold.md} textColor={theme.colors.main.primary}>{getRelativeTime(new Date(detected_date))}</Text>
                     </Text>
-                    <Text>
+                    <Text textColor={theme.colors.text.tetiary}>
                         Severity Score: {severity_score ?? "N/A"}
                     </Text>
                 </div>
@@ -225,8 +234,8 @@ const Card = ({
                                 exit={"collapse"}
                             >
                                 <div className="flex flex-col gap-2">
-                                    <div className="flex bg-bg-primary w-full px-3 py-2 border-[1px] rounded-xl border-border-primary/40 gap-4 items-center">
-                                        <Info title="Area" value={formatWithPrefix(area, "", 0)} />
+                                    <div className="flex bg-bg-primary w-full px-3 py-2 border-[1px] rounded-xl border-border-primary/40 gap-3 items-center">
+                                        <Info title={`Area (${areaUnit})`} value={areaFigure} />
                                         <VerticalDivider />
                                         <Info title="District" value={capitalizeWords(district)} />
                                         <VerticalDivider />
@@ -241,11 +250,11 @@ const Card = ({
                                     <div className="flex flex-wrap gap-2">
                                         <Chip
                                             title="Forest Distance"
-                                            value={formatWithPrefix(distance_to_forest_m)}
+                                            value={formatWithUnit({value : distance_to_forest_m})}
                                         />
                                         <Chip
                                             title="River Distance"
-                                            value={formatWithPrefix(distance_to_water_m)}
+                                            value={formatWithUnit({value : distance_to_water_m})}
                                         />
                                     </div>
                                     <Button

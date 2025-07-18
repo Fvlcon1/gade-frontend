@@ -141,6 +141,8 @@ class ApiClient {
       this.request<any>('/data/districts'),
     forestReserves: () =>
       this.request<any>('/data/forest-reserves'),
+    concessions: () =>
+      this.request<any>('/data/concessions'),
     rivers: () =>
       this.request<any>('/data/rivers'),
     districtSearch: (searchTerm: string) =>

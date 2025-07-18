@@ -6,7 +6,6 @@ import { useMutation } from "@tanstack/react-query"
 import { useState } from "react"
 import { DropdownItem } from "@/utils/@types"
 import { toast } from "react-hot-toast"
-import theme from "@styles/theme"
 import { FaEdit, FaUserAltSlash, FaUserCheck } from "react-icons/fa"
 import { MdDelete } from "react-icons/md"
 import { Tooltip } from "antd"
@@ -16,6 +15,7 @@ import EditModal from "../edit-modal/edit-modal"
 import DeleteConfirmationModal from "../confirmation-modal/confirmation-modal"
 import { FaLinkSlash } from "react-icons/fa6"
 import useActions from "./useActions"
+import { useTheme } from "@styles/theme-context"
 
 const Actions = ({
     user,
@@ -30,6 +30,7 @@ const Actions = ({
     const [isRevokeVisible, setIsRevokeVisible] = useState(false);
     const [isReactivateVisible, setIsReactivateVisible] = useState(false);
     const { reactivateUserMutation, isReactivatePending, deleteAccountMutation, isDeletePending } = useActions({ user })
+    const { theme, themeColor } = useTheme()
 
     return (
         <>
@@ -119,7 +120,7 @@ const Actions = ({
                                 onClick={() => setIsRevokeVisible(true)}
                             >
                                 <FaLinkSlash
-                                    color={"purple"}
+                                    color={themeColor === "dark" ? "#b04fb0" : "purple"}
                                 />
                             </div>
                         </Tooltip>

@@ -1,6 +1,6 @@
 "use client";
 import React, { useMemo, useState, useEffect, useRef, useCallback } from "react";
-import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON, useMap, useMapEvents, Marker } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
@@ -20,10 +20,13 @@ import ComparisonSlider from "../../../../Controllers/ComparisonSlider";
 import TimelineTiles from "@components/Controllers/timeline-controller/components/timeline-tiles";
 import { getLastTwelveMonths } from "@/utils/date-utils";
 import SideBySide from "./side-by-side";
+import useGeoLocation from "@/hooks/use-geolocation";
+import UserLocationMarker from "./user-location-marker";
 
 const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 'timeline' | 'comparison' | null }> = ({ activeBasemap, activeFeatureLayers, playhead, timelineMode }) => {
   const {
     filteredMiningSites,
+    filteredConcessions,
     filteredDistricts,
     forestReserves,
     rivers,
@@ -34,7 +37,7 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
     highlightedDistricts,
     dateRange,
     boundsFeature,
-    comparisonViewState,
+    setSelectedMiningSite,
     applyFilters
   } = useSpatialStore();
 
@@ -100,53 +103,47 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
       forest: forestReserves,
       admin: filteredDistricts,
       rivers: rivers,
+      concessions: filteredConcessions
     };
-  }, [filteredDistricts, filteredMiningSites, forestReserves, rivers]);
+  }, [filteredDistricts, filteredMiningSites, filteredConcessions, forestReserves, rivers]);
 
-  const getDistrictStyle = useCallback((feature: any, hover?: boolean) => {
+  const [selectedDistrictName, setSelectedDistrictName] = useState<string>();
+  const [selectedConcessionName, setSelectedConcessionName] = useState<string>();
+  const [selectedMiningSiteId, setSelectedMiningSiteId] = useState<string>();
+
+  const getDistrictStyle = useCallback((feature: any) => {
     const district = feature.properties.district;
-    const isHighlighted = highlightedDistricts.includes(district);
-    const isSelected = selectedDistricts.includes(district);
+    if (selectedDistrictName === district) return HIGHLIGHT_STYLE.admin;
+    return LAYER_STYLES.admin;
+  }, [selectedDistrictName]);
 
-    if (selectedDistricts.length === 0 && highlightedDistricts.length === 0) {
-      if (hover === true) return HIGHLIGHT_STYLE.admin;
-      return LAYER_STYLES.admin;
-    }
+  const getConcessionStyle = useCallback((feature: any) => {
+    const name = feature.properties.name;
+    if (selectedConcessionName === name) return HIGHLIGHT_STYLE.concessions;
+    return LAYER_STYLES.concessions;
+  }, [selectedConcessionName]);
 
-    if (isHighlighted) {
-      if (hover === true) return HIGHLIGHT_STYLE.admin;
-      return LAYER_STYLES.admin;
-    }
-
-    // if (isSelected) {
-    //   if(hover) return HOVER_STYLE.admin;
-    //   return {
-    //     color: 'var(--color-main-primary)',
-    //     weight: 1.5,
-    //     opacity: 0.6,
-    //     fillOpacity: 0.1,
-    //     dashArray: 'none',
-    //   };
-    // }
-
-    return { opacity: 0, fillOpacity: 0 };
-  }, [selectedDistricts, highlightedDistricts]);
-
-  const getMiningStyle = useCallback((feature: SpatialData["features"][number]) => {
-    if (boundsFeature?.properties?.id === feature?.properties?.id)
-      return HIGHLIGHT_STYLE.mining_sites
-
+  const getMiningStyle = useCallback((feature: any) => {
+    const id = feature.properties.id;
+    if (selectedMiningSiteId === id) return HIGHLIGHT_STYLE.mining_sites;
     return LAYER_STYLES.mining_sites;
-  }, [boundsFeature]);
+  }, [selectedMiningSiteId]);
 
-  const handleMouseOver = (e: any) => {
+  const [clickedDistricts, setClickedDistricts] = useState<any>()
+  const handleDistrictLayerClick = (e: any) => {
     const layer = e.target;
-    layer.setStyle(getDistrictStyle(layer.feature, true));
+    
+    setClickedDistricts(prev => {
+      prev?.setStyle(getDistrictStyle(prev.feature))
+      layer.setStyle(getDistrictStyle(layer.feature));
+      return layer
+    })
+
 
     // Add a tooltip
-    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-      layer.bringToFront();
-    }
+    // if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+    //   layer.bringToFront();
+    // }
   };
 
   const handleMouseOut = (e: any) => {
@@ -181,41 +178,27 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
             const data = filteredLayerData[layer.id];
             if (!layer.checked || !data) return null;
 
-            if (layer.id === 'admin') {
-              return (
-                <GeoJSON
-                  key={adminLayerKey}
-                  data={data}
-                  style={getDistrictStyle}
-                  interactive={true}
-                  onEachFeature={(feature, layer) => {
-                    layer.on({
-                      mouseover: (e) => handleMouseOver(e),
-                      mouseout: (e) => handleMouseOut(e),
-                    });
-                    const district = feature.properties.district;
-                    const tooltipContent = `<div class="font-medium">${district}</div>`;
-                    layer.bindTooltip(tooltipContent, {
-                      permanent: false,
-                      direction: 'top',
-                      offset: [0, -8],
-                      className: 'district-tooltip',
-                    });
-                    // layer.off('click');
-                    // layer.off('mouseover');
-                    // layer.off('mouseout');
-                  }}
-                />
-              );
-            }
-
             if (layer.id === 'mining_sites') {
               return (
                 <GeoJSON
                   key={`${layer.id}-${selectedDistricts.join(',')}-${dateRange?.from || ''}-${dateRange?.to || ''}-${data.features.length}-${playhead ?? ''}`}
                   data={data}
                   style={getMiningStyle}
+                  interactive={true}
                   onEachFeature={(feature, leafletLayer) => {
+                    leafletLayer.on({
+                      click: () => {
+                        const id = feature.properties.id;
+                        setSelectedMiningSite(feature)
+                        if (selectedMiningSiteId === id) {
+                          setSelectedMiningSiteId(undefined);
+                        } else {
+                          setSelectedMiningSiteId(id);
+                          setSelectedConcessionName(undefined);
+                          setSelectedDistrictName(undefined);
+                        }
+                      },
+                    });
                     const date = new Date(feature.properties.detected_date).toLocaleDateString();
                     const district = feature.properties.district;
                     const tooltipContent = `
@@ -229,6 +212,72 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
                       direction: 'top',
                       offset: [0, -8],
                       className: 'mining-site-tooltip',
+                    });
+                  }}
+                />
+              );
+            }
+
+            if(layer.id === "concessions"){
+              return (
+                <GeoJSON
+                  key={layer.id}
+                  data={data}
+                  style={getConcessionStyle}
+                  interactive={true}
+                  onEachFeature={(feature, layer) => {
+                    layer.on({
+                      click: () => {
+                        const name = feature.properties.name;
+                        if (selectedConcessionName === name) {
+                          setSelectedConcessionName(undefined);
+                        } else {
+                          setSelectedConcessionName(name);
+                          setSelectedMiningSiteId(undefined);
+                          setSelectedDistrictName(undefined);
+                        }
+                      },
+                    });
+                    const owner = feature.properties.owner;
+                    const tooltipContent = `<div class="font-medium">${owner}</div>`;
+                    layer.bindTooltip(tooltipContent, {
+                      permanent: false,
+                      direction: 'top',
+                      offset: [0, -8],
+                      className: 'district-tooltip',
+                    });
+                  }}
+                />
+              );
+            }
+
+            if (layer.id === 'admin') {
+              return (
+                <GeoJSON
+                  key={adminLayerKey}
+                  data={data}
+                  style={getDistrictStyle}
+                  interactive={true}
+                  onEachFeature={(feature, layer) => {
+                    layer.on({
+                      click: () => {
+                        const district = feature.properties.district;
+                        if (selectedDistrictName === district) {
+                          setSelectedDistrictName(undefined);
+                        } else {
+                          setSelectedDistrictName(district);
+                          setSelectedMiningSiteId(undefined);
+                          setSelectedConcessionName(undefined);
+                        }
+                      },
+                    });
+                    const district = feature.properties.district;
+                    const tooltipContent = `<div class="font-medium">${district}</div>`;
+                    layer.bindTooltip(tooltipContent, {
+                      permanent: false,
+                      direction: 'top',
+                      offset: [0, -8],
+                      className: 'district-tooltip',
                     });
                   }}
                 />
@@ -296,9 +345,8 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
   comparisonEndDate,
 }) => {
   const { reports, fetchReports, applyFilters, miningSites, comparisonViewState } = useSpatialStore();
-
+  const {location} = useGeoLocation();
   const searchParams = useSearchParams();
-
   const [currentBasemap, setCurrentBasemap] = useState(activeBasemap);
 
   useEffect(() => {
@@ -498,6 +546,7 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
             attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
           {timelineMode === 'timeline' && <TimelineTiles playhead={playhead} months={months} />}
+          {location && <UserLocationMarker position={location as any} />}
           <MapLayers activeBasemap={currentBasemap} activeFeatureLayers={activeFeatureLayers} playhead={playhead} timelineMode={timelineMode} />
           <ReportZoomHandler reports={reports} searchParams={searchParams} />
           <MouseCoordinateDisplay />

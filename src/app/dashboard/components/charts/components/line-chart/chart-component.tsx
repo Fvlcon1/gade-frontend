@@ -5,13 +5,14 @@ import dynamic from 'next/dynamic';
 import { ApexOptions } from 'apexcharts';
 import useLineChart from './hooks/useLineChart';
 import { formatWithPrefix } from '@/utils/unit-utils';
+import { useTheme } from '@styles/theme-context';
 
 const Chart = dynamic(() => import('react-apexcharts'), {
     ssr: false,
     loading: () => <ChartSkeleton />
 });
 
-const ClaimsTimelineChart = ({
+const AreaOverTimeChart = ({
     isLineChartDataPending,
     lineChartSeries,
     categories
@@ -20,6 +21,7 @@ const ClaimsTimelineChart = ({
     lineChartSeries: any
     categories: any
 }) => {
+    const {themeColor, theme} = useTheme()
     if (isLineChartDataPending) {
         return <ChartSkeleton />
     }
@@ -29,7 +31,7 @@ const ClaimsTimelineChart = ({
     const options: ApexOptions = {
         chart: {
             height: 350,
-            type: 'area',
+            type: 'line',
             toolbar: { show: false },
             foreColor: '#9CA3AF'
         },
@@ -49,6 +51,15 @@ const ClaimsTimelineChart = ({
             categories,
             axisBorder: { show: false },
             axisTicks: { show: false },
+            title: {
+                text: "Months",
+                style: {
+                    fontSize: '14px',
+                    fontFamily: 'Montserrat',
+                    fontWeight: 500,
+                    color: theme.colors.text.primary
+                }
+            },
             labels: {
                 style: {
                     colors: '#6B7280',
@@ -58,6 +69,15 @@ const ClaimsTimelineChart = ({
             }
         },
         yaxis: {
+            title: {
+                text: "Area",
+                style: {
+                    fontSize: '14px',
+                    fontFamily: 'Montserrat',
+                    fontWeight: 500,
+                    color: theme.colors.text.primary
+                }
+            },
             labels: {
                 style: {
                     colors: '#6B7280',
@@ -88,7 +108,7 @@ const ClaimsTimelineChart = ({
             strokeWidth: 2,
         },
         tooltip: {
-            theme: 'light',
+            theme: themeColor,
             y: {
                 formatter: function (value: any) {
                     return value;
@@ -107,4 +127,4 @@ const ClaimsTimelineChart = ({
     )
 };
 
-export default ClaimsTimelineChart;
+export default AreaOverTimeChart;

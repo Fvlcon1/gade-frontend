@@ -2,19 +2,20 @@ import Divider from "@components/ui/divider/divider"
 import ProfileInfo from "./profile-info"
 import { FaPowerOff, FaUserCircle } from "react-icons/fa"
 import Text from "@styles/components/text"
-import theme from "@styles/theme"
 import { FaGear } from "react-icons/fa6"
 import { useState } from "react"
 import { ViewStates } from "../profile-view"
 import { useAuthStore } from "@/lib/store/auth-store"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { useTheme } from "@/app/styles/theme-context"
 
 const Profile = ({
     setViewState
 }: {
     setViewState: (viewState: ViewStates) => void
 }) => {
+        const {theme} = useTheme()
         const { logout } = useAuthStore()
         const router = useRouter()
 

@@ -60,10 +60,13 @@ interface SpatialState {
   forestReserves: SpatialData | null;
   rivers: SpatialData | null;
   miningSites: SpatialData | null;
+  concessions: SpatialData | null;
+  filteredConcessions: SpatialData | null;
   filteredMiningSites: SpatialData | null;
   filteredDistricts: SpatialData | null;
   boundsFeature: SpatialData["features"][number] | null;
   reviewValidationSearchValue : string
+  selectedMiningSite : SpatialData["features"][number] | null;
 
   //View states
   comparisonViewState : ComparisonView
@@ -87,6 +90,7 @@ interface SpatialState {
   isLoading: boolean;
   error: string | null;
   selectedDistricts: string[];
+  selectedCompanies: string[];
   highlightedDistricts: string[];
   dateRange: { from: string | null; to: string | null } | null;
 
@@ -101,6 +105,7 @@ interface SpatialState {
   setMonths: (months : Array<{ monthIndex: number; year: number }>) => void;
   setBounds: (boundsFeature: SpatialData["features"][number] | null) => void,
   setComparisonViewState: (viewState : ComparisonView) => void,
+  setSelectedMiningSite: (selectedMiningSite : SpatialData["features"][number] | null) => void,
   setIsReviewValidationVisible: (isReviewValidationVisible : boolean) => void,
   fetchMiningSites: () => Promise<void>,
   setReviewValidationSearchValue: (searchValue : string) => void
@@ -112,6 +117,8 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
   forestReserves: null,
   rivers: null,
   miningSites: null,
+  concessions: null,
+  filteredConcessions: null,
   filteredMiningSites: null,
   filteredDistricts: null,
   months: getLastTwelveMonths(),
@@ -120,12 +127,14 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
   isLoading: false,
   error: null,
   selectedDistricts: [],
+  selectedCompanies: [],
   highlightedDistricts: [],
   dateRange: null,
   boundsFeature: undefined,
   comparisonViewState: "slider",
   isReviewValidationVisible: false,
   reviewValidationSearchValue: "",
+  selectedMiningSite: null,
 
   // Proximity
   minProximityToRiver: 0,
@@ -135,11 +144,13 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
 
   // Actions
   setSelectedDistricts: (districts) => set({ selectedDistricts: districts }),
+  setSelectedCompanies: (companies) => set({ selectedCompanies: companies }),
   setHighlightedDistricts: (districts) => set({ highlightedDistricts: districts }),
   setDateRange: (range) => set({ dateRange: range }),
   setMonths: (months : Array<{ monthIndex: number; year: number }>) => set({ months: months }),
   setBounds: (boundsFeature: any) => set({ boundsFeature }),
   setComparisonViewState: (viewState : "slider" | "side-by-side") => set({ comparisonViewState: viewState }),
+  setSelectedMiningSite: (selectedMiningSite : SpatialData["features"][number] | null) => set({ selectedMiningSite }),
   setIsReviewValidationVisible: (isReviewValidationVisible : boolean) => set({ isReviewValidationVisible }),
   setReviewValidationSearchValue: (searchValue : string) => set({ reviewValidationSearchValue: searchValue }),
   setProximityFilters: (options) => set({ 
@@ -149,7 +160,7 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
     maxProximityToForestReserve: options.maxProximityToForestReserve ?? get().maxProximityToForestReserve,
    }),
   applyFilters: (options = {}) => {
-    const { miningSites, districts, selectedDistricts, dateRange } = get();
+    const { miningSites, districts, selectedDistricts, dateRange, concessions, selectedCompanies } = get();
     if (!miningSites || !districts) return;
 
     const { year, playhead, range } = options;
@@ -238,8 +249,17 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
         selectedDistricts.includes(feature.properties.district)
       )
     };
-    console.log({filteredMiningSites})
-    set({ filteredMiningSites, filteredDistricts });
+    
+    const filteredConcessions = {
+      ...concessions,
+      features: concessions.features.filter(feature =>
+        selectedCompanies.length === 0 ||
+        selectedCompanies.includes(feature.properties.owner)
+      )
+    };
+    
+    console.log({filteredConcessions})
+    set({ filteredMiningSites, filteredDistricts, filteredConcessions });
   },
   fetchReports: async () => {
     try {
@@ -276,11 +296,12 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       // Fetch all data in parallel
-      const [districts, forestReserves, rivers, miningSites] = await Promise.allSettled([
+      const [districts, forestReserves, rivers, miningSites, concessions] = await Promise.allSettled([
         apiClient.spatial.districts(),
         apiClient.spatial.forestReserves(),
         apiClient.spatial.rivers(),
         apiClient.spatial.miningSites(),
+        apiClient.spatial.concessions(),
       ])
 
       set({
@@ -288,9 +309,11 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
         forestReserves: forestReserves.status === "fulfilled" ? forestReserves.value : null,
         rivers: rivers.status === "fulfilled" ? rivers.value : null,
         miningSites: miningSites.status === "fulfilled" ? miningSites.value : null,
+        concessions: concessions.status === "fulfilled" ? concessions.value : null,
         reportsLastUpdated: Date.now(),
         filteredMiningSites: miningSites.status === "fulfilled" ? miningSites.value : null,
         filteredDistricts: districts.status === "fulfilled" ? districts.value : null,
+        filteredConcessions: concessions.status === "fulfilled" ? concessions.value : null,
         isLoading: false,
         error: null
       });
