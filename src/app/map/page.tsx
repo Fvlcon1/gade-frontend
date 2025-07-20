@@ -12,9 +12,9 @@ import TimelineController from "../../components/Controllers/timeline-controller
 import { initialLayers } from "../../components/Controllers/LayersControl";
 import { useSpatialStore } from "@/lib/store/spatial-store";
 import { useAuthStore } from "@/lib/store/auth-store";
-import ReviewValidation from "./components/review-validation/review-validation";
-import ZoomControls from "./components/review-validation/components/zoom-controls";
-import RightNav from "./components/review-validation/components/right-nav";
+import ReviewValidation from "./components/right-nav/review-validation/review-validation";
+import ZoomControls from "./components/right-nav/review-validation/components/zoom-controls";
+import RightNav from "./components/right-nav/right-nav";
 import { useTheme } from "@styles/theme-context";
 import RightView from "./components/right-view/right-view";
 

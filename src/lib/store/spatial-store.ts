@@ -5,7 +5,6 @@ import L from 'leaflet';
 import { ComparisonView } from '@components/Controllers/timeline-controller/utils/types';
 
 // SpatialData type
-
 export interface SpatialDataProperties {
   assets?: string;
   category?: string;
@@ -54,6 +53,8 @@ interface Report {
   updated_at: string;
 }
 
+export type RightNav = "Review and Validation" | "Priority index Heatmap"
+
 interface SpatialState {
   // Spatial data
   districts: SpatialData | null;
@@ -68,6 +69,8 @@ interface SpatialState {
   boundsFeature: SpatialData["features"][number] | null;
   reviewValidationSearchValue: string
   selectedMiningSite: SpatialData["features"][number] | null;
+  activeRightNav: RightNav | null
+  isPriorityIndexVisible : boolean
 
   //View states
   comparisonViewState: ComparisonView
@@ -108,9 +111,11 @@ interface SpatialState {
   setComparisonViewState: (viewState: ComparisonView) => void,
   setSelectedMiningSite: (selectedMiningSite: SpatialData["features"][number] | null) => void,
   setIsReviewValidationVisible: (isReviewValidationVisible: boolean) => void,
+  setActiveRightNav: (activeRightNav: RightNav | null) => void,
   fetchMiningSites: () => Promise<void>,
   setHeatmapData: (heatmapData: SpatialData) => void,
   setReviewValidationSearchValue: (searchValue: string) => void
+  setIsPriorityIndexVisible: (value : boolean) => void
 }
 
 export const useSpatialStore = create<SpatialState>((set, get) => ({
@@ -138,6 +143,8 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
   isReviewValidationVisible: false,
   reviewValidationSearchValue: "",
   selectedMiningSite: null,
+  activeRightNav: null,
+  isPriorityIndexVisible : false,
 
   // Proximity
   minProximityToRiver: 0,
@@ -156,6 +163,8 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
   setSelectedMiningSite: (selectedMiningSite: SpatialData["features"][number] | null) => set({ selectedMiningSite }),
   setIsReviewValidationVisible: (isReviewValidationVisible: boolean) => set({ isReviewValidationVisible }),
   setReviewValidationSearchValue: (searchValue: string) => set({ reviewValidationSearchValue: searchValue }),
+  setActiveRightNav: (activeRightNav: RightNav | null) => set({ activeRightNav }),
+  setIsPriorityIndexVisible : (value : boolean) => set({ isPriorityIndexVisible : value }),
   setHeatmapData: (heatmapData: SpatialData) => set({ heatmapData }),
   setProximityFilters: (options) => set({
     minProximityToRiver: options.minProximityToRiver ?? get().minProximityToRiver,

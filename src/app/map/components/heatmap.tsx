@@ -4,22 +4,27 @@ import { useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet.heat/dist/leaflet-heat.js';
-import { addressPoints } from '@/app/test2/addressPoints';
 import { useSpatialStore } from '@/lib/store/spatial-store';
+import { utmToLatLng } from '@/utils/utm';
+import { FeatureCollection } from '@/types/heatmap';
 
 const Heatmap = () => {
 	const map = useMap();
-	const {heatmapData} = useSpatialStore();
+	const { heatmapData, isPriorityIndexVisible } = useSpatialStore();
 
 	useEffect(() => {
 		if (!map || !heatmapData) return;
+		console.log({ heatmapData });
 
-		const points: [number, number][] = heatmapData?.features.map(({geometry}) => [
-			Number(geometry.coordinates[0]),
-			Number(geometry.coordinates[1]),
-		]) || [];
+		const points: [number, number, number][] = (heatmapData as FeatureCollection)?.features.map(({ geometry, properties }) => {
+			const [lon, lat] = geometry.coordinates;
+			return [
+				lat,
+				lon,
+				properties.weight || 1
+			];
+		}) || [];
 
-		// Initialize the heat layer
 		const heat = L.heatLayer(points, {
 			radius: 25,
 			blur: 15,
@@ -28,12 +33,13 @@ const Heatmap = () => {
 			max: 1.0
 		});
 
+		if (!isPriorityIndexVisible) return;
 		heat.addTo(map);
 
 		return () => {
 			map.removeLayer(heat);
 		};
-	}, [map, heatmapData]);
+	}, [map, heatmapData, isPriorityIndexVisible]);
 
 	return null;
 };

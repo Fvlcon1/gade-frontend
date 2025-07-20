@@ -1,4 +1,4 @@
-import { ReviewContextProvider } from "./components/review-validation/context/review-context"
+import { ReviewContextProvider } from "./components/right-nav/review-validation/context/review-context"
 
 const MapLayout = ({ children }: { children: React.ReactNode }) => {
     return (

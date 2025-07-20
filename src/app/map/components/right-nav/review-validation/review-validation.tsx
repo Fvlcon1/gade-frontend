@@ -16,7 +16,7 @@ import { useSpatialStore } from "@/lib/store/spatial-store"
 const ReviewValidation = () => {
     const [updateCard, setUpdateCard] = useState<SpatialData["features"][number] | null>(null)
     const panelRef = useRef<HTMLDivElement>(null)
-    const { isReviewValidationVisible } = useSpatialStore()
+    const { activeRightNav } = useSpatialStore()
     return (
         <>
             <UpdateStatusModal
@@ -28,7 +28,7 @@ const ReviewValidation = () => {
 
             <AnimatePresence>
                 {
-                    isReviewValidationVisible ? (
+                    activeRightNav === "Review and Validation" ? (
                         <SlideIn
                             className=""
                             direction="right"
