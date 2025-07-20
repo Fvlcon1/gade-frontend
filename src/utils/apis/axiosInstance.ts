@@ -1,29 +1,102 @@
-import { toast } from "@components/ui/toast";
-import axios from "axios";
+import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
+import Cookies from "universal-cookie";
+
+const cookies = new Cookies();
 const baseURL = process.env.NEXT_PUBLIC_API_URL;
 
-// Create an Axios instance
 const axiosInstance = axios.create({
-    baseURL
+    baseURL,
+    withCredentials: true
 });
 
-// Axios Interceptor: Handles Unauthorized Errors (401)
-export const setupInterceptors = (logout: () => void) => {
-    console.log("interceptor")
+let isRefreshing = false;
+let failedQueue: Array<{ resolve: (value: any) => void; reject: (error: any) => void }> = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+    failedQueue.forEach(prom => {
+        if (error) {
+            prom.reject(error);
+        } else {
+            prom.resolve(token);
+        }
+    });
+    failedQueue = [];
+};
+
+const refreshAccessToken = async (): Promise<string | null> => {
+    try {
+        const response = await axios.post(`${baseURL}/auth/renew`, {
+            refresh_token: cookies.get("refreshToken")
+        }, {
+            withCredentials: true
+        });
+        const { access_token } = response.data;
+        cookies.set("accessToken", access_token, { path: '/' });
+        return access_token;
+    } catch (error) {
+        return null;
+    }
+};
+
+axiosInstance.interceptors.request.use(
+    (config: InternalAxiosRequestConfig) => {
+        const token = cookies.get("accessToken");
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
+export const setupInterceptors = (logout: (callApi?: boolean) => void) => {
     axiosInstance.interceptors.response.use(
         (response) => response,
-        (error) => {
-            if (error.response?.status === 401) {
-                console.log("instance")
-                toast.error({
-                    description: "Please login to continue"
-                })
-                logout();
-                return null
-            }
+        async (error: AxiosError) => {
+            const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
             
-            // 🔹 Allow other errors to be handled by the calling function
-            return Promise.reject(error);
+            if (error.response?.status !== 401 || !originalRequest || originalRequest._retry) {
+                logout(false);
+                return Promise.reject(error);
+            }
+            if (isRefreshing) {
+                return new Promise((resolve, reject) => {
+                    failedQueue.push({ resolve, reject });
+                })
+                .then((token) => {
+                    if (originalRequest.headers) {
+                        originalRequest.headers.Authorization = `Bearer ${token}`;
+                    }
+                    return axiosInstance(originalRequest);
+                })
+                .catch(err => {
+                    return Promise.reject(err);
+                });
+            }
+
+            originalRequest._retry = true;
+            isRefreshing = true;
+
+            try {
+                const newToken = await refreshAccessToken();
+                if (newToken) {
+                    processQueue(null, newToken);
+                    if (originalRequest.headers) {
+                        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+                    }
+                    return axiosInstance(originalRequest);
+                } else {
+                    throw new Error('Failed to refresh token');
+                }
+            } catch (refreshError) {
+                processQueue(refreshError, null);
+                logout(false);
+                return Promise.reject(refreshError);
+            } finally {
+                isRefreshing = false;
+            }
         }
     );
 };

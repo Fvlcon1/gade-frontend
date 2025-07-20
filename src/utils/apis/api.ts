@@ -1,25 +1,10 @@
-import axios, { GenericAbortSignal } from "axios";
-import Cookies from "universal-cookie";
+import { GenericAbortSignal } from "axios";
 import axiosInstance from "./axiosInstance";
 
-const cookies = new Cookies();
-const baseURL = process.env.NEXT_PUBLIC_API_URL;
-
-const getToken = () => {
-    return cookies.get("access_token");
-};
-
-const getHeaders = () => {
-    return {
-        Authorization: `Bearer ${getToken()}`
-    };
-};
-
 export const protectedApi = {
-    GET: async (url: string, params?: any, signal? : GenericAbortSignal) => {
+    GET: async (url: string, params?: any, signal?: GenericAbortSignal) => {
         try {
-            const headers = getHeaders();
-            const response = await axiosInstance.get(url, { headers, params, signal });
+            const response = await axiosInstance.get(url, { params, signal });
             return response.data;
         } catch (error) {
             throw error;
@@ -27,8 +12,7 @@ export const protectedApi = {
     },
     POST: async (url: string, body?: any) => {
         try {
-            const headers = getHeaders();
-            const response = await axiosInstance.post(url, body, { headers });
+            const response = await axiosInstance.post(url, body);
             return response.data;
         } catch (error) {
             throw error;
@@ -36,8 +20,7 @@ export const protectedApi = {
     },
     PATCH: async (url: string, body?: any) => {
         try {
-            const headers = getHeaders();
-            const response = await axiosInstance.patch(url, body, { headers });
+            const response = await axiosInstance.patch(url, body);
             return response.data;
         } catch (error) {
             throw error;
@@ -45,8 +28,7 @@ export const protectedApi = {
     },
     DELETE: async (url: string) => {
         try {
-            const headers = getHeaders();
-            const response = await axiosInstance.delete(url, { headers });
+            const response = await axiosInstance.delete(url);
             return response.data;
         } catch (error) {
             throw error;
@@ -54,8 +36,7 @@ export const protectedApi = {
     },
     PUT: async (url: string, body?: any) => {
         try {
-            const headers = getHeaders();
-            const response = await axiosInstance.put(url, body, { headers });
+            const response = await axiosInstance.put(url, body);
             return response.data;
         } catch (error) {
             throw error;
