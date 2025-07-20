@@ -2,7 +2,8 @@ import MapWithMeasurements from "../map/components/right-view/components/geaman-
 
 const Test = () => {
     return (
-        <MapWithMeasurements />
+        // <MapWithMeasurements />
+        <></>
     )
 }
 export default Test
