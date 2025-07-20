@@ -1,8 +1,6 @@
 import Container from "@components/ui/container/container"
 import { AnimatePresence } from "framer-motion"
 import Overlay from "@components/ui/overlay/overlay"
-import theme from "@styles/theme"
-import Text from "@styles/components/text"
 import { RiUserAddLine } from "react-icons/ri"
 import Form from "./form"
 import Header from "@components/header/header"

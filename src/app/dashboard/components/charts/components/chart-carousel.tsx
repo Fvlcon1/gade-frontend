@@ -8,9 +8,9 @@ import ReportsLineChart from "./reports-line-chart/reports-line-chart";
 
 const ChartCarousel = () => {
     const charts = [
-        { id: 1, component: <LineChart />, label: "Area over time" },
-        { id: 2, component: <ReportsLineChart />, label: "Reports over time" },
-        { id: 3, component: <BarChart />, label: "Districts by area" },
+        { id: 1, component: <LineChart />, label: "Total Detected Area per Month" },
+        { id: 2, component: <ReportsLineChart />, label: "Citizens Report Trend" },
+        { id: 3, component: <BarChart />, label: "Total Affected Land Area per District" },
     ];
 
     const [[currentIndex, direction], setCurrentIndex] = useState([0, 0]);

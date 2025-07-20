@@ -1,20 +1,17 @@
 import FormInput from "@components/ui/form input/formInput"
 import Button from "@components/ui/button/button"
 import Dropdown from "@components/ui/dropdown/dropdown"
-import theme from "@styles/theme"
 import { useFormik } from "formik"
 import { MdEmail } from "react-icons/md"
 import { RiUserAddLine } from "react-icons/ri"
 import * as Yup from 'yup'
-import { useState } from "react"
 import { DropdownItem } from "@/utils/@types"
-import { useRef } from "react"
 import { BiChevronDown } from "react-icons/bi"
 import useEditUser from "./hooks/useEditUser"
 import OutlineButton from "@components/ui/button/outlineButton"
-import { IoSend } from "react-icons/io5"
 import { IUserInfo } from "../../utils/types"
 import { departmentList } from "@/utils/constants"
+import { useTheme } from "@styles/theme-context"
 
 const Form = ({
     close,
@@ -24,6 +21,7 @@ const Form = ({
     user: IUserInfo
 }) => {
     const { formik, isEditPending } = useEditUser({ close, user })
+    const {theme} = useTheme()
 
     const dropdownItems: DropdownItem[] = [
         { key: "1", label: "Admin", onClick: () => { formik.setFieldValue("role", "ADMIN") }, isSelected: formik.values.role === "ADMIN" },

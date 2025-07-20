@@ -3,12 +3,12 @@
 import { useReactTable } from "@tanstack/react-table";
 import { flexRender, getCoreRowModel, getSortedRowModel } from "@tanstack/react-table";
 import Text from "@styles/components/text"
-import theme from "@styles/theme"
 import useUAMColumns from "../hooks/useColumns";
 import NoData from "@components/ui/NoData/noData";
 import { useEffect, useState, useRef } from "react";
 import { useAccountsContext } from "../context/context";
 import TableSkeleton from "@components/ui/loaders/table-skeleton";
+import { useTheme } from "@styles/theme-context";
 
 const Table = () => {
     const { columns } = useUAMColumns();
@@ -16,6 +16,7 @@ const Table = () => {
     const tableContainerRef = useRef<HTMLDivElement>(null);
     const [containerHeight, setContainerHeight] = useState(500);
     const {accountsData, accountsLoading, accountsIsFetching} = useAccountsContext()
+    const {theme} = useTheme()
 
     useEffect(() => {
         if (typeof window !== "undefined") {

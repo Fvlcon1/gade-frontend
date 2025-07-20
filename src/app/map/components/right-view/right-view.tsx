@@ -1,5 +1,5 @@
 import ReviewValidation from "../review-validation/review-validation"
-import MiningSiteAttribute from "./mining-site-attribute"
+import MiningSiteAttribute from "./components/mining-site-attribute"
 
 const RightView = () => {
     return (

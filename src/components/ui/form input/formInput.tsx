@@ -1,7 +1,7 @@
 import Input from "@components/ui/input/input"
 import Text from "@styles/components/text"
-import theme from "@styles/theme"
 import { ChangeEvent, DetailedHTMLProps, FocusEventHandler, HTMLInputAutoCompleteAttribute, InputHTMLAttributes, ReactNode } from "react"
+import { useTheme } from "@styles/theme-context"
 
 const FormInput = ({
     value,
@@ -36,6 +36,8 @@ const FormInput = ({
     inputProps? : DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>
     disabled? : boolean
 }) => {
+    const {theme} = useTheme()
+
     return (
         <div className="flex flex-col gap-[6px] w-full h-fit">
             <Text
@@ -65,7 +67,7 @@ const FormInput = ({
             {
                 error && touched && (
                     <Text
-                        textColor='#d44848'
+                        textColor={theme.colors.text.danger}
                     >
                         {error}
                     </Text>

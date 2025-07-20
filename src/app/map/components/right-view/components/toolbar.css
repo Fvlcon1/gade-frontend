@@ -1,0 +1,29 @@
+.leaflet-bottom.leaflet-right {
+    margin-bottom: 240px !important;
+    margin-right: 6px !important;
+}
+
+.leaflet-control-attribution.leaflet-control {
+    position: fixed !important;
+    bottom: 0 !important;
+    right: 0 !important;
+}
+
+.button-container {
+    border-radius: 5px !important;
+    border: none;
+}
+
+.leaflet-buttons-control-button {
+    border-radius: 5px !important;
+    background-color: var(--color-bg-secondary) !important;
+    border: none !important;
+    margin-bottom: 3px;
+    padding: 10px !important;
+    width: 40px !important;
+    height: 40px !important;
+}
+
+.leaflet-touch .leaflet-control-layers, .leaflet-touch .leaflet-bar {
+    border: none !important;
+}

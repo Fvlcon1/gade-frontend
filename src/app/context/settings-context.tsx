@@ -10,6 +10,7 @@ const SettingsContext = createContext<{
     setSettings: Dispatch<SetStateAction<UpdateSettingsPayload>>;
     saveSettings: (newSettings: UpdateSettingsPayload) => void;
     storeSettings: (settings: UpdateSettingsPayload) => void;
+    refetchSettings: () => void;
     settingsLoading: boolean;
     settingsError: Error;
     updateSettingsLoading: boolean;
@@ -20,6 +21,7 @@ const SettingsContext = createContext<{
     setSettings: () => {},
     saveSettings: () => {},
     storeSettings: () => {},
+    refetchSettings: () => {},
     settingsLoading: false,
     settingsError: null,
     updateSettingsLoading: false,

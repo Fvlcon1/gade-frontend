@@ -6,7 +6,7 @@ import { useTheme } from "@styles/theme-context"
 import { useState, useEffect, useRef } from "react"
 import Input from "@components/ui/input/input"
 import Button from "@components/ui/button/button"
-import { useRouter, redirect } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useAuthStore } from "@/lib/store/auth-store"
 import useMfa from "./use-mfa"
 import { ImSpinner10 } from "react-icons/im"
@@ -24,7 +24,13 @@ const MfaForm = () => {
     const {pendingLogin} = useAuthStore()
     const {verifyOtpMutation, verifyOtpLoading, verifyOtpError, resendOtpMutation, resendOtpLoading, resendOtpError} = useMfa()
 
-    if(!pendingLogin) redirect("/login")
+    // Handle redirect after hooks are called
+    useEffect(() => {
+        console.log({pendingLogin})
+        if (!pendingLogin?.email) {
+            router.replace("/login")
+        }
+    }, [pendingLogin, router])
 
     useEffect(() => {
         setIsMounted(true)

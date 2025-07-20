@@ -28,9 +28,9 @@ const useMfa = () => {
             cookies.set("refresh_token", data.refresh_token)
 
             setUser(data.user);
-            setPendingLogin(null);
-
+            
             router.push("/dashboard")
+            // setPendingLogin(null);
         },
         onError: (error: any) => {
             toast.error(error.response.data.message)

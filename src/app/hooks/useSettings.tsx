@@ -4,12 +4,14 @@ import { transformKeysToCamelCase } from "@/utils/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { UpdateSettingsPayload } from "../../components/Layout/LeftPanel/utils/types";
+import { useAuthStore } from "@/lib/store/auth-store";
 
 const isEqual = (a: any, b: any) => JSON.stringify(a) === JSON.stringify(b);
 
 const useSettings = () => {
     const queryClient = useQueryClient();
     const [localSettings, setLocalSettings] = useState<UpdateSettingsPayload | null>(null);
+    const {setUser, user} = useAuthStore()
 
     const resetPreferences = async () => {
         const response = await protectedApi.POST("/settings/preferences/reset");
@@ -33,6 +35,9 @@ const useSettings = () => {
     const getSettings = async () => {
         const response = await protectedApi.GET("/settings/profile");
         const settings = transformKeysToCamelCase(response.preferences);
+        const profile = transformKeysToCamelCase(response.profile);
+        console.log({profile})
+        setUser({user, ...response.profile});
         storeSettings(settings);
         return settings;
     };
@@ -41,6 +46,7 @@ const useSettings = () => {
         data: settings,
         isLoading: settingsLoading,
         error: settingsError,
+        refetch: refetchSettings
     } = useQuery({
         queryKey: ["settings"],
         queryFn: getSettings,
@@ -92,6 +98,7 @@ const useSettings = () => {
         updateSettingsLoading,
         resetPreferencesMutation,
         resetPreferencesLoading,
+        refetchSettings
     };
 
 };

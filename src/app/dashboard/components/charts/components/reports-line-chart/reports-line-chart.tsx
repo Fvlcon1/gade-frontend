@@ -28,7 +28,7 @@ const ReportsLineChart = () => {
                             size={theme.text.size.HM}
                             className="!pl-[200px]"
                         >
-                            Reports Over Time
+                            Citizens Report Trend
                         </Text>
                     </div>
 

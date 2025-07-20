@@ -22,8 +22,11 @@ import { getLastTwelveMonths } from "@/utils/date-utils";
 import SideBySide from "./side-by-side";
 import useGeoLocation from "@/hooks/use-geolocation";
 import UserLocationMarker from "./user-location-marker";
+import { GeomanControls } from "@/app/map/components/right-view/components/geaman-controls";
+import Toolbar from "@/app/map/components/right-view/components/toolbar";
+import Heatmap from "@/app/map/components/heatmap";
 
-const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 'timeline' | 'comparison' | null }> = ({ activeBasemap, activeFeatureLayers, playhead, timelineMode }) => {
+const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 'timeline' | 'comparison' | null }> = ({ activeFeatureLayers, playhead, timelineMode }) => {
   const {
     filteredMiningSites,
     filteredConcessions,
@@ -547,6 +550,8 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
           />
           {timelineMode === 'timeline' && <TimelineTiles playhead={playhead} months={months} />}
           {location && <UserLocationMarker position={location as any} />}
+          <Toolbar />
+          {/* <Heatmap /> */}
           <MapLayers activeBasemap={currentBasemap} activeFeatureLayers={activeFeatureLayers} playhead={playhead} timelineMode={timelineMode} />
           <ReportZoomHandler reports={reports} searchParams={searchParams} />
           <MouseCoordinateDisplay />

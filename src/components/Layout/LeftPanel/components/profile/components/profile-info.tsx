@@ -27,7 +27,7 @@ const ProfileInfo = () => {
                                 bold={theme.text.bold.md2}
                                 textColor={theme.colors.main.primary}
                             >
-                                {`${user?.first_name.charAt(0).toUpperCase()}${user?.last_name.charAt(0).toUpperCase()}`}
+                                {`${user?.first_name?.charAt(0)?.toUpperCase()}${user?.last_name?.charAt(0)?.toUpperCase()}`}
                             </Text>
                         </div>
                         <div className="flex flex-col mt-3 gap-1">

@@ -29,7 +29,7 @@ const LineChart = () => {
                             size={theme.text.size.HM}
                             className="!pl-[200px]"
                         >
-                            Area Over Time
+                            Total Detected Area per Month
                         </Text>
                     </div>
 

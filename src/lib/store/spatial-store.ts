@@ -16,17 +16,17 @@ export interface SpatialDataProperties {
   status?: string;
   type?: string;
   detected_date?: string;
-  id? : string
-  area? : number
-  severity? : string
-  severity_type? : string
-  severity_score? : number
-  proximity_to_water? : boolean
-  inside_forest_reserve? : boolean
-  detection_date? : string
-  all_violation_types? : string
-  distance_to_water_m? : number
-  distance_to_forest_m? : number
+  id?: string
+  area?: number
+  severity?: string
+  severity_type?: string
+  severity_score?: number
+  proximity_to_water?: boolean
+  inside_forest_reserve?: boolean
+  detection_date?: string
+  all_violation_types?: string
+  distance_to_water_m?: number
+  distance_to_forest_m?: number
 }
 export interface SpatialData {
   type: 'FeatureCollection';
@@ -63,14 +63,15 @@ interface SpatialState {
   concessions: SpatialData | null;
   filteredConcessions: SpatialData | null;
   filteredMiningSites: SpatialData | null;
+  heatmapData: SpatialData | null;
   filteredDistricts: SpatialData | null;
   boundsFeature: SpatialData["features"][number] | null;
-  reviewValidationSearchValue : string
-  selectedMiningSite : SpatialData["features"][number] | null;
+  reviewValidationSearchValue: string
+  selectedMiningSite: SpatialData["features"][number] | null;
 
   //View states
-  comparisonViewState : ComparisonView
-  isReviewValidationVisible : boolean
+  comparisonViewState: ComparisonView
+  isReviewValidationVisible: boolean
 
   //Filter
   months: Array<{ monthIndex: number; year: number }>;
@@ -102,13 +103,14 @@ interface SpatialState {
   setProximityFilters: (options: { minProximityToRiver?: number; maxProximityToRiver?: number; minProximityToForestReserve?: number; maxProximityToForestReserve?: number; }) => void;
   fetchAllData: () => Promise<void>;
   fetchReports: () => Promise<void>;
-  setMonths: (months : Array<{ monthIndex: number; year: number }>) => void;
+  setMonths: (months: Array<{ monthIndex: number; year: number }>) => void;
   setBounds: (boundsFeature: SpatialData["features"][number] | null) => void,
-  setComparisonViewState: (viewState : ComparisonView) => void,
-  setSelectedMiningSite: (selectedMiningSite : SpatialData["features"][number] | null) => void,
-  setIsReviewValidationVisible: (isReviewValidationVisible : boolean) => void,
+  setComparisonViewState: (viewState: ComparisonView) => void,
+  setSelectedMiningSite: (selectedMiningSite: SpatialData["features"][number] | null) => void,
+  setIsReviewValidationVisible: (isReviewValidationVisible: boolean) => void,
   fetchMiningSites: () => Promise<void>,
-  setReviewValidationSearchValue: (searchValue : string) => void
+  setHeatmapData: (heatmapData: SpatialData) => void,
+  setReviewValidationSearchValue: (searchValue: string) => void
 }
 
 export const useSpatialStore = create<SpatialState>((set, get) => ({
@@ -120,6 +122,7 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
   concessions: null,
   filteredConcessions: null,
   filteredMiningSites: null,
+  heatmapData: null,
   filteredDistricts: null,
   months: getLastTwelveMonths(),
   reports: null,
@@ -147,18 +150,19 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
   setSelectedCompanies: (companies) => set({ selectedCompanies: companies }),
   setHighlightedDistricts: (districts) => set({ highlightedDistricts: districts }),
   setDateRange: (range) => set({ dateRange: range }),
-  setMonths: (months : Array<{ monthIndex: number; year: number }>) => set({ months: months }),
+  setMonths: (months: Array<{ monthIndex: number; year: number }>) => set({ months: months }),
   setBounds: (boundsFeature: any) => set({ boundsFeature }),
-  setComparisonViewState: (viewState : "slider" | "side-by-side") => set({ comparisonViewState: viewState }),
-  setSelectedMiningSite: (selectedMiningSite : SpatialData["features"][number] | null) => set({ selectedMiningSite }),
-  setIsReviewValidationVisible: (isReviewValidationVisible : boolean) => set({ isReviewValidationVisible }),
-  setReviewValidationSearchValue: (searchValue : string) => set({ reviewValidationSearchValue: searchValue }),
-  setProximityFilters: (options) => set({ 
+  setComparisonViewState: (viewState: "slider" | "side-by-side") => set({ comparisonViewState: viewState }),
+  setSelectedMiningSite: (selectedMiningSite: SpatialData["features"][number] | null) => set({ selectedMiningSite }),
+  setIsReviewValidationVisible: (isReviewValidationVisible: boolean) => set({ isReviewValidationVisible }),
+  setReviewValidationSearchValue: (searchValue: string) => set({ reviewValidationSearchValue: searchValue }),
+  setHeatmapData: (heatmapData: SpatialData) => set({ heatmapData }),
+  setProximityFilters: (options) => set({
     minProximityToRiver: options.minProximityToRiver ?? get().minProximityToRiver,
     maxProximityToRiver: options.maxProximityToRiver ?? get().maxProximityToRiver,
     minProximityToForestReserve: options.minProximityToForestReserve ?? get().minProximityToForestReserve,
     maxProximityToForestReserve: options.maxProximityToForestReserve ?? get().maxProximityToForestReserve,
-   }),
+  }),
   applyFilters: (options = {}) => {
     const { miningSites, districts, selectedDistricts, dateRange, concessions, selectedCompanies } = get();
     if (!miningSites || !districts) return;
@@ -198,7 +202,7 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
       })
     };
 
-    const filteredMiningSitesBySearch = () : SpatialData => {
+    const filteredMiningSitesBySearch = (): SpatialData => {
       const result = {
         ...filteredMiningSites,
         features: filteredMiningSites.features.filter(feature => {
@@ -206,11 +210,11 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
           return id.toLowerCase() === get().reviewValidationSearchValue.toLowerCase();
         })
       }
-      console.log({result})
+      console.log({ result })
       return result
     }
 
-    const filterByProximityToRivers = () : SpatialData => {
+    const filterByProximityToRivers = (): SpatialData => {
       return {
         ...filteredMiningSites,
         features: filteredMiningSites.features.filter(feature => {
@@ -220,7 +224,7 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
       }
     }
 
-    const filterByProximityToForestReserves = () : SpatialData => {
+    const filterByProximityToForestReserves = (): SpatialData => {
       return {
         ...filteredMiningSites,
         features: filteredMiningSites.features.filter(feature => {
@@ -233,7 +237,7 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
     //Filter by proximity to river
     if (get().maxProximityToRiver)
       filteredMiningSites = filterByProximityToRivers()
-    
+
     //Filter by proximity to forest reserve
     if (get().maxProximityToForestReserve)
       filteredMiningSites = filterByProximityToForestReserves()
@@ -249,7 +253,7 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
         selectedDistricts.includes(feature.properties.district)
       )
     };
-    
+
     const filteredConcessions = {
       ...concessions,
       features: concessions.features.filter(feature =>
@@ -257,8 +261,8 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
         selectedCompanies.includes(feature.properties.owner)
       )
     };
-    
-    console.log({filteredConcessions})
+
+    console.log({ filteredConcessions })
     set({ filteredMiningSites, filteredDistricts, filteredConcessions });
   },
   fetchReports: async () => {
@@ -296,12 +300,13 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       // Fetch all data in parallel
-      const [districts, forestReserves, rivers, miningSites, concessions] = await Promise.allSettled([
+      const [districts, forestReserves, rivers, miningSites, concessions, heatmapData] = await Promise.allSettled([
         apiClient.spatial.districts(),
         apiClient.spatial.forestReserves(),
         apiClient.spatial.rivers(),
         apiClient.spatial.miningSites(),
         apiClient.spatial.concessions(),
+        apiClient.spatial.heatmapData(),
       ])
 
       set({
@@ -310,6 +315,7 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
         rivers: rivers.status === "fulfilled" ? rivers.value : null,
         miningSites: miningSites.status === "fulfilled" ? miningSites.value : null,
         concessions: concessions.status === "fulfilled" ? concessions.value : null,
+        heatmapData: heatmapData.status === "fulfilled" ? heatmapData.value : null,
         reportsLastUpdated: Date.now(),
         filteredMiningSites: miningSites.status === "fulfilled" ? miningSites.value : null,
         filteredDistricts: districts.status === "fulfilled" ? districts.value : null,

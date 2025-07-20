@@ -1,7 +1,6 @@
 import Input from "@components/ui/input/input";
 import { useState } from "react";
 import { IoReloadOutline, IoSearch } from "react-icons/io5";
-import theme from "@styles/theme";
 import Dropdown from "@components/ui/dropdown/dropdown";
 import { DropdownItem } from "@/utils/@types";
 import { BiChevronDown } from "react-icons/bi";
@@ -13,6 +12,7 @@ import { RiUserAddFill } from "react-icons/ri";
 import Button from "@components/ui/button/button";
 import InviteModal from "../invite-modal/invite-modal";
 import { useAccountsContext } from "../../context/context";
+import { useTheme } from "@styles/theme-context";
 
 const Controls = () => {
     const [searchValue, setSearchValue] = useState('');
@@ -22,6 +22,7 @@ const Controls = () => {
     const [selectedRole, setSelectedRole] = useState('');
     const [isInviteVisible, setIsInviteVisible] = useState(false)
     const { refetchAccounts } = useAccountsContext()
+    const {theme} = useTheme()
 
     const handleStatusChange = (status: string) => {
         setStatusValue(status)

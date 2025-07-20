@@ -72,7 +72,7 @@ const Actions = ({
                             title="Reactivate user"
                         >
                             <div
-                                className="p-2 rounded-md bg-green-100 hover:bg-green-200"
+                                className="p-2 rounded-md bg-text-success/20 hover:bg-text-success/30"
                                 onClick={() => setIsReactivateVisible(true)}
                             >
                                 <FaUserCheck color={"green"} />
@@ -90,7 +90,7 @@ const Actions = ({
                                         title="Deactivate user"
                                     >
                                         <div
-                                            className="p-2 rounded-md bg-orange-100 hover:bg-orange-200"
+                                            className="p-2 rounded-md bg-text-danger/20 hover:bg-text-danger/30"
                                             onClick={() => setIsDeactivateVisible(true)}
                                         >
                                             <FaUserAltSlash color={"orange"} />
@@ -102,7 +102,7 @@ const Actions = ({
                                 title="Delete user"
                             >
                                 <div
-                                    className="p-2 rounded-md bg-red-100 hover:bg-red-200"
+                                    className="p-2 rounded-md bg-text-danger/20 hover:bg-text-danger/30"
                                     onClick={() => setIsVisible(true)}
                                 >
                                     <MdDelete

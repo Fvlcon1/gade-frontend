@@ -147,6 +147,19 @@ class ApiClient {
       this.request<any>('/data/rivers'),
     districtSearch: (searchTerm: string) =>
       this.request<any>(`/data/districts/search?name=${encodeURIComponent(searchTerm)}`),
+    heatmapData: () => {
+      // Calculate dates for the last 6 months
+      const end = new Date();
+      const start = new Date();
+      start.setFullYear(start.getFullYear() - 1);
+      end.setMonth(end.getMonth() - 1);
+      
+      const formatDate = (date: Date) => {
+        return date.toISOString().split('T')[0];
+      };
+
+      return this.request<any>(`/data/heatmap-data?start_date=${formatDate(start)}&end_date=${formatDate(end)}`);
+    },
   };
 
   reports = {

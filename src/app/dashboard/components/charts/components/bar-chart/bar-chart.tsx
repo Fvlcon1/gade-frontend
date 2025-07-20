@@ -23,7 +23,7 @@ const BarChart = () => {
                         bold={theme.text.bold.md}
                         size={theme.text.size.HM}
                     >
-                        Districts by area
+                        Total Affected Land Area per District
                     </Text>
                 </div>
 
