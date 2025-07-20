@@ -37,3 +37,8 @@
 
 // 	return <div id="map" style={{ height: "100vh" }}></div>;
 // }
+
+
+export default function Map() {
+	return <></>
+}
