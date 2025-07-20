@@ -2,26 +2,40 @@
 
 import { useEffect } from 'react';
 import { useMap } from 'react-leaflet';
-import * as L from 'leaflet';
+import L from 'leaflet';
 import 'leaflet.heat/dist/leaflet-heat.js';
 import { addressPoints } from '@/app/test2/addressPoints';
+import { useSpatialStore } from '@/lib/store/spatial-store';
 
 const Heatmap = () => {
-  const map = useMap();
+	const map = useMap();
+	const {heatmapData} = useSpatialStore();
 
-  useEffect(() => {
-    if (!map) return;
+	useEffect(() => {
+		if (!map || !heatmapData) return;
 
-    const points: [number, number][] = addressPoints.map((p) => [
-      Number(p[0]),
-      Number(p[1]),
-    ]);
+		const points: [number, number][] = heatmapData?.features.map(({geometry}) => [
+			Number(geometry.coordinates[0]),
+			Number(geometry.coordinates[1]),
+		]) || [];
 
-    // @ts-ignore — suppress TS if needed
-    L.heatLayer(points).addTo(map);
-  }, [map]);
+		// Initialize the heat layer
+		const heat = L.heatLayer(points, {
+			radius: 25,
+			blur: 15,
+			maxZoom: 18,
+			minOpacity: 0.2,
+			max: 1.0
+		});
 
-  return null;
+		heat.addTo(map);
+
+		return () => {
+			map.removeLayer(heat);
+		};
+	}, [map, heatmapData]);
+
+	return null;
 };
 
 export default Heatmap;

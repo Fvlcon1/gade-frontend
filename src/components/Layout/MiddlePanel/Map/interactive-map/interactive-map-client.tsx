@@ -551,7 +551,7 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
           {timelineMode === 'timeline' && <TimelineTiles playhead={playhead} months={months} />}
           {location && <UserLocationMarker position={location as any} />}
           <Toolbar />
-          {/* <Heatmap /> */}
+          <Heatmap />
           <MapLayers activeBasemap={currentBasemap} activeFeatureLayers={activeFeatureLayers} playhead={playhead} timelineMode={timelineMode} />
           <ReportZoomHandler reports={reports} searchParams={searchParams} />
           <MouseCoordinateDisplay />
