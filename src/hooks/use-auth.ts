@@ -5,6 +5,7 @@ import { useAuthStore } from '@/lib/store/auth-store';
 import { toast } from '@/components/ui/toast';
 import type { LoginCredentials, SetupAccountRequest } from '@/types/auth';
 import Cookies from "universal-cookie"
+import { setupInterceptors } from '@/utils/apis/axiosInstance';
 
 const cookies = new Cookies();
 

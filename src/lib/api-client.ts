@@ -15,6 +15,8 @@ import type {
   AccountRegistrationRequest
 } from '@/types/auth';
 
+import axiosInstance from '@/utils/apis/axiosInstance';
+
 class ApiError extends Error {
   constructor(public code: number, message: string) {
     super(message);
@@ -22,58 +24,43 @@ class ApiError extends Error {
   }
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
-
-async function handleResponse<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ error: 'An error occurred' }));
-    throw new ApiError(response.status, error.error || 'An error occurred');
-  }
-  return response.json();
-}
-
 class ApiClient {
-  private baseUrl: string;
-
-  constructor() {
-    this.baseUrl = API_BASE_URL;
-  }
-
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: {
+      method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+      data?: any;
+      params?: any;
+    } = {}
   ): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`;
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${cookies.get('access_token')}`,
-        ...options.headers,
-      },
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || 'An error occurred');
+    try {
+      const response = await axiosInstance.request<T>({
+        url: endpoint,
+        method: options.method || 'GET',
+        data: options.data,
+        params: options.params,
+      });
+      return response.data;
+    } catch (error: any) {
+      if (error.response) {
+        throw new ApiError(error.response.status, error.response.data?.message || error.message);
+      }
+      throw new ApiError(500, error.message || 'An error occurred');
     }
-
-    return await response.json();
   }
 
   auth = {
     login: (credentials: LoginCredentials) =>
       this.request<LoginResponse>('/auth/login', {
         method: 'POST',
-        body: JSON.stringify(credentials),
+        data: credentials,
       }),
 
     setup: (data: SetupAccountRequest) => {
       console.log('apiClient.auth.setup - sending data:', data);
       return this.request<SetupAccountResponse>('/accounts/setup', {
         method: 'POST',
-        body: JSON.stringify(data),
+        data: data,
       });
     },
 
@@ -85,20 +72,21 @@ class ApiClient {
     sendOTP: (data: OTPRequest) =>
       this.request<OTPResponse>('/auth/send-otp', {
         method: 'POST',
-        body: JSON.stringify(data),
+        data: data,
       }),
 
     verifyOTP: (data: OTPVerificationRequest) =>
       this.request<OTPVerificationResponse>('/auth/verify-otp', {
         method: 'POST',
-        body: JSON.stringify(data),
+        data: data,
       }),
   };
 
   accounts = {
     list: (params?: { pageId: number; pageSize: number }) =>
       this.request<User[]>(
-        `/accounts/?page_id=${params?.pageId || 1}&page_size=${params?.pageSize || 10}`
+        `/accounts/`,
+        { params: { page_id: params?.pageId || 1, page_size: params?.pageSize || 10 } }
       ),
 
     get: (id: string) =>
@@ -107,7 +95,7 @@ class ApiClient {
     register: (data: AccountRegistrationRequest) =>
       this.request<User>('/accounts/register', {
         method: 'POST',
-        body: JSON.stringify(data),
+        data: data,
       }),
 
     delete: (id: string) =>
@@ -118,19 +106,19 @@ class ApiClient {
     updateDepartment: (id: string, department: string) =>
       this.request<User>(`/accounts/${id}/department`, {
         method: 'PATCH',
-        body: JSON.stringify({ department }),
+        data: { department },
       }),
 
     updateRole: (id: string, role: 'ADMIN' | 'STANDARD') =>
       this.request<User>(`/accounts/${id}/role`, {
         method: 'PATCH',
-        body: JSON.stringify({ role }),
+        data: { role },
       }),
 
     updateStatus: (id: string, status: 'ACTIVE' | 'INACTIVE' | 'PENDING') =>
       this.request<User>(`/accounts/${id}/status`, {
         method: 'PATCH',
-        body: JSON.stringify({ status }),
+        data: { status },
       }),
   };
 
@@ -146,7 +134,9 @@ class ApiClient {
     rivers: () =>
       this.request<any>('/data/rivers'),
     districtSearch: (searchTerm: string) =>
-      this.request<any>(`/data/districts/search?name=${encodeURIComponent(searchTerm)}`),
+      this.request<any>(`/data/districts/search`, {
+        params: { name: searchTerm }
+      }),
     heatmapData: () => {
       // Calculate dates for the last 6 months
       const end = new Date();
@@ -158,15 +148,21 @@ class ApiClient {
         return date.toISOString().split('T')[0];
       };
 
-      return this.request<any>(`/data/heatmap-data?start_date=${formatDate(start)}&end_date=${formatDate(end)}`);
+      return this.request<any>(`/data/heatmap-data`, {
+        params: { start_date: formatDate(start), end_date: formatDate(end) }
+      });
     },
   };
 
   reports = {
     list: (page: number = 1, pageSize: number = 10) =>
-      this.request<any>(`/admin/report?page_id=${page}&page_size=${pageSize}`),
+      this.request<any>(`/admin/report`, {
+        params: { page_id: page, page_size: pageSize }
+      }),
     all: () =>
-      this.request<any>(`/admin/report?page_id=1&page_size=1000`),
+      this.request<any>(`/admin/report`, {
+        params: { page_id: 1, page_size: 1000 }
+      }),
   };
 }
 

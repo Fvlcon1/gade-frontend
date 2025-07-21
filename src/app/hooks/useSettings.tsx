@@ -5,13 +5,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { UpdateSettingsPayload } from "../../components/Layout/LeftPanel/utils/types";
 import { useAuthStore } from "@/lib/store/auth-store";
+import { setupInterceptors } from "@/utils/apis/axiosInstance";
 
 const isEqual = (a: any, b: any) => JSON.stringify(a) === JSON.stringify(b);
 
 const useSettings = () => {
     const queryClient = useQueryClient();
     const [localSettings, setLocalSettings] = useState<UpdateSettingsPayload | null>(null);
-    const {setUser, user} = useAuthStore()
+    const {setUser, user, logout} = useAuthStore()
 
     const resetPreferences = async () => {
         const response = await protectedApi.POST("/settings/preferences/reset");
@@ -31,6 +32,8 @@ const useSettings = () => {
             toast.error(error?.response?.data?.detail || "Failed to reset preferences");
         },
     });
+
+    setupInterceptors(logout);
 
     const getSettings = async () => {
         const response = await protectedApi.GET("/settings/profile");

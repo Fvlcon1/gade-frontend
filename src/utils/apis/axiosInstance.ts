@@ -26,12 +26,12 @@ const processQueue = (error: any, token: string | null = null) => {
 const refreshAccessToken = async (): Promise<string | null> => {
     try {
         const response = await axios.post(`${baseURL}/auth/renew`, {
-            refresh_token: cookies.get("refreshToken")
+            refresh_token: cookies.get("refresh_token")
         }, {
             withCredentials: true
         });
         const { access_token } = response.data;
-        cookies.set("accessToken", access_token, { path: '/' });
+        cookies.set("access_token", access_token, { path: '/' });
         return access_token;
     } catch (error) {
         return null;
@@ -40,7 +40,7 @@ const refreshAccessToken = async (): Promise<string | null> => {
 
 axiosInstance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-        const token = cookies.get("accessToken");
+        const token = cookies.get("access_token");
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -52,6 +52,7 @@ axiosInstance.interceptors.request.use(
 );
 
 export const setupInterceptors = (logout: (callApi?: boolean) => void) => {
+    console.log("setupInterceptors")
     axiosInstance.interceptors.response.use(
         (response) => response,
         async (error: AxiosError) => {
