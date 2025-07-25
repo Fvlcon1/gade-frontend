@@ -7,9 +7,9 @@ import MetricCardSkeleton from "./components/metrics-skeleton"
 import { IMetricCard } from "../../utils/types"
 
 const Metrics = () => {
-    const {pageId, setPageId, pageSize, setPageSize, reportsData, reportsLoading, reportsError, refetchAlerts, reportsIsFetching, metricsData} = useAlertsContext()
+    const { alertsLoading, metricsData} = useAlertsContext()
 
-    if(reportsLoading) {
+    if(alertsLoading) {
         return <MetricCardSkeleton />
     }
     

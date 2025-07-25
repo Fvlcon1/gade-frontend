@@ -31,11 +31,11 @@ export const getStatusTextColor = (status: string) => {
 export const getSeverityBgClass = (severity: string) => {
     switch (severity) {
         case "LOW":
-            return "bg-green-100";
+            return "bg-green-500";
         case "MEDIUM":
-            return "bg-orange-100";
+            return "bg-orange-500";
         case "HIGH":
-            return "bg-red-100";
+            return "bg-red-500";
         default:
             return "bg-gray-100";
     }

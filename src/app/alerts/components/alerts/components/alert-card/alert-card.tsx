@@ -27,19 +27,6 @@ import Input from "@components/ui/input/input"
 import { IoClose, IoSearch } from "react-icons/io5"
 import { departmentList } from "@/utils/constants"
 
-const Rod = ({ isHover }: { isHover: boolean }) => {
-    return (
-        <div
-            className={`h-full bg-bg-secondary ${isHover ? "w-[12px]" : "w-[7px]"} duration-200 transition-all rounded`}
-            style={{
-                backgroundColor: isHover
-                    ? getSeverityColor("HIGH")
-                    : getSeverityColor("HIGH") + hexOpacity(70),
-            }}
-        />
-    )
-}
-
 const AlertCard = ({
     alert,
     alertIsFetching
@@ -296,11 +283,11 @@ const AlertCard = ({
     }) => {
         return (
             <div
-                className={`relative ${alertIsFetching ? "cursor-wait" : ""} ${isHover ? "shadow-xl shadow-text-primary/5" : ""} p-2 flex w-[1024px] overflow-hidden cursor-pointer hover:bg-bg-primary-lighter duration-200 gap-2 justify-between rounded-xl border-[1px] border-border-primary`}
+                className={`relative ${alertIsFetching ? "cursor-wait" : ""} group p-2 flex w-[1024px] overflow-hidden cursor-pointer hover:bg-bg-primary-lighter duration-300 gap-2 justify-between rounded-xl border-[1px] border-border-primary`}
                 onMouseOver={() => setIsHover(true)}
                 onMouseLeave={() => setIsHover(false)}
                 style={{
-                    backgroundColor: isHover ? getSeverityColor("HIGH") + hexOpacity(5) : "",
+                    // backgroundColor: isHover ? getSeverityColor("HIGH") + hexOpacity(5) : "",
                     borderColor: isHover ? getSeverityColor("HIGH") + hexOpacity(20) : "",
                 }}
             >
@@ -309,18 +296,20 @@ const AlertCard = ({
         )
     }
 
+    const Rod = () => {
+        const bgClass = "bg-[#EF4444]/50 group-hover:bg-[#EF4444]/70";
+        const hoverClass = "w-[7px] group-hover:w-[14px]"
+
+        return (
+            <div className={`h-full ${bgClass} ${hoverClass} duration-200 rounded`} />
+        )
+    }
+
     return (
         <>
             <Popups />
             <MainContainer>
-                <div
-                    className={`h-full bg-bg-secondary ${isHover ? "w-[12px]" : "w-[7px]"} duration-200 transition-all rounded`}
-                    style={{
-                        backgroundColor: isHover
-                            ? getSeverityColor("HIGH")
-                            : getSeverityColor("HIGH") + hexOpacity(70),
-                    }}
-                />
+                <Rod />
                 <div className="flex gap-2 flex-1 py-1">
                     <Icon />
                     <div className="flex flex-1 flex-col h-fit gap-3">
