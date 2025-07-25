@@ -10,7 +10,7 @@ export interface User {
   created_at: string;
   updated_at: string;
   last_active?: string;
-  image_url?: string;
+  profile_url?: string;
 }
 
 export interface LoginCredentials {

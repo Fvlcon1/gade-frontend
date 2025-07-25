@@ -23,11 +23,11 @@ const Profile = ({
         {
             label: "Profile",
             href: "/profile",
-            icon: <FaUserCircle size={15} color={theme.colors.text.secondary} />
+            icon: <FaUserCircle size={13} color={theme.colors.text.secondary} />
         },
         {
             label: "Preferences",
-            icon: <FaGear size={15} color={theme.colors.text.secondary} />,
+            icon: <FaGear size={13} color={theme.colors.text.secondary} />,
             onClick: () => setViewState("preferences")
         },
         {
@@ -35,8 +35,8 @@ const Profile = ({
         },
         {
             label: "Logout",
-            icon: <FaPowerOff size={15} color={"red"} />,
-            color: "red",
+            icon: <FaPowerOff size={13} color={theme.colors.text.danger} />,
+            color: theme.colors.text.danger,
             onClick: () => {
                 router.push('/login')
                 logout()

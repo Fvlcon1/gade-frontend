@@ -1,5 +1,6 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import Cookies from "universal-cookie";
+import { publicRoutes } from '@/middleware';
 
 const cookies = new Cookies();
 const baseURL = process.env.NEXT_PUBLIC_API_URL;
@@ -51,15 +52,16 @@ axiosInstance.interceptors.request.use(
     }
 );
 
+const isRoutable = typeof window !== 'undefined' && !publicRoutes.some(route => window.location.pathname.startsWith(route))
+
 export const setupInterceptors = (logout: (callApi?: boolean) => void) => {
-    console.log("setupInterceptors")
     axiosInstance.interceptors.response.use(
         (response) => response,
         async (error: AxiosError) => {
             const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
             
             if (error.response?.status !== 401 || !originalRequest || originalRequest._retry) {
-                logout(false);
+                // if (isRoutable) logout(false);
                 return Promise.reject(error);
             }
             if (isRefreshing) {
@@ -89,13 +91,17 @@ export const setupInterceptors = (logout: (callApi?: boolean) => void) => {
                     }
                     return axiosInstance(originalRequest);
                 } else {
+                    if (isRoutable) logout(false);
                     throw new Error('Failed to refresh token');
                 }
             } catch (refreshError) {
-                processQueue(refreshError, null);
-                logout(false);
-                return Promise.reject(refreshError);
+                if(refreshError.response?.status === 401){
+                    processQueue(refreshError, null);
+                    if (isRoutable) logout(false);
+                    return Promise.reject(refreshError);
+                }
             } finally {
+                processQueue(null, null);
                 isRefreshing = false;
             }
         }

@@ -39,102 +39,123 @@ export function formatWithPrefix(
 
 type UnitSystem = "metric" | "imperial";
 type MeasurementType = "length" | "area" | "volume";
-
-type Unit =
-    | "m" | "km" | "ft" | "mi"
-    | "m²" | "ha" | "ac"
-    | "m³" | "l" | "gal";
+type Unit = "m" | "km" | "ft" | "mi" | "m²" | "ha" | "km²" | "ac" | "m³" | "l" | "gal";
 
 interface FormatUnitOptions {
     value: number | null | undefined;
-    system?: UnitSystem;                // default: localStorage or "metric"
-    type?: MeasurementType;             // default: "length"
-    unit?: Unit;                        // default: system/type default
-    decimalPlaces?: number;            // default: 2
-    useMetricPrefixes?: boolean;       // enable metric prefix scaling
-    prefixStyle?: "value" | "unit";    // "value" = 5.6M km², "unit" = 5.6 Mm²
+    system?: UnitSystem;
+    type?: MeasurementType;
+    unit?: Unit;
+    decimalPlaces?: number;
+    useMetricPrefixes?: boolean;
+    prefixStyle?: "value" | "unit";
 }
 
 type UnitInfo = {
     label: string;
     factor: number;
+    baseUnit?: string;
+    threshold?: number; // Minimum value to prefer this unit
 };
 
 const unitMaps: Record<MeasurementType, Record<UnitSystem, Record<string, UnitInfo>>> = {
     length: {
         metric: {
-            m: { label: "m", factor: 1 },
-            km: { label: "km", factor: 1 / 1000 },
+            m: { label: "m", factor: 1, baseUnit: "m", threshold: 0 },
+            km: { label: "km", factor: 1 / 1000, baseUnit: "m", threshold: 1000 },
         },
         imperial: {
-            ft: { label: "ft", factor: 3.28084 },
-            mi: { label: "mi", factor: 0.000621371 },
+            ft: { label: "ft", factor: 3.28084, threshold: 0 },
+            mi: { label: "mi", factor: 0.000621371, threshold: 5280 }, // 5280 ft = 1 mile
         },
     },
     area: {
         metric: {
-            "m²": { label: "m²", factor: 1 },
-            ha: { label: "ha", factor: 1 / 10000 },
+            "m²": { label: "m²", factor: 1, baseUnit: "m²", threshold: 0 },
+            ha: { label: "ha", factor: 1 / 10000, baseUnit: "m²", threshold: 5000 }, // Use ha for areas > 5000m²
+            "km²": { label: "km²", factor: 1 / 1000000, baseUnit: "m²", threshold: 500000 }, // Use km² for areas > 50ha
         },
         imperial: {
-            ac: { label: "ac", factor: 0.000247105 },
+            "ft²": { label: "ft²", factor: 10.764, threshold: 0 },
+            ac: { label: "ac", factor: 0.000247105, threshold: 10000 }, // ~10,000 ft²
         },
     },
     volume: {
         metric: {
-            "m³": { label: "m³", factor: 1 },
-            l: { label: "l", factor: 1000 },
+            "m³": { label: "m³", factor: 1, baseUnit: "m³", threshold: 0 },
+            l: { label: "l", factor: 1000, baseUnit: "m³", threshold: 0.001 }, // Use L for small volumes
         },
         imperial: {
-            gal: { label: "gal", factor: 264.172 },
+            "ft³": { label: "ft³", factor: 35.314, threshold: 0 },
+            gal: { label: "gal", factor: 264.172, threshold: 0.1 },
         },
     },
 };
 
-const defaultUnits: Record<MeasurementType, Record<UnitSystem, Unit>> = {
-    length: { metric: "m", imperial: "ft" },
-    area: { metric: "m²", imperial: "ac" },
-    volume: { metric: "m³", imperial: "gal" },
+// Real-world usage thresholds for areas
+const areaThresholds = {
+    metric: [
+        { unit: "m²", max: 5000, description: "Small areas: rooms, small plots" },
+        { unit: "ha", max: 500000, description: "Medium-large areas: farms, parks" }, // 50 hectares
+        { unit: "km²", max: Infinity, description: "Very large areas: cities, regions" },
+    ],
+    imperial: [
+        { unit: "ft²", max: 43560, description: "Small areas" }, // 1 acre = 43,560 ft²
+        { unit: "ac", max: Infinity, description: "Large areas" },
+    ]
 };
 
-const metricPrefixes = [
-    { prefix: "T", factor: 1e12 },
-    { prefix: "B", factor: 1e9 },
-    { prefix: "M", factor: 1e6 },
-    { prefix: "K", factor: 1e3 },
-];
+function findBestAreaUnit(unitsForType: Record<string, UnitInfo>, value: number, system: UnitSystem): { unit: string; info: UnitInfo } {
+    const thresholds = areaThresholds[system];
+    
+    for (const threshold of thresholds) {
+        if (value <= threshold.max && unitsForType[threshold.unit]) {
+            return { 
+                unit: threshold.unit, 
+                info: unitsForType[threshold.unit] 
+            };
+        }
+    }
+    
+    // Fallback to largest unit
+    const fallbackUnit = system === "metric" ? "km²" : "ac";
+    return { 
+        unit: fallbackUnit, 
+        info: unitsForType[fallbackUnit] 
+    };
+}
 
-const metricUnitPrefixes = [
-    { prefix: "T", factor: 1e12 },
-    { prefix: "G", factor: 1e9 },
-    { prefix: "M", factor: 1e6 },
-    { prefix: "k", factor: 1e3 },
-    { prefix: "h", factor: 1e2 },
-    { prefix: "da", factor: 1e1 },
-];
-
-const imperialAutoConvert = (
-    unitsForType: Record<Unit, UnitInfo>,
-    rawValue: number
-): { value: number; label: string } => {
+function findBestUnit(
+    unitsForType: Record<string, UnitInfo>, 
+    value: number, 
+    type: MeasurementType,
+    system: UnitSystem
+): { unit: string; info: UnitInfo } {
+    
+    // Special handling for areas using real-world thresholds
+    if (type === "area") {
+        return findBestAreaUnit(unitsForType, value, system);
+    }
+    
+    // For length and volume, use threshold-based selection
     const candidates = Object.entries(unitsForType)
-        .map(([unit, info]) => ({
-            unit,
-            factor: info.factor,
-            label: info.label,
-        }))
-        .sort((a, b) => b.factor - a.factor);
+        .map(([unit, info]) => ({ unit, info }))
+        .sort((a, b) => (b.info.threshold || 0) - (a.info.threshold || 0)); // Highest threshold first
 
-    for (const c of candidates) {
-        const converted = rawValue * c.factor;
-        if (converted >= 1) {
-            return { value: converted, label: c.label };
+    // Find the appropriate unit based on threshold
+    for (const candidate of candidates) {
+        const threshold = candidate.info.threshold || 0;
+        if (value >= threshold) {
+            return { unit: candidate.unit, info: candidate.info };
         }
     }
 
-    const last = candidates[candidates.length - 1];
-    return { value: rawValue * last.factor, label: last.label };
-};
+    // Fallback to smallest unit
+    return { 
+        unit: candidates[candidates.length - 1].unit, 
+        info: candidates[candidates.length - 1].info 
+    };
+}
 
 export function formatWithUnit({
     value,
@@ -146,74 +167,31 @@ export function formatWithUnit({
     prefixStyle = "value",
 }: FormatUnitOptions): string {
     if (!Number.isFinite(value)) {
-        const fallbackSystem = system || "metric";
-        const fallbackUnit = unit || defaultUnits[type][fallbackSystem];
-        return `0.00 ${fallbackUnit}`;
+        const fallbackUnit = unit || "m";
+        return `0.${"0".repeat(decimalPlaces)} ${fallbackUnit}`;
     }
 
-    // Determine system if not provided
-    let resolvedSystem = system;
-    if (!resolvedSystem) {
-        if (typeof window !== "undefined") {
-            const settings = localStorage.getItem("settings");
-            resolvedSystem = JSON.parse(settings || "{}")?.units || "metric";
-        } else {
-            resolvedSystem = "metric";
-        }
+    // Determine system
+    let resolvedSystem = system || "metric";
+
+    const unitsForType = unitMaps[type]?.[resolvedSystem];
+    if (!unitsForType) {
+        return `${value.toFixed(decimalPlaces)} unknown`;
     }
 
-    const unitsForType = unitMaps[type][resolvedSystem];
+    // Determine unit to use
+    let chosenUnit: string;
+    let unitInfo: UnitInfo;
 
-    let chosenUnit = unit;
-    if (!chosenUnit) {
-        const candidates = Object.entries(unitsForType)
-            .map(([unitKey, info]) => ({
-                unit: unitKey as Unit,
-                factor: info.factor,
-            }))
-            .sort((a, b) => b.factor - a.factor);
-
-        chosenUnit =
-            candidates.find((c) => value * c.factor >= 1)?.unit ||
-            candidates[candidates.length - 1].unit;
-    }
-
-    const unitInfo = unitsForType[chosenUnit];
-    if (!unitInfo) {
-        return `${value.toFixed(decimalPlaces)} ${chosenUnit}`;
+    if (unit && unitsForType[unit]) {
+        chosenUnit = unit;
+        unitInfo = unitsForType[unit];
+    } else {
+        const best = findBestUnit(unitsForType, value, type, resolvedSystem);
+        chosenUnit = best.unit;
+        unitInfo = best.info;
     }
 
     let scaledValue = value * unitInfo.factor;
-
-    // IMPERIAL: auto convert to best unit
-    if (resolvedSystem === "imperial" && !unit) {
-        const { value: converted, label } = imperialAutoConvert(unitsForType, value);
-        return `${converted.toLocaleString(undefined, {
-            maximumFractionDigits: decimalPlaces,
-        })} ${label}`;
-    }
-
-    // METRIC: apply prefixes based on chosen style
-    const baseUnits = ["m", "m²", "m³"];
-    if (useMetricPrefixes && resolvedSystem === "metric" && baseUnits.includes(unitInfo.label)) {
-        if (prefixStyle === "value") {
-            // COMMON STYLE: Prefix on value (5.6M m²)
-            for (const p of metricPrefixes) {
-                if (Math.abs(scaledValue) >= p.factor) {
-                    scaledValue = scaledValue / p.factor;
-                    return `${scaledValue.toFixed(decimalPlaces)}${p.prefix} ${unitInfo.label}`;
-                }
-            }
-        } else if (prefixStyle === "unit") {
-            // SCIENTIFIC STYLE: Prefix on unit (5.6 Mm²)
-            for (const p of metricUnitPrefixes) {
-                if (scaledValue / p.factor >= 1) {
-                    const newValue = scaledValue / p.factor;
-                    return `${newValue.toFixed(decimalPlaces)} ${p.prefix}${unitInfo.label}`;
-                }
-            }
-        }
-    }
-
     return `${scaledValue.toFixed(decimalPlaces)} ${unitInfo.label}`;
 }

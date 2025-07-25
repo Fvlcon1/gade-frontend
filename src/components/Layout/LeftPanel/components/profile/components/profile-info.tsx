@@ -3,10 +3,11 @@ import theme from "@styles/theme"
 import { getRelativeTime } from "@/utils/getDate"
 import { useAuthStore } from "@/lib/store/auth-store"
 import { hexOpacity } from "@/utils/hexOpacity"
+import Image from "next/image"
 
 const ProfileInfo = () => {
-    const {user} = useAuthStore()
-    
+    const { user } = useAuthStore()
+
     return (
         <div className="w-full p-2">
             <div className="w-full rounded-xl bg-bg-primary-lighter flex flex-col">
@@ -22,13 +23,25 @@ const ProfileInfo = () => {
                                 backgroundColor: "#dcdaec"
                             }}
                         >
-                            <Text
-                                size={theme.text.size.HL}
-                                bold={theme.text.bold.md2}
-                                textColor={theme.colors.main.primary}
-                            >
-                                {`${user?.first_name?.charAt(0)?.toUpperCase()}${user?.last_name?.charAt(0)?.toUpperCase()}`}
-                            </Text>
+                            {
+                                user?.profile_url ? (
+                                    <Image
+                                        src={user?.profile_url}
+                                        alt="Profile Picture"
+                                        className="w-full h-full object-cover rounded-full"
+                                        width={130}
+                                        height={130}
+                                    />
+                                ) : (
+                                    <Text
+                                        size={"40px"}
+                                        bold={theme.text.bold.md2}
+                                        textColor={theme.colors.main.primary}
+                                    >
+                                        {`${user?.first_name.charAt(0).toUpperCase()}${user?.last_name.charAt(0).toUpperCase()}`}
+                                    </Text>
+                                )
+                            }
                         </div>
                         <div className="flex flex-col mt-3 gap-1">
                             <Text

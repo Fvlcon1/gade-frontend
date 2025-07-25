@@ -15,7 +15,7 @@ const Overlay = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{  opacity: 0 }}
-            transition={{duration : 0.1}}
+            transition={{duration : 0.2}}
             className={`fixed flex justify-center items-center top-0 left-0 z-[10001] w-[100vw] h-[100vh] bg-[#15151f5b] backdrop-filter backdrop-blur-sm ${className}`}
         >
             <div className="fixed flex top-0 left-0 z-[-1] w-full h-full"

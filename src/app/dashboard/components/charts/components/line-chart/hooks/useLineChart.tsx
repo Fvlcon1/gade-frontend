@@ -2,7 +2,7 @@
 
 import { useDashboardContext } from "@/app/dashboard/context/dashboard-context"
 import { useEffect, useState } from "react"
-import { formatWithPrefix } from "@/utils/unit-utils"
+import { formatWithPrefix, formatWithUnit } from "@/utils/unit-utils"
 import { shortMonthNames } from "@/utils/constants"
 
 const useLineChart = () => {
@@ -15,10 +15,11 @@ const useLineChart = () => {
             setCategories(areaOverTime.map((item)=>{
                 return shortMonthNames[new Date(item.period).getMonth()]
             }))
+            const unit = "ha"
             setLineChartData([
                 {
-                    name: 'area',
-                    data: areaOverTime.map((item)=> formatWithPrefix(item.value, "km2", 1))
+                    name: `Area (${unit})`,
+                    data: areaOverTime.map((item)=> formatWithUnit({value: item.value, type: "area", unit}))
                 },
             ])
         }

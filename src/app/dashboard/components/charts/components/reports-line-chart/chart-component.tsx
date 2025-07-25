@@ -99,6 +99,13 @@ const ReportsLineChart = ({
             strokeDashArray: 4,
             yaxis: { lines: { show: true } }
         },
+        markers: {
+            size: 7,
+            shape: 'circle',
+            colors: undefined,
+            strokeColors: '#fff',
+            strokeWidth: 2,
+        },
         tooltip: {
             theme: themeColor,
             y: {

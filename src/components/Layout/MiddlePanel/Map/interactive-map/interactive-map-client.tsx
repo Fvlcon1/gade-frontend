@@ -40,6 +40,8 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
     highlightedDistricts,
     dateRange,
     boundsFeature,
+    displayableAttribute,
+    setDisplayableAttribute,
     setSelectedMiningSite,
     applyFilters
   } = useSpatialStore();
@@ -116,21 +118,21 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
 
   const getDistrictStyle = useCallback((feature: any) => {
     const district = feature.properties.district;
-    if (selectedDistrictName === district) return HIGHLIGHT_STYLE.admin;
+    if (displayableAttribute?.type === 'district' && displayableAttribute?.feature.properties.district === district) return HIGHLIGHT_STYLE.admin;
     return LAYER_STYLES.admin;
-  }, [selectedDistrictName]);
+  }, [displayableAttribute]);
 
   const getConcessionStyle = useCallback((feature: any) => {
     const name = feature.properties.name;
-    if (selectedConcessionName === name) return HIGHLIGHT_STYLE.concessions;
+    if (displayableAttribute?.type === 'concession' && displayableAttribute?.feature.properties.name === name) return HIGHLIGHT_STYLE.concessions;
     return LAYER_STYLES.concessions;
-  }, [selectedConcessionName]);
+  }, [displayableAttribute]);
 
   const getMiningStyle = useCallback((feature: any) => {
     const id = feature.properties.id;
-    if (selectedMiningSiteId === id) return HIGHLIGHT_STYLE.mining_sites;
+    if (displayableAttribute?.type === 'miningSite' && displayableAttribute?.feature.properties.id === id) return HIGHLIGHT_STYLE.mining_sites;
     return LAYER_STYLES.mining_sites;
-  }, [selectedMiningSiteId]);
+  }, [displayableAttribute]);
 
   const [clickedDistricts, setClickedDistricts] = useState<any>()
   const handleDistrictLayerClick = (e: any) => {
@@ -162,18 +164,6 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
 
   return (
     <>
-      {isLoading && (
-        <div className="absolute top-4 right-[120px] bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-sm z-[1002] flex items-center gap-2">
-          <div className="animate-spin rounded-full h-4 w-4 border-2 border-[var(--color-main-primary)] border-t-transparent" />
-        </div>
-      )}
-
-      {error && (
-        <div className="absolute top-4 right-[120px] bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-sm z-[1002] flex items-center gap-2">
-          <span className="text-sm text-red-500 font-medium">Could not load layers</span>
-        </div>
-      )}
-
       {!isLoading && !error && (
         <>
           <ReportsLayer reports={reports} activeFeatureLayers={activeFeatureLayers} />
@@ -192,13 +182,10 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
                     leafletLayer.on({
                       click: () => {
                         const id = feature.properties.id;
-                        setSelectedMiningSite(feature)
-                        if (selectedMiningSiteId === id) {
-                          setSelectedMiningSiteId(undefined);
-                        } else {
-                          setSelectedMiningSiteId(id);
-                          setSelectedConcessionName(undefined);
-                          setSelectedDistrictName(undefined);
+                        if(displayableAttribute?.type === 'miningSite' && displayableAttribute?.feature.properties.id === id){
+                          setDisplayableAttribute(null)
+                        } else{
+                          setDisplayableAttribute({ type: 'miningSite', feature })
                         }
                       },
                     });
@@ -232,12 +219,10 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
                     layer.on({
                       click: () => {
                         const name = feature.properties.name;
-                        if (selectedConcessionName === name) {
-                          setSelectedConcessionName(undefined);
-                        } else {
-                          setSelectedConcessionName(name);
-                          setSelectedMiningSiteId(undefined);
-                          setSelectedDistrictName(undefined);
+                        if(displayableAttribute?.type === 'concession' && displayableAttribute?.feature.properties.name === name){
+                          setDisplayableAttribute(null)
+                        } else{
+                          setDisplayableAttribute({ type: 'concession', feature })
                         }
                       },
                     });
@@ -265,12 +250,10 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
                     layer.on({
                       click: () => {
                         const district = feature.properties.district;
-                        if (selectedDistrictName === district) {
-                          setSelectedDistrictName(undefined);
-                        } else {
-                          setSelectedDistrictName(district);
-                          setSelectedMiningSiteId(undefined);
-                          setSelectedConcessionName(undefined);
+                        if(displayableAttribute?.type === 'district' && displayableAttribute?.feature.properties.district === district){
+                          setDisplayableAttribute(null)
+                        } else{
+                          setDisplayableAttribute({ type: 'district', feature })
                         }
                       },
                     });

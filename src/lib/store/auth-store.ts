@@ -59,11 +59,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   sidebarExpanded: false,
   setSidebarExpanded: (expanded) => set({ sidebarExpanded: expanded }),
   setUser: (user) => {
-    if (user) {
-      localStorage.setItem('user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('user');
-    }
+    localStorage.setItem('user', JSON.stringify(user));
     set({ 
       user, 
       isAuthenticated: !!user,
@@ -82,14 +78,9 @@ export const useAuthStore = create<AuthState>((set) => ({
   setLoading: (isLoading) => set({ isLoading }),
   logout: () => {
     localStorage.removeItem('pendingLogin');
-    localStorage.removeItem('user');
+    // localStorage.removeItem('user');
     cookies.remove('access_token');
     cookies.remove('refresh_token');
-    // set({ 
-    //   user: null,
-    //   pendingLogin: null,
-    //   isAuthenticated: false,
-    //   error: null 
-    // });
+    if(typeof window !== 'undefined') window.location.assign("/login")
   },
 })); 

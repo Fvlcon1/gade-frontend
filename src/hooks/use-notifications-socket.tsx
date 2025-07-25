@@ -23,7 +23,9 @@ const useNotificationsSocket = () => {
 
 		// Listen for messages
 		socket.addEventListener('message', (event) => {
-			console.log({socketData : event.data})
+			const data = JSON.parse(event.data)
+			console.log({socketData : data})
+			if(data.type === "REPORT_ALERT") setNotification(data)
 		})
 
 		// Connection closed

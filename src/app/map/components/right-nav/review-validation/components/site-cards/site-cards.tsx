@@ -15,9 +15,6 @@ const SiteCards = ({
     const { order, setOrder, selectedSeverity, selectedStatus } = useReviewContext();
     const localfilteredSites = filteredMiningSites?.features.length ? [...filteredMiningSites?.features] : []
 
-    if(localfilteredSites)
-        localfilteredSites.length = 40
-
     const sortSites = (sites: SpatialData["features"]) => {
         if(order === "Newest")
             return sites?.sort((a, b) => new Date(b.properties.detected_date).getTime() - new Date(a.properties.detected_date).getTime())
@@ -25,12 +22,29 @@ const SiteCards = ({
             return sites?.sort((a, b) => new Date(a.properties.detected_date).getTime() - new Date(b.properties.detected_date).getTime())
         return sites
     }
+
+    const getSeverity = (severityScore : number) => {
+        if(severityScore <= 2)
+            return "Low"
+        if(severityScore <= 3)
+            return "Medium"
+        return "High"
+    }
     const filteredSites = useMemo(()=>{
         let sites = sortSites(localfilteredSites)
+        sites = sites.map((site) => ({
+            ...site,
+            properties: {
+                ...site.properties,
+                severity: getSeverity(site.properties.severity_score)
+            }
+        }))
         if(selectedSeverity != "All")
             sites = sites?.filter((site) => site.properties.severity?.toLowerCase() === selectedSeverity.toLowerCase())
         if(selectedStatus != "All Status")
             sites = sites?.filter((site) => reverseStatusMapping[site.properties.status as string]?.toLowerCase() === selectedStatus.toLowerCase())
+        if(sites)
+            sites.length = 40
         return sites
     }, [order, selectedSeverity, selectedStatus, localfilteredSites])
 

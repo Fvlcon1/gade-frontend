@@ -136,26 +136,22 @@ const getSeverityBgColor = (severity: string) => {
 }
 
 const MiningSiteAttribute = () => {
-    const { selectedMiningSite, setSelectedMiningSite } = useSpatialStore()
-    const { severity, area, district, region, detected_date, severity_score, all_violation_types, distance_to_forest_m, distance_to_water_m } = selectedMiningSite?.properties || {}
+    const { selectedMiningSite, setSelectedMiningSite, displayableAttribute, setDisplayableAttribute } = useSpatialStore()
+    const { severity, area, district, region, detected_date, severity_score, all_violation_types, distance_to_forest_m, distance_to_water_m } = displayableAttribute?.feature?.properties || {}
     const violationTypes = parseViolationTypes(all_violation_types)
 
     const areaValue = formatWithUnit({ value: area, type: "area" }).split(" ")
     const areaFigure = areaValue[0]
     const areaUnit = areaValue[1]
 
-    useEffect(() => {
-        console.log({selectedMiningSite})
-    }, [selectedMiningSite])
-
     return (
         <AnimatePresence>
             {
-                selectedMiningSite ? (
+                displayableAttribute?.type === 'miningSite' ? (
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
+                        // exit={{ opacity: 0, y: -10 }}
                         className={`flex h-fit w-[350px] shadow-xl flex-col relative cursor-pointer hover:shadow-xl duration-300 rounded-2xl`}
                     >
                         <div className="w-full flex justify-between gap-2">
@@ -169,7 +165,7 @@ const MiningSiteAttribute = () => {
                                 </Text>
                             </div>
                             <ClickableTab
-                                onClick={() => setSelectedMiningSite(null)}
+                                onClick={() => setDisplayableAttribute(null)}
                                 className="!rounded-full"
                             >
                                 <IoIosCloseCircle />

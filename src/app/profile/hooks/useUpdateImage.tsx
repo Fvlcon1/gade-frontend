@@ -3,12 +3,13 @@ import { useMutation } from "@tanstack/react-query"
 import axios from "axios"
 import toast from "react-hot-toast"
 import { useSettingsContext } from "@/app/context/settings-context"
+import useUpdateProfile from "./useUpdateProfile"
 
 const useUpdateImage = () => {
     const {refetchSettings} = useSettingsContext()
+    const {updateProfileImageMutation} = useUpdateProfile()
     const getUploadUrl = async () => {
         const response = await protectedApi.GET("settings/upload-url")
-        console.log({response})
         return response
     }
 
@@ -20,21 +21,19 @@ const useUpdateImage = () => {
         }
     })
 
-    const updateImage = async ({presignedUrl, blob}: {presignedUrl: string, blob: Blob}) => {
+    const updateImage = async ({presignedUrl, fileUrl, blob}: {presignedUrl: string, fileUrl: string, blob: Blob}) => {
         const response = await axios.put(presignedUrl, blob, {
             headers: {
                 "Content-Type": blob.type,
-                // "x-amz-acl": "public-read"
             }
         })
-        console.log({response})
         return response
     }
 
     const {mutateAsync: updateImageMutation, isPending: isUpdateImagePending, isSuccess: isUpdateImageSuccess} = useMutation({
         mutationFn: updateImage,
-        onSuccess: (response) => {
-            refetchSettings()
+        onSuccess: (response, {fileUrl}) => {
+            updateProfileImageMutation(fileUrl)
             toast.success("Image updated successfully")
         },
         onError: (error: any) => {

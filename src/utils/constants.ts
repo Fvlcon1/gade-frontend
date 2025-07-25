@@ -5,7 +5,7 @@ export const months = ["January", "February", "March", "April", "May", "June", "
 export const shortMonthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
 export const departmentList = [
-    "Environmental commission",
+    "Environmental Protection Agency",
     "GADE Team",
     "Geological Survey Authority",
     "Ghana Army",

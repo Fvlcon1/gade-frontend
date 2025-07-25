@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 // Define public routes that don't require authentication
-const publicRoutes = ['/login', '/setup', '/2fa'];
+export const publicRoutes = ['/login', '/setup', '/2fa', 'mfa'];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -12,7 +12,7 @@ export function middleware(request: NextRequest) {
   const refreshToken = request.cookies.get('refresh_token');
 
   // If user is logged in and tries to access signin, redirect them back
-  if (pathname.startsWith('/signin') && accessToken && refreshToken) {
+  if (pathname.startsWith('/login') && accessToken && refreshToken) {
     const from = request.nextUrl.searchParams.get('from') || '/';
     return NextResponse.redirect(new URL(from, request.url));
   }

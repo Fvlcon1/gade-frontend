@@ -1,6 +1,6 @@
 import { hexOpacity } from "@/utils/hexOpacity"
 import Text from "@styles/components/text"
-import theme from "@styles/theme"
+import { useTheme } from "@styles/theme-context";
 import { IMetricCard } from "@/app/accounts/utils/types"
 
 const MetricCard = ({
@@ -8,6 +8,8 @@ const MetricCard = ({
 } : {
     metric : IMetricCard
 }) => {
+    const { theme } = useTheme()
+    
     return (
         <div 
             className="flex-1 rounded-xl flex flex-col gap-0 p-2 px-4 relative overflow-hidden border-[1px] border-border-primary"

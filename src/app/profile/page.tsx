@@ -10,8 +10,10 @@ import { useState } from "react";
 import ChangePassword from "./components/change-password";
 
 const Profile = () => {
-    const { sidebarExpanded } = useAuthStore();
+    const { sidebarExpanded, user } = useAuthStore();
     const [showPasswordModal, setShowPasswordModal] = useState(false);
+
+    if(!user) return null
 
     return (
         <>

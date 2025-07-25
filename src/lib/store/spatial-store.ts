@@ -17,6 +17,8 @@ export interface SpatialDataProperties {
   detected_date?: string;
   id?: string
   area?: number
+  expiry_date?: string
+  start_date?: string
   severity?: string
   severity_type?: string
   severity_score?: number
@@ -53,6 +55,11 @@ interface Report {
   updated_at: string;
 }
 
+interface DisplayableAttribute {
+  type : 'miningSite' | 'concession' | 'district' | 'river' | 'forestReserve'
+  feature : SpatialData["features"][number]
+}
+
 export type RightNav = "Review and Validation" | "Priority index Heatmap"
 
 interface SpatialState {
@@ -69,6 +76,7 @@ interface SpatialState {
   boundsFeature: SpatialData["features"][number] | null;
   reviewValidationSearchValue: string
   selectedMiningSite: SpatialData["features"][number] | null;
+  displayableAttribute : DisplayableAttribute | null
   activeRightNav: RightNav | null
   isPriorityIndexVisible : boolean
 
@@ -116,6 +124,7 @@ interface SpatialState {
   setHeatmapData: (heatmapData: SpatialData) => void,
   setReviewValidationSearchValue: (searchValue: string) => void
   setIsPriorityIndexVisible: (value : boolean) => void
+  setDisplayableAttribute: (displayableAttribute: DisplayableAttribute | null) => void
 }
 
 export const useSpatialStore = create<SpatialState>((set, get) => ({
@@ -145,6 +154,7 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
   selectedMiningSite: null,
   activeRightNav: null,
   isPriorityIndexVisible : false,
+  displayableAttribute : null,
 
   // Proximity
   minProximityToRiver: 0,
@@ -166,6 +176,7 @@ export const useSpatialStore = create<SpatialState>((set, get) => ({
   setActiveRightNav: (activeRightNav: RightNav | null) => set({ activeRightNav }),
   setIsPriorityIndexVisible : (value : boolean) => set({ isPriorityIndexVisible : value }),
   setHeatmapData: (heatmapData: SpatialData) => set({ heatmapData }),
+  setDisplayableAttribute: (displayableAttribute: DisplayableAttribute | null) => set({ displayableAttribute }),
   setProximityFilters: (options) => set({
     minProximityToRiver: options.minProximityToRiver ?? get().minProximityToRiver,
     maxProximityToRiver: options.maxProximityToRiver ?? get().maxProximityToRiver,

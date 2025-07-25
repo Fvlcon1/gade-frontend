@@ -4,7 +4,7 @@ import ChartSkeleton from '../chart-skeleton';
 import dynamic from 'next/dynamic';
 import { ApexOptions } from 'apexcharts';
 import useLineChart from './hooks/useLineChart';
-import { formatWithPrefix } from '@/utils/unit-utils';
+import { formatWithPrefix, formatWithUnit } from '@/utils/unit-utils';
 import { useTheme } from '@styles/theme-context';
 
 const Chart = dynamic(() => import('react-apexcharts'), {
@@ -70,7 +70,7 @@ const AreaOverTimeChart = ({
         },
         yaxis: {
             title: {
-                text: "Area",
+                text: `Area - ha`,
                 style: {
                     fontSize: '14px',
                     fontFamily: 'Montserrat',
@@ -84,7 +84,7 @@ const AreaOverTimeChart = ({
                     fontSize: '12px',
                     fontFamily: 'Montserrat'
                 },
-                formatter: (val: number) => `${formatWithPrefix(val, '', 0)}`
+                formatter: (val: number) => val.toString()
             }
         },
         legend: {

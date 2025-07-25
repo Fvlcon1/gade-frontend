@@ -1,7 +1,7 @@
 import OutlineButton from "@components/ui/button/outlineButton"
 import { useSettingsContext } from "@/app/context/settings-context"
 import { FaUserGear } from "react-icons/fa6"
-import { useConfirmationModal } from "@components/ui/confirmation-modal/confirmation-modal-context"
+import { useConfirmationModal } from "@components/ui/modals/confirmation-modal/confirmation-modal-context"
 import { useTheme } from "@styles/theme-context"
 
 const Actions = () => {

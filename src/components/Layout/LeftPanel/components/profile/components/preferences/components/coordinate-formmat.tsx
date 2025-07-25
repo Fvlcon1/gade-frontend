@@ -23,16 +23,16 @@ const CoordinateFormat = () => {
     
     const items: DropdownItem[] = [
         {
-            key: "dd",
+            key: "DD",
             label: "DD (decimal degrees)",
-            onClick: () => handleCoordinateFormatChange("dd"),
-            isSelected: coordinateFormat === "dd"
+            onClick: () => handleCoordinateFormatChange("DD"),
+            isSelected: coordinateFormat === "DD"
         },
         {
-            key: "dms",
+            key: "DMS",
             label: "DMS (degree minutes seconds)",
-            onClick: () => handleCoordinateFormatChange("dms"),
-            isSelected: coordinateFormat === "dms"
+            onClick: () => handleCoordinateFormatChange("DMS"),
+            isSelected: coordinateFormat === "DMS"
         }
     ]
     return (

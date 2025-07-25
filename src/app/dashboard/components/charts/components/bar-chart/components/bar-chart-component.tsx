@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import theme from '@styles/theme';
 import { useDashboardContext } from '@/app/dashboard/context/dashboard-context';
 import dynamic from 'next/dynamic';
@@ -6,7 +6,7 @@ import { hexOpacity } from '@/utils/hexOpacity';
 import useBarChart from '../hooks/use-barchart';
 import ChartSkeleton from '../../chart-skeleton';
 import { formatNumber } from '@/utils/number-utils';
-import { formatWithPrefix } from '@/utils/unit-utils';
+import { formatWithPrefix, formatWithUnit } from '@/utils/unit-utils';
 import { capitalizeWords } from '@/utils/utils';
 import { useTheme } from '@styles/theme-context';
 
@@ -34,9 +34,11 @@ const barColors = [
 const BarChartComponent = () => {
     const { isMetricsPending } = useDashboardContext();
     const {themeColor, theme} = useTheme()
-    
     const { barChartSeries, categories } = useBarChart();
-    const getShade = (opacity : number) => "#70018f" + hexOpacity(opacity)
+
+    useEffect(() => {
+        console.log({barChartSeries, categories})
+    }, [barChartSeries, ])
 
     const options = {
         chart: {
@@ -87,7 +89,7 @@ const BarChartComponent = () => {
         },
         yaxis: {
             title: {
-                text: "Area",
+                text: "Area - ha",
                 style: {
                     fontSize: '14px',
                     fontFamily: 'Montserrat',

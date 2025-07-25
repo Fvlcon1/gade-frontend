@@ -9,12 +9,11 @@ import Button from "@components/ui/button/button";
 import Copychip from "@components/ui/chip/copyChip";
 import ClickableTab from "@components/ui/clickable/clickabletab"
 import Text from "@styles/components/text"
-import theme from "@styles/theme"
+import { useTheme } from "@styles/theme-context"
 import { AnimatePresence, motion } from 'framer-motion';
 import L from "leaflet";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { FaCircleCheck } from "react-icons/fa6";
-import { useTheme } from "@/app/styles/theme-context"
 
 const Dot = () => {
     const { theme } = useTheme()
@@ -110,9 +109,9 @@ const parseViolationTypes = (input: string): string[] => {
 const getSeverityTailwindColor = (severity: string) => {
     switch (severity?.toLowerCase()) {
         case "low":
-            return "bg-green-700"
+            return "bg-bg-quantinary"
         case "medium":
-            return "bg-orange-600"
+            return "bg-[#c77032]"
         case "high":
             return "bg-[#E3655E]"
         default:
@@ -120,12 +119,26 @@ const getSeverityTailwindColor = (severity: string) => {
     }
 }
 
-const getSeverityBgColor = (severity: string) => {
+const getShadowColorClass = (severity: string) => {
     switch (severity?.toLowerCase()) {
         case "low":
-            return "#00C853"
+            return "shadow-bg-quantinary/20"
         case "medium":
-            return "#f64a00"
+            return "shadow-[#c77032]/20"
+        case "high":
+            return "shadow-[#E3655E]/20"
+        default:
+            return "shadow-[#E3655E]/20"
+    }
+}
+
+const getSeverityBgColor = (severity: string) => {
+    const { theme } = useTheme()
+    switch (severity?.toLowerCase()) {
+        case "low":
+            return theme.colors.bg.quantinary
+        case "medium":
+            return "#c77032"
         case "high":
             return "#E3655E"
         default:
@@ -151,7 +164,12 @@ const Card = ({
     const { severity, id, area, district, region, detected_date, severity_score, all_violation_types, distance_to_forest_m, distance_to_water_m } = feature.properties
     const violationTypes = parseViolationTypes(all_violation_types)
     const { setBounds, boundsFeature } = useSpatialStore();
-    const isCardSelected = boundsFeature === feature
+    const { theme } = useTheme()
+    const isCardSelected = boundsFeature?.properties?.id === feature?.properties?.id
+
+    useEffect(() => {
+        console.log({isCardSelected})
+    }, [isCardSelected])
 
     const areaValue = formatWithUnit({value : area, type : "area"}).split(" ")
     const areaFigure = areaValue[0]
@@ -165,22 +183,27 @@ const Card = ({
     return (
         <div
             onClick={handleCardClick}
-            className={`flex flex-col relative cursor-pointer ${isCardSelected ? "shadow-xl shadow-main-primary/20" : ""} hover:shadow-xl duration-300 rounded-2xl`}
+            className={`flex flex-col relative cursor-pointer ${isCardSelected ? `shadow-xl ${getShadowColorClass(severity)}` : ""} hover:shadow-xl duration-300 rounded-2xl`}
         >
             <div className={`px-3 py-1.5 w-fit ${getSeverityTailwindColor(severity)} rounded-t-xl flex items-center gap-1.5`}>
                 <Dot />
                 <Text
-                    textColor={theme.colors.bg.primary}
+                    textColor={"white"}
                     bold={theme.text.bold.md}
                 >
                     {capitalizeWords(severity) || "Unknown Severity"}
                 </Text>
             </div>
             <div className={`absolute left-0 top-4 z-[-1] w-[50px] h-[50px] ${getSeverityTailwindColor(severity)}`} />
-            <div className={`w-full px-3 py-2 flex flex-col gap-0 bg-bg-primary-lighter relative rounded-2xl border-[1px] ${isCardSelected ? "border-main-primary" : `border-[${getSeverityBgColor(severity)}]`}`}>
+            <div 
+                className={`w-full px-3 py-2 flex flex-col gap-0 bg-bg-primary-lighter relative rounded-2xl border-[1px]`}
+                style={{
+                    borderColor : getSeverityBgColor(severity)
+                }}
+            >
                 {
                     isCardSelected && (
-                        <FaCircleCheck className="absolute top-2 right-2" color={theme.colors.main.primary} size={20} />
+                        <FaCircleCheck className="absolute top-2 right-2" color={getSeverityBgColor(severity)} size={20} />
                     )
                 }
                 <div className="flex flex-col gap-1.5">
@@ -209,11 +232,14 @@ const Card = ({
                         violationTypes.map((type, index) => {
                             return (
                                 <div
-                                    className="px-2 py-1 flex rounded-full bg-[#E3655E]/10 border-[1px] border-[#E3655E]"
+                                    className="px-2 py-1 flex rounded-full border-[1px]"
+                                    style={{
+                                        borderColor : severity !== "Low" ? getSeverityBgColor(severity) : theme.colors.text.tetiary
+                                    }}
                                     key={index}
                                 >
                                     <Text
-                                        textColor="#E3655E"
+                                        textColor={severity !== "Low" ? getSeverityBgColor(severity) : theme.colors.text.tetiary}
                                         bold={theme.text.bold.md}
                                     >
                                         {type}

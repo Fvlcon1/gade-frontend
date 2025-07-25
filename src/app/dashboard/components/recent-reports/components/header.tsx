@@ -2,9 +2,11 @@ import Text from "@styles/components/text"
 import { IoStatsChart } from "react-icons/io5"
 import { BsFillInfoCircleFill } from "react-icons/bs"
 import { useTheme } from "@styles/theme-context"
+import { useDashboardContext } from "@/app/dashboard/context/dashboard-context"
 
 const Header = () => {
     const {theme} = useTheme()
+    const {reportedCasesChange} = useDashboardContext()
     return (
         <div>
             <div className="flex items-center gap-4">
@@ -34,7 +36,7 @@ const Header = () => {
                             <Text
                                 textColor={theme.darkColor}
                             >
-                                200% increase in illegal mining activity detected this month compared to the previous data.
+                                {reportedCasesChange?.increasePercent}% increase in reported cases this month compared to the previous data.
                             </Text>
                         </div>
                     </div>

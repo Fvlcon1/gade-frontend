@@ -22,6 +22,7 @@ const useDashboard = () => {
     const getMetrics = async () => {
         const response = await protectedApi.GET("/data/metrics");
         const transformedData = transformKeysToCamelCase(response)
+        console.log({transformedData})
         getRankings(transformedData, setRankings)
         return transformedData
     };

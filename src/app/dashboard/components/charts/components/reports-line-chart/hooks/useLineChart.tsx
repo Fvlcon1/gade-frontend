@@ -2,7 +2,6 @@
 
 import { useDashboardContext } from "@/app/dashboard/context/dashboard-context"
 import { useEffect, useState } from "react"
-import { formatWithPrefix } from "@/utils/unit-utils"
 import { shortMonthNames } from "@/utils/constants"
 
 const useLineChart = () => {
@@ -17,8 +16,8 @@ const useLineChart = () => {
             }))
             setLineChartData([
                 {
-                    name: 'reports',
-                    data: reportsOverTime.map((item)=> formatWithPrefix(item.value, "", 1))
+                    name: `Reports`,
+                    data: reportsOverTime.map((item)=> item.value)
                 },
             ])
         }

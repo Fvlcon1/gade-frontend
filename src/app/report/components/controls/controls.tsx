@@ -1,7 +1,5 @@
 import Input from "@components/ui/input/input";
-import { useState } from "react";
-import { IoReloadOutline, IoSearch } from "react-icons/io5";
-import theme from "@styles/theme";
+import { IoReloadOutline } from "react-icons/io5";
 import Dropdown from "@components/ui/dropdown/dropdown";
 import { DropdownItem } from "@/utils/@types";
 import { BiChevronDown } from "react-icons/bi";
@@ -9,10 +7,12 @@ import { HiOutlineStatusOnline } from "react-icons/hi";
 import { FaUserShield } from "react-icons/fa";
 import OutlineButton from "@components/ui/button/outlineButton";
 import { useReportsContext } from "../../context/report-context";
+import { useTheme } from "@styles/theme-context";
 
 const Controls = () => {
     const { refetchReports, selectedStatus, selectedSeverity, setSelectedStatus, setSelectedSeverity } = useReportsContext()
-
+    const { theme } = useTheme()
+    
     const handleStatusChange = (status: string) => {
         setSelectedStatus(status)
     }

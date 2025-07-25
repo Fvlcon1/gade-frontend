@@ -11,10 +11,11 @@ import Dropdown from "@components/ui/dropdown/dropdown";
 import ProfileView from "./components/profile/profile-view";
 import ProfileHead from "./components/profile-head";
 import { useTheme } from "@styles/theme-context";
-import ConfirmationModal from "@components/ui/confirmation-modal/confirmation-modal";
+import ConfirmationModal from "@components/ui/modals/confirmation-modal/confirmation-modal";
 import { FaUserGear } from "react-icons/fa6";
 import { useSettingsContext } from "@/app/context/settings-context";
 import Logo from "./components/logo";
+import { Tooltip } from "antd";
 
 export const getActiveMenuItem = (pathname: string) => {
   return menuItems.find((item) => item.href === pathname);
@@ -97,13 +98,15 @@ const LeftPanel = () => {
                       ${!isExpanded ? "justify-center" : ""}   
                     `}
                 >
-                  <Icon
-                    size={item.size ?? 16}
-                    className={`${isActive
-                      ? "text-[var(--color-main-primary)]"
-                      : "text-[var(--color-text-tetiary)]"
-                      }`}
-                  />
+                  <Tooltip placement="right" title={item.label}>
+                    <Icon
+                      size={item.size ?? 16}
+                      className={`${isActive
+                        ? "text-[var(--color-main-primary)]"
+                        : "text-[var(--color-text-tetiary)]"
+                        }`}
+                    />
+                  </Tooltip>
                   {isExpanded && (
                     <Text
                       textColor={isActive ? theme.colors.main.primary : theme.colors.text.secondary}
@@ -126,15 +129,6 @@ const LeftPanel = () => {
             outterContainerClassName="w-full"
           >
             <div className="flex flex-1 w-full items-center rounded-b-2xl border-[1px] border-border-primary gap-2 px-3 justify-center py-3 bg-bg-primary-lighter hover:bg-bg-secondary duration-200 cursor-pointer">
-              {/* <div className="min-w-[28px] min-h-[28px] overflow-hidden rounded-full flex">
-                  <Image
-                    src="/assets/LeftPanel/profile.png"
-                    alt="Profile"
-                    width={28}
-                    height={28}
-                    className="rounded-full object-cover"
-                  />
-                </div> */}
               <ProfileHead />
               {isExpanded && (
                 <div className="flex flex-1 w-full flex-col gap-1 overflow-x-hidden">

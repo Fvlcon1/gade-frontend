@@ -17,7 +17,10 @@ const useSettings = () => {
     const resetPreferences = async () => {
         const response = await protectedApi.POST("/settings/preferences/reset");
         const settings = transformKeysToCamelCase(response.preferences);
-        storeSettings(settings);
+        storeSettings({
+            ...settings,
+            coordinateFormat: settings.coordinateFormat.toUpperCase()
+        });
         queryClient.invalidateQueries({ queryKey: ["settings"] });
     }
 
@@ -36,12 +39,13 @@ const useSettings = () => {
     setupInterceptors(logout);
 
     const getSettings = async () => {
-        const response = await protectedApi.GET("/settings/profile");
+        const response = await protectedApi.GET("/settings");
         const settings = transformKeysToCamelCase(response.preferences);
-        const profile = transformKeysToCamelCase(response.profile);
-        console.log({profile})
         setUser({user, ...response.profile});
-        storeSettings(settings);
+        storeSettings({
+            ...settings,
+            coordinateFormat: settings.coordinateFormat.toUpperCase()
+        });
         return settings;
     };
 
@@ -60,7 +64,7 @@ const useSettings = () => {
         mutationFn: async (payload: UpdateSettingsPayload) => {
             const response = await protectedApi.PUT("/settings/preferences", {
                 app_theme: payload.appTheme,
-                coordinate_format: payload.coordinateFormat,
+                coordinate_format: payload.coordinateFormat.toLowerCase(),
                 default_mapview: payload.defaultMapview,
                 notifications_enabled: payload.notificationsEnabled,
                 units: payload.units,
@@ -69,7 +73,10 @@ const useSettings = () => {
         },
         onSuccess: (data) => {
             toast.success("Settings updated successfully");
-            storeSettings(data);
+            storeSettings({
+                ...data,
+                coordinateFormat: data.coordinateFormat.toUpperCase()
+            });
             queryClient.invalidateQueries({ queryKey: ["settings"] });
         },
         onError: (error: any) => {

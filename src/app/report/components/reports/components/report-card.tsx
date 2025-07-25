@@ -1,5 +1,5 @@
 import Text from "@styles/components/text"
-import theme from "@styles/theme"
+import { useTheme } from "@styles/theme-context";
 import { BsThreeDots } from "react-icons/bs"
 import ClickableTab from "@components/ui/clickable/clickabletab"
 import getDate from "@/utils/getDate"
@@ -12,7 +12,7 @@ import { GrSync } from "react-icons/gr"
 import { FaMapMarkerAlt } from "react-icons/fa"
 import UpdateStatusModal from "./update-status-modal"
 import { useState } from "react"
-import ConfirmationModal from "@components/ui/confirmation-modal/confirmation-modal"
+import ConfirmationModal from "@components/ui/modals/confirmation-modal/confirmation-modal"
 import { useRouter } from "next/navigation"
 
 const ReportCard = ({
@@ -25,6 +25,7 @@ const ReportCard = ({
     const router = useRouter()
     const [updateStatusModalVisible, setUpdateStatusModalVisible] = useState(false)
     const [deleteModalVisible, setDeleteModalVisible] = useState(false)
+    const { theme } = useTheme()
     const dropdownOptions: DropdownItem[] = [
         { key: "1", icon: <GrSync size={12} color={theme.colors.text.secondary} />, label: "Update status", onClick: () => { setUpdateStatusModalVisible(true) } },
         { key: "2", icon: <FaMapMarkerAlt size={12} color={theme.colors.text.secondary} />, label: "View on map", onClick: () => { handleViewOnMap(report) } },

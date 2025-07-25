@@ -1,7 +1,7 @@
 import Container from "@components/ui/container/container"
 import { AnimatePresence } from "framer-motion"
 import Overlay from "@components/ui/overlay/overlay"
-import theme from "@styles/theme"
+import { useTheme } from "@styles/theme-context"
 import Text from "@styles/components/text"
 import { RiUserAddLine } from "react-icons/ri"
 import Header from "@components/header/header"
@@ -26,6 +26,7 @@ const UpdateStatusModal = ({
     const status: FilterStatus[] = ["open", "under review", "closed"];
     const [selectedStatus, setSelectedStatus] = useState<FilterStatus>(currentStatus);
     const {updateReportMutation, updateReportLoading, updateReportSuccess} = useReportsContext()
+    const { theme } = useTheme()
 
     const StatusText = useCallback(({
         status,

@@ -1,7 +1,6 @@
 import Container from "@components/ui/container/container"
 import { AnimatePresence } from "framer-motion"
 import Overlay from "@components/ui/overlay/overlay"
-import theme from "@styles/theme"
 import Text from "@styles/components/text"
 import { RiUserAddLine } from "react-icons/ri"
 import Header from "@components/header/header"
@@ -11,6 +10,7 @@ import OutlineButton from "@components/ui/button/outlineButton"
 import Button from "@components/ui/button/button"
 import { Status } from "../utils/types"
 import useReview from "../hooks/useReview"
+import { useTheme } from "@styles/theme-context"
 
 const UpdateStatusModal = ({
     isVisible,
@@ -23,8 +23,9 @@ const UpdateStatusModal = ({
     currentStatus: Status
     id: string
 }) => {
-    const status: Status[] = ["Open", "In Review", "False Positive", "Closed"];
+    const status: Status[] = ["In Review", "False Positive", "Verified"];
     const [selectedStatus, setSelectedStatus] = useState<Status>(currentStatus);
+    const { theme } = useTheme()
     const { updateStatusMutation, updateStatusPending, updateStatusSuccess, updateStatusError } = useReview()
 
     const StatusText = useCallback(({
@@ -82,9 +83,9 @@ const UpdateStatusModal = ({
                         className="rounded-2xl"
                     >
                         <div
-                            className="w-[300px] flex flex-col"
+                            className="w-[300px] flex flex-col border border-border-secondary rounded-2xl"
                         >
-                            <div className="bg-main-primary/5 border-solid border-b-[1px] border-bg-tetiary rounded-t-[20px] h-[55px] flex items-center pl-4">
+                            <div className="bg-main-primary/5 border-solid border-b-[1px] border-border-primary rounded-t-[20px] h-[55px] flex items-center pl-4">
                                 <Header
                                     title="Update Status"
                                     icon={RiUserAddLine}

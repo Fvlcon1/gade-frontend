@@ -6,7 +6,7 @@ import Container from "@components/ui/container/container"
 import Text from "@styles/components/text"
 import { useTheme } from "@styles/theme-context"
 import { theme } from "antd"
-import { useState, useEffect } from "react"
+import { useState, useEffect, Fragment } from "react"
 import { FaCloudUploadAlt } from "react-icons/fa"
 import Button from "@components/ui/button/button"
 import { MdFileUpload } from "react-icons/md"
@@ -68,15 +68,15 @@ const ChangeProfilePicture = ({
                                     {
                                         [1, 2, 3].map((index: number) => {
                                             return (
-                                                <>
-                                                    <div key={index} className={`h-3 w-3 rounded-full ${activeStep === 2 ? "bg-[#32ba50]" : activeStep >= index - 1 ? "bg-main-primary" : "bg-bg-tetiary"}`} />
+                                                <Fragment key={index}>
+                                                    <div className={`h-3 w-3 rounded-full ${activeStep === 2 ? "bg-[#32ba50]" : activeStep >= index - 1 ? "bg-main-primary" : "bg-bg-tetiary"}`} />
                                                     {
                                                         index <= 2 ? (
                                                             <div key={`divider-${index}`} className={`w-[50px] h-[1px] ${activeStep === 2 ? "bg-[#32ba50]" : activeStep >= index ? "bg-main-primary" : "bg-bg-tetiary"}`} />
                                                         ) : null
 
                                                     }
-                                                </>
+                                                </Fragment>
                                             )
                                         })
                                     }

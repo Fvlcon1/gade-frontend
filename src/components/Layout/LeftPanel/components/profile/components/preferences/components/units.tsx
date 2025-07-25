@@ -4,7 +4,7 @@ import { LuChevronDown } from "react-icons/lu"
 import Dropdown from "@components/ui/dropdown/dropdown"
 import { DropdownItem } from "@/utils/@types"
 import { useSettingsContext } from "@/app/context/settings-context"
-import { useConfirmationModal } from "@components/ui/confirmation-modal/confirmation-modal-context"
+import { useConfirmationModal } from "@components/ui/modals/confirmation-modal/confirmation-modal-context"
 import { BsInfoCircleFill } from "react-icons/bs"
 import { useTheme } from "@/app/styles/theme-context"
 

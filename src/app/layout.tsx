@@ -3,7 +3,7 @@ import { Montserrat } from "next/font/google";
 import "./globals.css";
 import "./styles/css/loader.css"
 import { Providers } from "../providers/providers";
-import { ConfirmationModalProvider } from "@/components/ui/confirmation-modal/confirmation-modal-context";
+import { ConfirmationModalProvider } from "@components/ui/modals/confirmation-modal/confirmation-modal-context";
 import SpatialDataInitializer from './SpatialDataInitializer';
 import { QueryProvider } from '@/providers/query-provider';
 import { Toaster } from "react-hot-toast";
@@ -50,7 +50,7 @@ export default function RootLayout({
 									<SpatialDataInitializer />
 									{children}
 									{toaster}
-									{/* <PushNotification /> */}
+									<PushNotification />
 								</ConfirmationModalProvider>
 							</Providers>
 						</ThemeProvider>

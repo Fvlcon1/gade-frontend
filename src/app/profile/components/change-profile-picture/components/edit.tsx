@@ -70,8 +70,8 @@ const EditImage: React.FC<EditImageProps> = ({ imageSrc, onSave, aspect = 1 }) =
         setSaving(true);
         try {
             const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels, rotation);
-            const {upload_url : uploadUrl} = await getUploadUrlMutation()
-            await updateImageMutation({presignedUrl: uploadUrl, blob: croppedImage.blob})
+            const {upload_url : uploadUrl, file_url : fileUrl} = await getUploadUrlMutation()
+            await updateImageMutation({presignedUrl: uploadUrl, fileUrl, blob: croppedImage.blob})
             onSave(croppedImage);
         } catch (e) {
             setError("Failed to crop image.");

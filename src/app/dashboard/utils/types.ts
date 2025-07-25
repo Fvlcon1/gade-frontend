@@ -67,7 +67,13 @@ export interface DashboardContextType {
     districtsByArea: DistrictByArea[];
     reportsOverTime: TimeSeries[];
     severityDistribution: SeverityDistribution[];
-    totalForestReserveAffected: TimeSeries[];
+    forestReserveAffectedOverTime: TimeSeries[];
+    reportedCasesChange : {
+        increasePercent: number;
+        currentMonth: number;
+        previousMonth: number;
+    }
+
     metrics: Metrics;
     reports: Report[];
 

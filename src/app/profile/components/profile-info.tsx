@@ -41,9 +41,9 @@ const ProfileInfo = () => {
                                     />
                                 </div>
                                 {
-                                    user?.image_url ? (
+                                    user?.profile_url ? (
                                         <Image
-                                            src={user?.image_url}
+                                            src={user?.profile_url}
                                             alt="Profile Picture"
                                             className="w-full h-full object-cover rounded-full"
                                             width={130}

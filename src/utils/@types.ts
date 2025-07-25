@@ -69,9 +69,10 @@ export interface Notification {
 		status: string  
 		locality: string
 		severity: string
-		location: string
-		lat: string
-		lon: string
+		location: {
+			lat: string
+			lon: string
+		}
 		created_at: string
 	}
 }
