@@ -36,7 +36,7 @@ const Header = () => {
                             <Text
                                 textColor={theme.darkColor}
                             >
-                                {reportedCasesChange?.increasePercent}% increase in reported cases this month compared to the previous data.
+                                {reportedCasesChange?.increasePercent}% increase in reported cases this month compared to last month
                             </Text>
                         </div>
                     </div>

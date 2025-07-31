@@ -108,10 +108,14 @@ const MfaForm = () => {
         <div className="flex flex-1 items-center justify-center">
             <div className="w-[80%] flex flex-col items-center gap-5">
                 <div className="flex flex-col gap-1.5 items-center">
-                    <Text size={theme.text.size.HM} bold={theme.text.bold.md}>
+                    <Text 
+                        size={theme.text.size.HM} 
+                        bold={theme.text.bold.md}
+                        textColor={theme.darkColors.text.secondary}
+                    >
                         Email Verification
                     </Text>
-                    <Text>
+                    <Text textColor={theme.darkColors.text.tetiary}>
                         We sent a code to <b>{maskEmail(pendingLogin.email)}</b>
                     </Text>
                 </div>
@@ -134,7 +138,8 @@ const MfaForm = () => {
                                 onKeyDown: (e) => handleKeyDown(e, index)
                             }}
                             className="!bg-transparent !shadow text-xl w-10 h-12 rounded-md border"
-                            inputClassName="text-center"
+                            inputClassName="text-center dark"
+                            borderColor={theme.darkColors.border.secondary}
                             onChange={(e) => handleChange(e.target.value, index)}
                         />
                     ))}
@@ -143,7 +148,7 @@ const MfaForm = () => {
                 {
                     resendOtpLoading ? (
                         <div className="flex items-center gap-2">
-                            <ImSpinner10 className="animate-spin" color={theme.colors.text.secondary} size={15} />
+                            <ImSpinner10 className="animate-spin" color={theme.darkColors.text.secondary} size={15} />
                             <Text>Resending...</Text>
                         </div>
                     ) : null
@@ -152,21 +157,21 @@ const MfaForm = () => {
                 {
                     verifyOtpLoading ? (
                         <div className="flex items-center gap-2">
-                            <ImSpinner10 className="animate-spin" color={theme.colors.text.secondary} size={15} />
-                            <Text>Verifying...</Text>
+                            <ImSpinner10 className="animate-spin" color={theme.darkColors.text.secondary} size={15} />
+                            <Text textColor={theme.darkColors.text.secondary}>Verifying...</Text>
                         </div>
                     ) : null
                 }
 
                 <div className="flex flex-col gap-1 items-center">
-                    <Text textColor={theme.colors.text.tetiary}>
+                    <Text textColor={theme.darkColors.text.tetiary}>
                         Didn&apos;t receive a code?
                     </Text>
                     <Text
                         textColor={
                             resendTimer === 0
-                                ? theme.colors.main.primary
-                                : theme.colors.text.secondary
+                                ? theme.darkColors.main.primary
+                                : theme.darkColors.text.secondary
                         }
                         bold={resendTimer === 0 ? theme.text.bold.md : theme.text.bold.sm2}
                         underline={resendTimer === 0}
@@ -187,8 +192,8 @@ const MfaForm = () => {
                     onClick={() => router.push('/login')}
                 />
 
-                {verifyOtpError && <Text textColor={theme.colors.text.danger}>{verifyOtpError.response?.data?.message}</Text>}
-                {resendOtpError && <Text textColor={theme.colors.text.danger}>{resendOtpError.response?.data?.message}</Text>}
+                {verifyOtpError && <Text textColor={theme.darkColors.text.danger}>{verifyOtpError.response?.data?.message}</Text>}
+                {resendOtpError && <Text textColor={theme.darkColors.text.danger}>{resendOtpError.response?.data?.message}</Text>}
             </div>
         </div>
     )

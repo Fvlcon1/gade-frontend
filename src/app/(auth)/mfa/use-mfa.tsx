@@ -33,6 +33,7 @@ const useMfa = () => {
             // setPendingLogin(null);
         },
         onError: (error: any) => {
+            router.push("/login")
             toast.error(error.response.data.message)
         }
     })

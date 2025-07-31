@@ -24,9 +24,9 @@ const SigninForm = () => {
             <>
                 {
                     isPasswordVisible ? (
-                        <RiEyeLine className="cursor-pointer" onClick={() => setIsPasswordVisible(!isPasswordVisible)} color={theme.colors.text.tetiary} />
+                        <RiEyeLine className="cursor-pointer" onClick={() => setIsPasswordVisible(!isPasswordVisible)} color={theme.darkColors.text.tetiary} />
                     ) : (
-                        <RiEyeCloseLine className="cursor-pointer" onClick={() => setIsPasswordVisible(!isPasswordVisible)} color={theme.colors.text.tetiary} />
+                        <RiEyeCloseLine className="cursor-pointer" onClick={() => setIsPasswordVisible(!isPasswordVisible)} color={theme.darkColors.text.tetiary} />
                     )
                 }
             </>
@@ -46,40 +46,42 @@ const SigninForm = () => {
                     <Text
                         size={theme.text.size.HM}
                         bold={theme.text.bold.md}
+                        textColor={theme.darkColors.text.secondary}
                     >
                         Sign in to <b>GADE</b>
                     </Text>
-                    <Text textColor={theme.colors.text.tetiary}>
+                    <Text textColor={theme.darkColors.text.tetiary}>
                         Enter your credentials to access your account
                     </Text>
                 </div>
 
                 <div className="flex flex-col gap-2">
                     <div className="flex flex-col gap-1.5">
-                        <Text>
+                        <Text textColor={theme.darkColors.text.secondary}>
                             Email
                         </Text>
                         <Input
                             placeholder="Email"
-                            PreIcon={<MdEmail color={theme.colors.text.tetiary} />}
+                            PreIcon={<MdEmail color={theme.darkColors.text.tetiary} />}
                             value={formik.values.email}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             type="text"
                             name="email"
                             required
+                            borderColor={theme.darkColors.border.secondary}
                             className={`!bg-transparent !shadow ${formik.touched.email && formik.errors.email ? "!border-text-danger" : ""}`}
                         />
-                        {formik.touched.email && formik.errors.email && <Text textColor={theme.colors.text.danger}>{formik.errors.email}</Text>}
+                        {formik.touched.email && formik.errors.email && <Text textColor={theme.darkColors.text.danger}>{formik.errors.email}</Text>}
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                        <Text>
+                        <Text textColor={theme.darkColors.text.secondary}>
                             Password
                         </Text>
                         <Input
                             placeholder="Password"
-                            PreIcon={<RiLockPasswordFill color={theme.colors.text.tetiary} />}
+                            PreIcon={<RiLockPasswordFill color={theme.darkColors.text.tetiary} />}
                             PostIcon={<PasswordIcon />}
                             value={formik.values.password}
                             onChange={formik.handleChange}
@@ -87,16 +89,17 @@ const SigninForm = () => {
                             type={isPasswordVisible ? "text" : "password"}
                             name="password"
                             required
+                            borderColor={theme.darkColors.border.secondary}
                             className={`!bg-transparent !shadow ${formik.touched.password && formik.errors.password ? "!border-text-danger" : ""}`}
                         />
-                        {formik.touched.password && formik.errors.password && <Text textColor={theme.colors.text.danger}>{formik.errors.password}</Text>}
+                        {formik.touched.password && formik.errors.password && <Text textColor={theme.darkColors.text.danger}>{formik.errors.password}</Text>}
                     </div>
                 </div>
 
                 <div className="w-full flex items-center justify-end">
                     <Text 
                         className="hover:!underline hover:!opacity-80 duration-200 cursor-pointer"
-                        textColor={theme.colors.text.tetiary}
+                        textColor={theme.darkColors.text.tetiary}
                     >
                         Forgot Password?
                     </Text>
@@ -110,7 +113,7 @@ const SigninForm = () => {
                 />
 
                 <div className="w-full flex items-center justify-center">
-                    {loginError && <Text textColor={theme.colors.text.danger}>{loginError.response?.data?.message}</Text>}
+                    {loginError && <Text textColor={theme.darkColors.text.danger}>{loginError.response?.data?.message}</Text>}
                 </div>
             </form>
         </div>

@@ -25,6 +25,15 @@ import UserLocationMarker from "./user-location-marker";
 import { GeomanControls } from "@/app/map/components/right-view/components/geaman-controls";
 import Toolbar from "@/app/map/components/right-view/components/toolbar";
 import Heatmap from "@/app/map/components/heatmap";
+import { Montserrat } from "next/font/google";
+import { capitalizeWords } from "@/utils/utils";
+import getDate from "@/utils/getDate";
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["400", "600", "700"], // Add required font weights
+  variable: "--font-montserrat",
+});
 
 const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 'timeline' | 'comparison' | null }> = ({ activeFeatureLayers, playhead, timelineMode }) => {
   const {
@@ -137,7 +146,7 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
   const [clickedDistricts, setClickedDistricts] = useState<any>()
   const handleDistrictLayerClick = (e: any) => {
     const layer = e.target;
-    
+
     setClickedDistricts(prev => {
       prev?.setStyle(getDistrictStyle(prev.feature))
       layer.setStyle(getDistrictStyle(layer.feature));
@@ -182,9 +191,9 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
                     leafletLayer.on({
                       click: () => {
                         const id = feature.properties.id;
-                        if(displayableAttribute?.type === 'miningSite' && displayableAttribute?.feature.properties.id === id){
+                        if (displayableAttribute?.type === 'miningSite' && displayableAttribute?.feature.properties.id === id) {
                           setDisplayableAttribute(null)
-                        } else{
+                        } else {
                           setDisplayableAttribute({ type: 'miningSite', feature })
                         }
                       },
@@ -192,23 +201,31 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
                     const date = new Date(feature.properties.detected_date).toLocaleDateString();
                     const district = feature.properties.district;
                     const tooltipContent = `
-                      <div class="space-y-1">
-                        <div class="font-medium">Detected: ${date}</div>
-                        ${district ? `<div class="text-gray-600">District: ${district}</div>` : ''}
+                      <div class="flex flex-col gap-0 ${montserrat.className}">
+                        <div class="font-medium flex w-full gap-2 p-2 py-1.5 items-center rounded-md bg-bg-tetiary">
+                          <div class="text-text-tetiary">Detected: </div>
+                          <div class="text-text-secondary">${getDate(new Date(date), {shortmonth: true})}</div>
+                        </div>
+                        ${district ? (`
+                            <div class="flex w-full gap-2 p-2 py-1.5">
+                              <div class="font-medium text-text-tetiary">District: </div>
+                              <div class="text-text-secondary">${capitalizeWords(district)}</div>
+                            </div>
+                          `) : ""}
                       </div>
                     `;
                     leafletLayer.bindTooltip(tooltipContent, {
                       permanent: false,
                       direction: 'top',
                       offset: [0, -8],
-                      className: 'mining-site-tooltip',
+                      className: '!p-2 !w-[250px] !rounded-lg !bg-bg-secondary !border !border-border-secondary',
                     });
                   }}
                 />
               );
             }
 
-            if(layer.id === "concessions"){
+            if (layer.id === "concessions") {
               return (
                 <GeoJSON
                   key={layer.id}
@@ -219,20 +236,26 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
                     layer.on({
                       click: () => {
                         const name = feature.properties.name;
-                        if(displayableAttribute?.type === 'concession' && displayableAttribute?.feature.properties.name === name){
+                        if (displayableAttribute?.type === 'concession' && displayableAttribute?.feature.properties.name === name) {
                           setDisplayableAttribute(null)
-                        } else{
+                        } else {
                           setDisplayableAttribute({ type: 'concession', feature })
                         }
                       },
                     });
-                    const owner = feature.properties.owner;
-                    const tooltipContent = `<div class="font-medium">${owner}</div>`;
+                    const {owner, name, district} = feature.properties;
+                    const tooltipContent = `<div class="${montserrat.className} font-medium text-text-secondary">${owner}</div>
+                    ${district ? (`
+                        <div class="font-medium flex w-full gap-2 p-2 py-1.5 items-center">
+                          <div class="font-medium text-text-secondary">District: </div>
+                          <div class="text-text-secondary">${capitalizeWords(district)}</div>
+                        </div>
+                          `) : ""}`;
                     layer.bindTooltip(tooltipContent, {
                       permanent: false,
                       direction: 'top',
                       offset: [0, -8],
-                      className: 'district-tooltip',
+                      className: '!p-2 !rounded-md !bg-bg-secondary !border !border-border-secondary',
                     });
                   }}
                 />
@@ -250,20 +273,20 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
                     layer.on({
                       click: () => {
                         const district = feature.properties.district;
-                        if(displayableAttribute?.type === 'district' && displayableAttribute?.feature.properties.district === district){
+                        if (displayableAttribute?.type === 'district' && displayableAttribute?.feature.properties.district === district) {
                           setDisplayableAttribute(null)
-                        } else{
+                        } else {
                           setDisplayableAttribute({ type: 'district', feature })
                         }
                       },
                     });
                     const district = feature.properties.district;
-                    const tooltipContent = `<div class="font-medium">${district}</div>`;
+                    const tooltipContent = `<div class="${montserrat.className} font-medium text-text-secondary">${capitalizeWords(district)}</div>`;
                     layer.bindTooltip(tooltipContent, {
                       permanent: false,
                       direction: 'top',
                       offset: [0, -8],
-                      className: 'district-tooltip',
+                      className: '!p-2 !rounded-md !bg-bg-secondary !border !border-border-secondary',
                     });
                   }}
                 />
@@ -277,12 +300,12 @@ const MapLayers: React.FC<LayerProps & { playhead: number | null; timelineMode: 
                 style={LAYER_STYLES[layer.id]}
                 onEachFeature={(feature, leafletLayer) => {
                   const name = feature.properties.name || 'Unnamed';
-                  const tooltipContent = `<div class="font-medium">${name}</div>`;
+                  const tooltipContent = `<div class="${montserrat.className} font-medium text-text-secondary">${name}</div>`;
                   leafletLayer.bindTooltip(tooltipContent, {
                     permanent: false,
                     direction: 'top',
                     offset: [0, -8],
-                    className: `${layer.id}-tooltip`,
+                    className: `${layer.id}-tooltip font-medium !p-2 !rounded-md !bg-bg-secondary !border !border-border-secondary`,
                   });
                 }}
               />
@@ -331,7 +354,7 @@ const InteractiveMapClient: React.FC<MapContainerProps> = ({
   comparisonEndDate,
 }) => {
   const { reports, fetchReports, applyFilters, miningSites, comparisonViewState } = useSpatialStore();
-  const {location} = useGeoLocation();
+  const { location } = useGeoLocation();
   const searchParams = useSearchParams();
   const [currentBasemap, setCurrentBasemap] = useState(activeBasemap);
 
