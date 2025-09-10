@@ -10,9 +10,6 @@ import { DropdownItem } from "@/utils/@types";
 import { hexOpacity } from "@/utils/hexOpacity";
 import { useTheme } from "@/app/styles/theme-context";
 
-// ────────────────────────────────────────────
-// Types
-// ────────────────────────────────────────────
 type DropdownPosition = "bottom-right" | "bottom-left" | "top-right" | "top-left";
 
 interface DropdownProps extends React.HTMLAttributes<HTMLDivElement> {

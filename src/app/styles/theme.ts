@@ -64,7 +64,6 @@ export const theme = {
         size: {
             xs: TypographySize.xs,
             xs2: TypographySize.xs2,
-            SM: TypographySize.SM,
             body: TypographySize.body,
             body2: TypographySize.body2,
             HL: TypographySize.HL,

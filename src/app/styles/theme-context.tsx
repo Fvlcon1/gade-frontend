@@ -16,7 +16,6 @@ interface Theme {
 		size: {
 			xs: TypographySize.xs,
 			xs2: TypographySize.xs2,
-			SM: TypographySize.SM,
 			body: TypographySize.body,
 			body2: TypographySize.body2,
 			HM2: TypographySize.HM2,
@@ -53,7 +52,6 @@ const ThemeContext = createContext<ThemeContextProps>({
 			size: {
 				xs: TypographySize.xs,
 				xs2: TypographySize.xs2,
-				SM: TypographySize.SM,
 				body: TypographySize.body,
 				body2: TypographySize.body2,
 				HM2: TypographySize.HM2,
@@ -74,19 +72,20 @@ const ThemeContext = createContext<ThemeContextProps>({
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 	const {settings} = useSettingsContext()
 
-	const [systemTheme, setSystemTheme] = useState<ThemeType>(() => {
-		if (typeof window !== "undefined") {
-			return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-		}
-		return "light";
-	});
+	const [systemTheme, setSystemTheme] = useState<ThemeType>("light");
 
-	const [themeColor, setThemeColor] = useState<ThemeType>(() => {
-		if (typeof window !== "undefined") {
-			return (localStorage.getItem("theme") as ThemeType) || "light";
-		}
-		return "light";
-	});
+	const [themeColor, setThemeColor] = useState<ThemeType>("light");
+
+	const setUpTheme = () => {
+		if (typeof window !== "undefined")
+			setThemeColor((localStorage.getItem("theme") as ThemeType) || "light")
+		if (typeof window !== "undefined")
+			setSystemTheme(window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+	}
+
+	useEffect(() => {
+		setUpTheme()
+	}, [])
 
 	useEffect(() => {
 		const appTheme = settings?.appTheme
@@ -137,17 +136,12 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 		};
 	}, [settings]);
 
-	const getSystemTheme = () =>
-		typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches
-			? "dark"
-			: "light";
-
 	const colors =
 		themeColor === "dark"
 			? darkColors
 			: themeColor === "light"
 				? lightColors
-				: getSystemTheme() === "dark"
+				: systemTheme === "dark"
 					? darkColors
 					: lightColors;
 
@@ -171,7 +165,6 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 			size: {
 				xs: TypographySize.xs,
 				xs2: TypographySize.xs2,
-				SM: TypographySize.SM,
 				body: TypographySize.body,
 				body2: TypographySize.body2,
 				HM2: TypographySize.HM2,

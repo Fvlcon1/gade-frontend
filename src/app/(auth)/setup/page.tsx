@@ -35,9 +35,9 @@ const RegisterForm = () => {
             <>
                 {
                     isPasswordVisible ? (
-                        <RiEyeLine className="cursor-pointer" onClick={() => setIsPasswordVisible(!isPasswordVisible)} color={theme.colors.text.tetiary} />
+                        <RiEyeLine className="cursor-pointer" onClick={() => setIsPasswordVisible(!isPasswordVisible)} color={theme.darkColors.text.tetiary} />
                     ) : (
-                        <RiEyeCloseLine className="cursor-pointer" onClick={() => setIsPasswordVisible(!isPasswordVisible)} color={theme.colors.text.tetiary} />
+                        <RiEyeCloseLine className="cursor-pointer" onClick={() => setIsPasswordVisible(!isPasswordVisible)} color={theme.darkColors.text.tetiary} />
                     )
                 }
             </>
@@ -49,9 +49,9 @@ const RegisterForm = () => {
             <>
                 {
                     isConfirmPasswordVisible ? (
-                        <RiEyeLine onClick={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)} color={theme.colors.text.tetiary} />
+                        <RiEyeLine onClick={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)} color={theme.darkColors.text.tetiary} />
                     ) : (
-                        <RiEyeCloseLine onClick={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)} color={theme.colors.text.tetiary} />
+                        <RiEyeCloseLine onClick={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)} color={theme.darkColors.text.tetiary} />
                     )
                 }
             </>
@@ -70,7 +70,7 @@ const RegisterForm = () => {
                     >
                         Set up your account
                     </Text>
-                    <Text textColor={theme.colors.text.tetiary}>
+                    <Text textColor={theme.darkColors.text.tetiary}>
                         Enter your credentials to set up your account
                     </Text>
                 </div>
@@ -85,13 +85,13 @@ const RegisterForm = () => {
                             value={formik.values.firstname}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
-                            PreIcon={<BiSolidUserPin color={theme.colors.text.tetiary} />}
+                            PreIcon={<BiSolidUserPin color={theme.darkColors.text.tetiary} />}
                             type="text"
                             name="firstname"
                             required
                             className={`!bg-transparent !shadow ${formik.touched.firstname && formik.errors.firstname ? "!border-text-danger" : ""}`}
                         />
-                        {formik.touched.firstname && formik.errors.firstname && <Text textColor={theme.colors.text.danger}>{formik.errors.firstname}</Text>}
+                        {formik.touched.firstname && formik.errors.firstname && <Text textColor={theme.darkColors.text.danger}>{formik.errors.firstname}</Text>}
                     </div>
 
                     <div className="flex flex-col gap-1.5">
@@ -103,13 +103,13 @@ const RegisterForm = () => {
                             value={formik.values.lastname}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
-                            PreIcon={<BiSolidUserPin color={theme.colors.text.tetiary} />}
+                            PreIcon={<BiSolidUserPin color={theme.darkColors.text.tetiary} />}
                             type="text"
                             name="lastname"
                             required
                             className={`!bg-transparent !shadow ${formik.touched.lastname && formik.errors.lastname ? "!border-text-danger" : ""}`}
                         />
-                        {formik.touched.lastname && formik.errors.lastname && <Text textColor={theme.colors.text.danger}>{formik.errors.lastname}</Text>}
+                        {formik.touched.lastname && formik.errors.lastname && <Text textColor={theme.darkColors.text.danger}>{formik.errors.lastname}</Text>}
                     </div>
 
                     <div className="flex flex-col gap-1.5">
@@ -121,13 +121,13 @@ const RegisterForm = () => {
                             value={formik.values.username}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
-                            PreIcon={<IoIosAt color={theme.colors.text.tetiary} />}
+                            PreIcon={<IoIosAt color={theme.darkColors.text.tetiary} />}
                             type="text"
                             name="username"
                             required
                             className={`!bg-transparent !shadow ${formik.touched.username && formik.errors.username ? "!border-text-danger" : ""}`}
                         />
-                        {formik.touched.username && formik.errors.username && <Text textColor={theme.colors.text.danger}>{formik.errors.username}</Text>}
+                        {formik.touched.username && formik.errors.username && <Text textColor={theme.darkColors.text.danger}>{formik.errors.username}</Text>}
                     </div>
 
                     <div className="flex flex-col gap-1.5">
@@ -139,7 +139,7 @@ const RegisterForm = () => {
                             value={formik.values.password}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
-                            PreIcon={<RiLockPasswordFill color={theme.colors.text.tetiary} />}
+                            PreIcon={<RiLockPasswordFill color={theme.darkColors.text.tetiary} />}
                             PostIcon={<PasswordIcon />}
                             type={isPasswordVisible ? "text" : "password"}
                             name="password"
@@ -152,7 +152,7 @@ const RegisterForm = () => {
                                     <Text
                                         key={index}
                                         className="pl-[1px]"
-                                        textColor={criteria.met ? theme.colors.text.success : theme.colors.text.tetiary}
+                                        textColor={criteria.met ? theme.darkColors.text.success : theme.darkColors.text.tetiary}
                                     >
                                         {criteria.met ? "✓ " : "𒉽 "}{criteria.text}
                                     </Text>
@@ -170,14 +170,14 @@ const RegisterForm = () => {
                             value={formik.values.confirmPassword}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
-                            PreIcon={<RiLockPasswordFill color={theme.colors.text.tetiary} />}
+                            PreIcon={<RiLockPasswordFill color={theme.darkColors.text.tetiary} />}
                             PostIcon={<ConfirmPasswordIcon />}
                             type={isConfirmPasswordVisible ? "text" : "password"}
                             name="confirmPassword"
                             required
                             className={`!bg-transparent !shadow ${formik.touched.confirmPassword && formik.errors.confirmPassword ? "!border-text-danger" : ""}`}
                         />
-                        {formik.touched.confirmPassword && formik.errors.confirmPassword && <Text textColor={theme.colors.text.danger}>{formik.errors.confirmPassword}</Text>}
+                        {formik.touched.confirmPassword && formik.errors.confirmPassword && <Text textColor={theme.darkColors.text.danger}>{formik.errors.confirmPassword}</Text>}
                     </div>
                 </div>
 
@@ -189,11 +189,11 @@ const RegisterForm = () => {
                 />
 
                 <div className="w-full flex items-center mt-1">
-                    <Text textColor={theme.colors.text.tetiary}>
+                    <Text textColor={theme.darkColors.text.tetiary}>
                         Already have an account?&nbsp;
                     </Text>
                     <Text
-                        textColor={theme.colors.main.primary}
+                        textColor={theme.darkColors.main.primary}
                         bold={theme.text.bold.md}
                         underline
                         className="cursor-pointer duration-300 hover:!opacity-70"
@@ -205,7 +205,7 @@ const RegisterForm = () => {
 
                 {
                     registerError && (
-                        <Text textColor={theme.colors.text.danger}>
+                        <Text textColor={theme.darkColors.text.danger}>
                             {registerError.response.data.message}
                         </Text>
                     )
@@ -232,7 +232,7 @@ const InvalidToken = () => {
             >
                 Invalid Token
             </Text>
-            <Text textAlign="center" textColor={theme.colors.text.tetiary}>
+            <Text textAlign="center" textColor={theme.darkColors.text.tetiary}>
                 The registration link is invalid or has expired, please contact your administrator for a valid registration link.
             </Text>
             <Button

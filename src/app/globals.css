@@ -1,30 +1,5 @@
 @import "tailwindcss";
 
-/*
-  DARK THEME IMPLEMENTATION
-  - Uses .dark class on <html> or <body> (recommended by Tailwind)
-  - All variables are set in :root for light, and overridden in .dark for dark mode
-*/
-
-/* :root {
-	--text-primary: #283A52;
-	--text-secondary: #3F5B83;
-	--text-tetiary: #95A3B7;
-
-	--bg-primary: #FFFFFF;
-	--bg-secondary: #F4F4F4;
-	--bg-tetiary: #EBEBEB;
-	--bg-quantinary: #D0D0D0;
-	--bg-primary-lighter: #FBFBFB;
-
-	--border-primary: #EBEDF1;
-	--border-secondary: #E0E4EB;
-	--border-tetiary: #D7DCE5;
-	--border-quantinary: #CED3DF;
-
-	--main-primary: #5A87C7;
-} */
-
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
