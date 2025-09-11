@@ -24,7 +24,7 @@ export const recentActivities: RecentActivity[] = [
     ),
     title: (
       <Text
-        size={theme.text.size.SM}
+        
         bold={theme.text.bold.sm}
         className="!text-[var(--color-text-secondary)] font-normal"
       >
@@ -34,7 +34,7 @@ export const recentActivities: RecentActivity[] = [
     ),
     time: (
       <Text
-        size={theme.text.size.SM}
+        
         bold={theme.text.bold.sm}
         className="!text-[var(--color-text-tetiary)] font-light mt-[2px]"
       >
@@ -50,7 +50,7 @@ export const recentActivities: RecentActivity[] = [
     ),
     title: (
       <Text
-        size={theme.text.size.SM}
+        
         bold={theme.text.bold.md}
         className="!text-[var(--color-text-primary)] font-normal"
       >
@@ -59,7 +59,7 @@ export const recentActivities: RecentActivity[] = [
     ),
     time: (
       <Text
-        size={theme.text.size.SM}
+        
         bold={theme.text.bold.sm}
         className="!text-[var(--color-text-tetiary)] font-light mt-[2px]"
       >
@@ -75,7 +75,7 @@ export const recentActivities: RecentActivity[] = [
     ),
     title: (
       <Text
-        size={theme.text.size.SM}
+        
         bold={theme.text.bold.sm}
         className="!text-[var(--color-text-secondary)] font-normal"
       >
@@ -84,7 +84,7 @@ export const recentActivities: RecentActivity[] = [
     ),
     time: (
       <Text
-        size={theme.text.size.SM}
+        
         bold={theme.text.bold.sm}
         className="!text-[var(--color-text-tetiary)] font-light mt-[2px]"
       >
@@ -100,7 +100,7 @@ export const recentActivities: RecentActivity[] = [
     ),
     title: (
       <Text
-        size={theme.text.size.SM}
+        
         bold={theme.text.bold.sm}
         className="!text-[var(--color-text-secondary)] font-normal"
       >
@@ -109,7 +109,7 @@ export const recentActivities: RecentActivity[] = [
     ),
     time: (
       <Text
-        size={theme.text.size.SM}
+        
         bold={theme.text.bold.sm}
         className="!text-[var(--color-text-tetiary)] font-light mt-[2px]"
       >

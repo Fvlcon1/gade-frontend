@@ -30,7 +30,6 @@ const Map = () => {
             <MdMap className="w-[14px] h-[14px] text-[var(--color-main-primary)]" />
           </div>
           <Text
-            size={theme.text.size.SM}
             bold={theme.text.bold.md}
             className="!text-[var(--color-main-primary)] cursor-pointer"
           >

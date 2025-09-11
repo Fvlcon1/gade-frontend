@@ -13,7 +13,6 @@ const RecentActivities = () => {
           <PiPulseBold className="text-[var(--color-main-primary)]" size={13} />
         </div>
         <Text
-          size={theme.text.size.SM}
           bold={theme.text.bold.md}
           className="!text-[var(--color-main-primary)]"
         >

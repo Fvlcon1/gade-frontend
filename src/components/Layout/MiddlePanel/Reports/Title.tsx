@@ -8,7 +8,6 @@ import ClickableTab from "@components/ui/clickable/clickabletab";
 const Title = () => {
 return ( <div className="w-full max-w-[775px] h-[30px] flex items-center space-x-3 mt-5 ">
 <div className=" text-[var(--text-primary)] h-[30px] rounded-full flex items-center px-2 flex-shrink-0"> <ClickableTab> <div className="w-[25px] h-[25px] bg-[var(--main-primary-20)] rounded-[5px] flex items-center justify-center mr-2"> <MdMap size={14} className="text-[var(--main-primary)]" /> </div> </ClickableTab> <Text 
-       size={theme.text.size.SM} 
        bold={theme.text.bold.md} 
        className="!text-[var(--color-main-primary)]"
      >
@@ -22,7 +21,6 @@ Recent Reports </Text> </div>
       </ClickableTab>
     </div>
     <Text 
-      size={theme.text.size.SM} 
       bold={theme.text.bold.sm} 
       className="!text-[var(--color-main-primary)]"
     >

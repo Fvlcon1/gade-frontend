@@ -27,7 +27,6 @@ const WorstAffectedRegions = () => {
           <MdBarChart className="text-[var(--color-main-primary)]" size={13} />
         </div>
         <Text
-          size={theme.text.size.SM}
           bold={theme.text.bold.md}
           className="!text-[var(--color-main-primary)]"
         >
@@ -51,7 +50,6 @@ const WorstAffectedRegions = () => {
               <div className="flex items-center gap-3 text-white font-medium">
                 <span className="w-5 h-5 text-white flex items-center justify-center">
                   <Text
-                    size={theme.text.size.SM}
                     bold={theme.text.bold.lg}
                     className="!text-[#ffffff]"
                   >
@@ -76,7 +74,6 @@ const WorstAffectedRegions = () => {
       <div className="flex items-center gap-2 mt-3 bg-[var(--color-bg-tetiary)] text-[var(--color-main-primary)] rounded-full px-3 py-1 w-fit min-h-[32px]">
         <FaInfoCircle size={12} />
         <Text
-          size={theme.text.size.SM}
           bold={theme.text.bold.sm}
           className="!text-[var(--color-main-primary)]"
         >
@@ -88,7 +85,6 @@ const WorstAffectedRegions = () => {
 
       <div className="mt-[50px] w-full h-[33px] flex justify-center items-center ">
           <Text
-          size={theme.text.size.SM}
           bold={theme.text.bold.sm}
           className="!text-[var(--color-main-primary)]"
         >

@@ -23,7 +23,6 @@ const FactCard = () => {
           <div className="flex flex-col text-sm justify-center">
             <p>
               <Text
-                size={theme.text.size.SM}
                 bold={theme.text.bold.lg}
                 className="!text-[var(--color-main-primary)]"
               >
@@ -34,7 +33,7 @@ const FactCard = () => {
               Our reports have protected{" "}
               <span>
                 <Text
-                  size={theme.text.size.SM}
+                  
                   bold={theme.text.bold.lg}
                   className="!text-[var(--color-main-primary)]"
                 >
@@ -50,7 +49,7 @@ const FactCard = () => {
         <div className="h-[30px] absolute bottom-8 left-[63px] px-[6px] py-1 bg-[var(--color-bg-tetiary)] rounded-full flex items-center gap-1 w-[254px]">
           <FaInfoCircle className="text-[#4C1D95] text-sm" size={15} />
           <Text
-            size={theme.text.size.SM}
+            
             bold={theme.text.bold.sm}
             className="!text-[var(--color-main-primary)]"
           >
@@ -58,7 +57,7 @@ const FactCard = () => {
           </Text>
           <span>
             <Text
-              size={theme.text.size.SM}
+              
               bold={theme.text.bold.md}
               className="!text-[var(--color-main-primary)]"
             >
@@ -66,7 +65,7 @@ const FactCard = () => {
             </Text>
           </span>{" "}
           <Text
-            size={theme.text.size.SM}
+            
             bold={theme.text.bold.sm}
             className="!text-[var(--color-main-primary)]"
           >

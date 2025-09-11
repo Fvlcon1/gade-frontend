@@ -87,7 +87,6 @@ const Districts = ({
                 className="w-full flex items-center justify-between"
             >
                 <Text
-                    size={theme.text.size.SM}
                     bold={theme.text.bold.md}
                     className="pl-1"
                 >

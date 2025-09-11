@@ -67,7 +67,7 @@ const Dropdown = ({ icon, options, selected, onChange }) => {
         onClick={() => setOpen(!open)}
       >
         {icon}
-        <Text size={theme.text.size.SM} bold={theme.text.bold.md} className="text-gray-700">
+        <Text bold={theme.text.bold.md} className="text-gray-700">
           {selected}
         </Text>
         <IoMdArrowDropdown size={16} className="text-gray-400" />

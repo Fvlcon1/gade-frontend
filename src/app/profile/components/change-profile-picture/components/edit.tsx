@@ -99,7 +99,7 @@ const EditImage: React.FC<EditImageProps> = ({ imageSrc, onSave, aspect = 1 }) =
                 style={{ background: theme.colors.bg.secondary, borderRadius: 16 }}
             >
                 <div className="flex flex-col gap-3 w-full max-w-md">
-                    <Text size={theme.text.size.SM} bold={theme.text.bold.sm}>Zoom</Text>
+                    <Text  bold={theme.text.bold.sm}>Zoom</Text>
                     <Slider
                         value={zoom}
                         min={1}
@@ -107,7 +107,7 @@ const EditImage: React.FC<EditImageProps> = ({ imageSrc, onSave, aspect = 1 }) =
                         step={0.01}
                         onChange={(_, value) => setZoom(Number(value))}
                     />
-                    <Text size={theme.text.size.SM} bold={theme.text.bold.sm}>Rotate</Text>
+                    <Text  bold={theme.text.bold.sm}>Rotate</Text>
                     <Slider
                         value={rotation}
                         min={0}
