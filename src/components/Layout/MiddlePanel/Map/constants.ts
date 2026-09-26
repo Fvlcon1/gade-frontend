@@ -6,10 +6,13 @@ const currentMonth = now.getMonth();
 const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
 
 
+const cartoKey = process.env.NEXT_PUBLIC_CARTO_API_KEY;
+const cartoKeyParam = cartoKey ? `?key=${cartoKey}` : '';
+
 export const BASEMAP_URLS = {
   osm: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-  cartocdnLight: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-  cartocdnDark: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+  cartocdnLight: `https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png${cartoKeyParam}`,
+  cartocdnDark: `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png${cartoKeyParam}`,
   satellite: "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
   planet: `https://tiles.planet.com/basemaps/v1/planet-tiles/global_monthly_${currentYear}_${String(prevMonth + 1).padStart(2, '0')}_mosaic/gmap/{z}/{x}/{y}.png?api_key=${process.env.NEXT_PUBLIC_PL_KEY}`,
 };
